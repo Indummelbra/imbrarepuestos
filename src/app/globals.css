@@ -1,36 +1,90 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-yellow: #FFD700;
-  --color-brand-black: #0A0A0A;
-  --color-brand-gray: #1F1F1F;
+  --color-primary: #F18700;
+  --color-secondary: #212221;
+  --color-background-light: #f8f7f5;
+  --color-background-dark: #212221;
+  
+  --radius-default: 0px; /* Estilo industrial: puntas rectas */
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-full: 9999px;
+
+  --font-display: var(--font-archivo), sans-serif;
+  --font-body: var(--font-montserrat), sans-serif;
+  --font-sans: var(--font-montserrat), sans-serif;
 }
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #212221;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background: #212221;
+  --foreground: #f3f4f6;
+}
+
+/* Sistema de Jerarquía Tipográfica Global */
+h1, .h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+h2, .h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+h3, .h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+h4, .h4 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+p, .body-text {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #4b5563; /* Gris suave para lectura */
+}
+
+.dark p, .dark .body-text {
+  color: #9ca3af;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
 }
 
-/* Clases de utilidad personalizadas para el look industrial */
-.industrial-border {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+select::-ms-expand {
+  display: none;
 }
 
-.glass-morphism {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Clases de utilidad personalizadas para el look industrial de Imbra */
+.shadow-inner-soft {
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
