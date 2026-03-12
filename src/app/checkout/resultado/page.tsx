@@ -2,14 +2,14 @@ import Link from 'next/link';
 import { CheckCircle2, XCircle, Clock, ArrowRight } from 'lucide-react';
 
 interface ResultPageProps {
-  searchParams: {
+  searchParams: Promise<{
     reference?: string;
     requestId?: string;
-  };
+  }>;
 }
 
-export default function CheckoutResultPage({ searchParams }: ResultPageProps) {
-  const { reference } = searchParams;
+export default async function CheckoutResultPage({ searchParams }: ResultPageProps) {
+  const { reference } = await searchParams;
 
   // En un escenario real, aquí consultaríamos el estado usando querySession(requestId)
   // Por ahora mostramos una vista de "Procesando / Resultado"
