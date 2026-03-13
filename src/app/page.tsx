@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+export const dynamic = "force-dynamic";
 import MotoSelector from "@/components/features/MotoSelector";
 import Hero from "@/components/features/Hero";
 import CategoryCarousel from "@/components/features/CategoryCarousel";

@@ -199,19 +199,19 @@ export default function Footer() {
             </Link>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {/* Logos de Pago Con URLs Oficiales */}
-            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm min-w-[64px]">
-              <Image src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" width={40} height={24} className="h-6 w-auto object-contain" alt="Mastercard" unoptimized />
+            <div className="bg-white px-2 py-1 rounded flex items-center justify-center h-6 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
+              <Image src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" width={32} height={20} className="h-4 w-auto object-contain" alt="Mastercard" unoptimized />
             </div>
-            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm min-w-[48px]">
-              <Image src="https://www.svgrepo.com/show/303225/visa-logo.svg" width={40} height={16} className="h-4 w-auto object-contain" alt="Visa" unoptimized />
+            <div className="bg-white px-2 py-1 rounded flex items-center justify-center h-6 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
+              <Image src="https://www.svgrepo.com/show/303225/visa-logo.svg" width={32} height={10} className="h-3 w-auto object-contain" alt="Visa" unoptimized />
             </div>
-            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm min-w-[48px]">
-              <Image src="https://cdn.worldvectorlogo.com/logos/nequi-2.svg" width={40} height={40} className="h-6 w-auto object-contain" alt="Nequi" unoptimized />
+            <div className="bg-white px-2 py-1 rounded flex items-center justify-center h-6 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
+              <Image src="https://cdn.worldvectorlogo.com/logos/nequi-2.svg" width={32} height={32} className="h-4 w-auto object-contain" alt="Nequi" unoptimized />
             </div>
-            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm min-w-[80px]">
-              <Image src="https://placetopay.dev/_astro/logo-placetopay.zD2RPUwO.svg" width={80} height={24} className="h-6 w-auto object-contain" alt="Placetopay" unoptimized />
+            <div className="bg-white px-2 py-1 rounded flex items-center justify-center h-6 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
+              <Image src="https://placetopay.dev/_astro/logo-placetopay.zD2RPUwO.svg" width={60} height={20} className="h-4 w-auto object-contain" alt="Placetopay" unoptimized />
             </div>
           </div>
         </div>
