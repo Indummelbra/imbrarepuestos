@@ -1,8 +1,8 @@
 import { mapWooProductToImbra } from "./mappers";
 import { Product } from "@/types/product";
 
-const WOOCOMMERCE_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL;
-const GRAPHQL_URL = process.env.WPGRAPHQL_URL || `${WOOCOMMERCE_URL}/graphql`;
+const WOOCOMMERCE_URL = (process.env.NEXT_PUBLIC_WORDPRESS_URL || '').replace(/\/$/, '');
+const GRAPHQL_URL = process.env.WPGRAPHQL_URL || (WOOCOMMERCE_URL ? `${WOOCOMMERCE_URL}/graphql` : '');
 const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
 
@@ -46,6 +46,9 @@ async function fetchWooRest(endpoint: string, options: RequestInit = {}) {
  * Función base para realizar peticiones a WPGraphQL.
  */
 async function fetchWooGraphQL(query: string, variables: Record<string, unknown> = {}, options: RequestInit = {}) {
+  if (!WOOCOMMERCE_URL) {
+    throw new Error("Faltan variables de entorno de WooCommerce (URL)");
+  }
   const response = await fetch(GRAPHQL_URL, {
     method: 'POST',
     headers: {
