@@ -14,6 +14,12 @@
   --font-display: var(--font-archivo), sans-serif;
   --font-body: var(--font-montserrat), sans-serif;
   --font-sans: var(--font-montserrat), sans-serif;
+
+  /* IMBRA DESIGN SYSTEM TOKENS */
+  --content-max-width: 1920px;
+  --safe-padding-mobile: 0.75rem; /* px-3 */
+  --safe-padding-lg: 1rem;       /* px-4 */
+  --safe-padding-xl: 1.25rem;    /* px-5 */
 }
 
 :root {
@@ -26,8 +32,18 @@
   --foreground: #f3f4f6;
 }
 
-/* Sistema de Jerarquía Tipográfica Global */
-h1, .h1 {
+/* IMBRA GLOBAL RESET - Neutralización para control total por componente */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: normal;
+  text-decoration: none;
+  text-transform: none;
+}
+
+/* Clases de Utilidad Industrial (Opt-in) */
+.imbra-h1-industrial {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 5vw, 5rem);
   font-weight: 900;
@@ -37,7 +53,7 @@ h1, .h1 {
   font-style: italic;
 }
 
-h2, .h2 {
+.imbra-h2-industrial {
   font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 800;
@@ -46,7 +62,7 @@ h2, .h2 {
   text-transform: uppercase;
 }
 
-h3, .h3 {
+.imbra-h3-industrial {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 2.25rem);
   font-weight: 800;
@@ -54,24 +70,11 @@ h3, .h3 {
   text-transform: uppercase;
 }
 
-h4, .h4 {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.3;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 p, .body-text {
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.6;
   color: #4b5563; /* Gris suave para lectura */
-}
-
-.dark p, .dark .body-text {
-  color: #9ca3af;
 }
 
 body {
@@ -87,4 +90,13 @@ select::-ms-expand {
 /* Clases de utilidad personalizadas para el look industrial de Imbra */
 .shadow-inner-soft {
   box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* REGLAS DE ORO: CONTENEDORES IMBRA */
+.imbra-full-width {
+  @apply w-full;
+}
+
+.imbra-content-container {
+  @apply mx-auto w-full max-w-[var(--content-max-width)] px-5;
 }

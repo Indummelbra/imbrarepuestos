@@ -25,7 +25,7 @@ export default function PaymentsFAQPage() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="max-w-[1920px] mx-auto px-3 lg:px-4 xl:px-5 py-12">
       <div className="text-center mb-12">
         <h1 className="text-3xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
           <HelpCircle className="text-yellow-500 w-8 h-8" />

@@ -5,10 +5,15 @@ import Link from "next/link";
 export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white">
-      {/* 1. TOP BAR - Enmarcado */}
-      <div className="px-6 lg:px-8 xl:px-10 bg-white pt-2">
-        <div className="bg-[#f3f4f6] dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 py-2 shadow-sm">
-          <div className="container mx-auto px-4 flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-[0.05em]">
+      {/* SECCIÓN 1: TOP BAR */}
+      <div className="w-full bg-[#f3f4f6] dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
+        {/* DIV 1: FONDO (Full Width) */}
+        
+        <div className="imbra-content-container">
+          {/* DIV 2: CONTENEDOR (1920px + padding global) */}
+          
+          <div className="py-2 flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-[0.05em]">
+            {/* DIV 3: CONTENIDO INTERNO */}
             <div> ¡Bienvenido a la tienda oficial de Imbra Repuestos! </div>
             <div className="flex items-center space-x-6">
               <Link href="#" className="hover:text-primary transition-colors">Catálogo</Link>
@@ -26,13 +31,18 @@ export default function Header() {
         </div>
       </div>
 
-      {/* 2. MIDDLE BAR - Enmarcado */}
-      <div className="px-6 lg:px-8 xl:px-10 bg-white">
-        <div className="bg-white dark:bg-gray-950 py-5 border-b border-gray-100 dark:border-gray-900">
-          <div className="container mx-auto px-4 flex items-center justify-between gap-8">
+      {/* SECCIÓN 2: MIDDLE BAR */}
+      <div className="w-full bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-900">
+        {/* DIV 1: FONDO (Full Width) */}
+        
+        <div className="imbra-content-container">
+          {/* DIV 2: CONTENEDOR (1920px + padding global) */}
+          
+          <div className="py-5 flex items-center justify-between gap-8">
+            {/* DIV 3: CONTENIDO INTERNO */}
             <div className="flex items-center space-x-10">
               <Link href="/" className="flex items-center group shrink-0">
-                <img src="https://imbrarepuestos.com/wp-content/uploads/2020/06/logo-Imbra-negro-e1513387420770.png" alt="Imbra Repuestos" className="h-10 w-auto object-contain dark:brightness-0 dark:invert" />
+                <img src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png" alt="Imbra Repuestos" className="h-14 w-auto object-contain dark:brightness-0 dark:invert" />
               </Link>
               <button className="flex items-center space-x-2 text-gray-900 dark:text-white font-black hover:text-primary transition-colors group">
                 <span className="material-icons text-2xl group-hover:scale-110 transition-transform">menu</span>
@@ -78,10 +88,15 @@ export default function Header() {
         </div>
       </div>
 
-      {/* 3. BOTTOM BAR - Enmarcado */}
-      <div className="px-6 lg:px-8 xl:px-10 bg-white">
-        <nav className="bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-900 font-display">
-          <div className="container mx-auto px-4 flex justify-between items-center py-4">
+      {/* SECCIÓN 3: BOTTOM BAR */}
+      <nav className="w-full bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-900 font-display">
+        {/* DIV 1: FONDO (Full Width) */}
+        
+        <div className="imbra-content-container">
+          {/* DIV 2: CONTENEDOR (1920px + padding global) */}
+          
+          <div className="flex justify-between items-center py-4">
+            {/* DIV 3: CONTENIDO INTERNO */}
             <ul className="flex space-x-10 text-[14px] font-bold text-gray-900 dark:text-white uppercase">
               <li><Link href="/" className="text-primary hover:text-primary transition-colors flex items-center">INICIO <span className="material-icons text-sm ml-1">expand_more</span></Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors flex items-center group">TIENDA <span className="material-icons text-sm ml-1 text-gray-400 group-hover:text-primary transition-colors">expand_more</span></Link></li>
@@ -95,8 +110,8 @@ export default function Header() {
               <button className="flex items-center hover:text-primary transition-colors uppercase"> Español <span className="material-icons text-[10px] ml-1 opacity-50">expand_more</span> </button>
             </div>
           </div>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </header>
   );
 }
