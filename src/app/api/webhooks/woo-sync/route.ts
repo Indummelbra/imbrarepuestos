@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { revalidateTag } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase";
 import { mapWooProductToImbra, WooProductRaw } from "@/lib/mappers";

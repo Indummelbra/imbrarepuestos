@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { createOrder } from '@/lib/woocommerce';
 
 export async function POST(req: Request) {
