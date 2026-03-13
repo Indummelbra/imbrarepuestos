@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { PTPAuth, PTPCreateSessionRequest, PTPCreateSessionResponse } from '../types/placetopay';
+import { PTPAuth, PTPCreateSessionRequest, PTPCreateSessionResponse, PTPQuerySessionResponse } from '../types/placetopay';
 
 const LOGIN = process.env.PTP_LOGIN;
 const SECRET_KEY = process.env.PTP_SECRET_KEY;
@@ -66,7 +66,7 @@ export async function createSession(data: Omit<PTPCreateSessionRequest, 'auth'>)
 /**
  * Consulta el estado de una sesión en PlacetoPay
  */
-export async function querySession(requestId: number): Promise<any> {
+export async function querySession(requestId: number): Promise<PTPQuerySessionResponse> {
   const auth = generateAuth();
   
   const payload = { auth };

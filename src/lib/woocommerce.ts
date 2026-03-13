@@ -122,8 +122,27 @@ export async function getProducts(): Promise<Product[]> {
 
     const data = await fetchWooGraphQL(query, {}, { next: { tags: ['products'], revalidate: 3600 } });
     
+    interface GQLNode {
+      databaseId: number;
+      name: string;
+      slug: string;
+      sku?: string;
+      description?: string;
+      shortDescription?: string;
+      onSale: boolean;
+      regularPrice?: string;
+      salePrice?: string;
+      price?: string;
+      image?: { sourceUrl: string; altText: string };
+      galleryImages?: { nodes: Array<{ sourceUrl: string; altText: string }> };
+      productCategories?: { nodes: Array<{ databaseId: number; name: string; slug: string }> };
+      attributes?: { nodes: Array<{ name: string; options: string[] }> };
+      stockStatus?: string;
+      stockQuantity?: number;
+    }
+
     // Mapear la data de GraphQL (los campos pueden variar ligeramente)
-    return data.products.nodes.map((node: any) => mapWooProductToImbra({
+    return data.products.nodes.map((node: GQLNode) => mapWooProductToImbra({
       id: node.databaseId,
       name: node.name,
       slug: node.slug,
@@ -137,10 +156,10 @@ export async function getProducts(): Promise<Product[]> {
       images: [
         node.image,
         ...(node.galleryImages?.nodes || [])
-      ].filter(Boolean).map(img => ({ src: img.sourceUrl, alt: img.altText })),
-      categories: node.productCategories?.nodes.map((c: any) => ({ id: c.databaseId, name: c.name, slug: c.slug })),
+      ].filter((img): img is { sourceUrl: string; altText: string } => !!img).map(img => ({ src: img.sourceUrl, alt: img.altText })),
+      categories: node.productCategories?.nodes.map((c) => ({ id: c.databaseId, name: c.name, slug: c.slug })),
       attributes: node.attributes?.nodes || [],
-      stock_status: node.stockStatus?.toLowerCase(),
+      stock_status: node.stockStatus?.toLowerCase() as Product['stock_status'],
       stock_quantity: node.stockQuantity || 0
     }));
 
@@ -231,10 +250,11 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       images: [
         node.image,
         ...(node.galleryImages?.nodes || [])
-      ].filter(Boolean).map(img => ({ src: img.sourceUrl, alt: img.altText })),
-      categories: node.productCategories?.nodes.map((c: any) => ({ id: c.databaseId, name: c.name, slug: c.slug })),
+      ].filter((img: { sourceUrl: string; altText: string } | undefined): img is { sourceUrl: string; altText: string } => !!img)
+       .map(img => ({ src: img.sourceUrl, alt: img.altText })),
+      categories: node.productCategories?.nodes.map((c: { databaseId: number; name: string; slug: string }) => ({ id: c.databaseId, name: c.name, slug: c.slug })),
       attributes: node.attributes?.nodes || [],
-      stock_status: node.stockStatus?.toLowerCase(),
+      stock_status: node.stockStatus?.toLowerCase() as Product['stock_status'],
       stock_quantity: node.stockQuantity || 0
     });
   } catch (error) {

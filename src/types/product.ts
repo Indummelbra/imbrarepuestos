@@ -29,6 +29,6 @@ export interface Product {
   is_comprable: boolean; // stock_quantity > 0
   meta_data: {
     key: string;
-    value: any;
+    value: unknown;
   }[];
 }

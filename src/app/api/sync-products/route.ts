@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { mapWooProductToImbra } from "@/lib/mappers";
+import { mapWooProductToImbra, WooProductRaw } from "@/lib/mappers";
 
 const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
@@ -49,8 +49,8 @@ export async function GET(request: Request) {
 
     console.log(`Mapeando ${allProducts.length} productos...`);
     const mappedProducts = allProducts.map(p => {
-      const imbraProduct = mapWooProductToImbra(p);
-      const productRaw = p as { status?: string }; // Cast seguro para acceso a status
+      const productRaw = p as WooProductRaw & { status?: string };
+      const imbraProduct = mapWooProductToImbra(productRaw);
       return {
         id: imbraProduct.id,
         name: imbraProduct.name,

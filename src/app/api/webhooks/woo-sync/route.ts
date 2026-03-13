@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase";
-import { mapWooProductToImbra } from "@/lib/mappers";
+import { mapWooProductToImbra, WooProductRaw } from "@/lib/mappers";
 
 const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       const wooProduct = await getFullProduct(productId);
       if (!wooProduct) throw new Error("No se pudo obtener el producto completo");
 
-      const imbraProduct = mapWooProductToImbra(wooProduct);
+      const imbraProduct = mapWooProductToImbra(wooProduct as WooProductRaw);
       
       // Mapear para Supabase
       const supabaseData = {
