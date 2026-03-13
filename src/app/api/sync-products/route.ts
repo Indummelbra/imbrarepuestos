@@ -43,8 +43,8 @@ export async function GET(request: Request) {
       } else {
         allProducts = [...allProducts, ...products];
         page++;
-        // Limitar para evitar loops infinitos en dev
-        if (page > 20) hasMore = false; 
+        // Limitar para evitar loops infinitos, 50 páginas cubren 5000 productos
+        if (page > 50) hasMore = false; 
       }
     }
 
