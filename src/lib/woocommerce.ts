@@ -95,17 +95,21 @@ export async function getProducts(): Promise<Product[]> {
             description
             shortDescription
             onSale
-            regularPrice
-            salePrice
-            price
+            ... on ProductWithPricing {
+              regularPrice
+              salePrice
+              price
+            }
             image {
               sourceUrl
               altText
             }
-            galleryImages {
-              nodes {
-                sourceUrl
-                altText
+            ... on ProductWithGallery {
+              galleryImages {
+                nodes {
+                  sourceUrl
+                  altText
+                }
               }
             }
             productCategories {
