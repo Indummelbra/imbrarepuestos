@@ -28,18 +28,18 @@ export default function PromoBanners() {
               className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-80 group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-0 p-8 flex flex-col justify-center items-start z-10">
-              <span className="text-white !text-white font-bold uppercase tracking-widest text-xs mb-2">
-                Gran Venta - Hasta 40% Dto
+              <span className="imbra-label !text-white mb-2">
+                ¡NUEVA LLEGADA!
               </span>
-              <h3 className="imbra-h3-industrial text-white !text-white text-3xl md:text-4xl lg:text-5xl mb-4">
-                REPUESTOS <br /> ORIGINALES
+              <h3 className="imbra-h3 text-white !text-white !text-3xl md:!text-4xl lg:!text-5xl mb-4">
+                EXPLORA NUESTROS <br /> RINES REFORZADOS
               </h3>
-              <p className="text-white !text-white font-medium mb-8 text-sm md:text-base leading-relaxed">
-                Trabajamos con las mejores marcas
+              <p className="imbra-body !text-white mb-8">
+                Calidad superior para cada terreno
               </p>
               <Link 
                 href="#" 
-                className="bg-secondary !bg-[#212221] text-white !text-white px-8 py-3 font-black text-xs uppercase tracking-widest hover:bg-white hover:!text-[#212221] transition-all flex items-center group/btn active:scale-95 shadow-lg"
+                className="bg-secondary !bg-[#212221] text-white !text-white px-8 py-3 font-black text-xs uppercase tracking-widest hover:bg-white hover:!text-[#212221] transition-all flex items-center group/btn active:scale-95"
               >
                 COMPRAR AHORA 
                 <span className="material-icons text-sm ml-2 group-hover/btn:translate-x-1 transition-transform">chevron_right</span>
@@ -55,14 +55,14 @@ export default function PromoBanners() {
               className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-60 group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-0 p-8 flex flex-col justify-center items-start z-10">
-              <span className="text-primary !text-[#F18700] font-bold uppercase tracking-widest text-xs mb-2">
-                El Precio Más Bajo
+              <span className="imbra-label-orange mb-2">
+                ¡SÓLO ESTA SEMANA!
               </span>
-              <h3 className="imbra-h3-industrial text-white !text-white text-2xl md:text-3xl lg:text-4xl mb-4">
-                EQUIPAMIENTO <br /> ESENCIAL
+              <h3 className="imbra-h3 text-white !text-white !text-2xl md:!text-3xl lg:!text-4xl mb-4">
+                KITS DE <br /> REPARACIÓN
               </h3>
-              <p className="text-primary !text-[#F18700] font-bold mb-8 text-sm md:text-base">
-                Ahorra en más de 80,000 repuestos
+              <p className="imbra-body-bold !text-primary mb-8 !text-sm md:!text-base">
+                Mantenimiento profesional al mejor precio
               </p>
               <Link 
                 href="#" 
@@ -84,10 +84,10 @@ export default function PromoBanners() {
                 className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-70 group-hover:scale-110 transition-transform duration-1000"
               />
               <div className="absolute inset-0 p-8 flex flex-col justify-center z-10">
-                <h3 className="imbra-h3-industrial text-white !text-white text-xl md:text-2xl leading-tight">
-                  TODO EN REPUESTOS <br /> & ACCESORIOS
+                <h3 className="imbra-h3 text-white !text-white !text-xl md:!text-2xl">
+                  TODO EN <br /> ACCESORIOS
                 </h3>
-                <p className="text-white !text-white font-black uppercase text-xs tracking-widest mt-2">
+                <p className="imbra-label !text-white mt-2">
                   HASTA 25% DTO
                 </p>
               </div>
@@ -100,11 +100,11 @@ export default function PromoBanners() {
                 className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-1000"
               />
               <div className="absolute inset-0 p-8 flex flex-col justify-center items-end text-right z-10">
-                <span className="text-primary !text-[#F18700] font-bold uppercase text-[10px] tracking-[0.2em] mb-2">
-                  MANTENTE CARGADO
+                <span className="imbra-label-orange mb-2">
+                  MÁXIMA CALIDAD
                 </span>
-                <h3 className="imbra-h3-industrial text-white !text-white text-xl md:text-2xl leading-tight">
-                  BATERÍAS DE <br /> MÁXIMA CALIDAD
+                <h3 className="imbra-h3 text-white !text-white !text-xl md:!text-2xl">
+                  BATERÍAS <br /> IMBRA
                 </h3>
               </div>
             </div>

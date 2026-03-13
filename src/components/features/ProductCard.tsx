@@ -34,20 +34,20 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* Product Info */}
       <div className="p-4 flex flex-col items-center text-center">
-        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+        <span className="imbra-label mb-1">
           {product.category}
         </span>
-        <h3 className="text-gray-900 dark:text-white font-bold text-sm mb-2 h-10 line-clamp-2 leading-snug group-hover:text-primary transition-colors uppercase italic">
+        <h3 className="imbra-h3 !text-sm mb-2 h-10 line-clamp-2 leading-snug group-hover:text-primary transition-colors uppercase italic">
           {product.name}
         </h3>
         <div className="flex items-center space-x-2 mb-4">
-          <span className="text-primary font-black text-lg">
+          <span className="imbra-price text-lg">
             ${product.price.toLocaleString('es-CO')}
           </span>
           {/* Optional: <span className="text-gray-400 line-through text-xs">$300.000</span> */}
         </div>
         
-        <button className="w-full bg-gray-900 hover:bg-primary text-white font-bold py-2.5 rounded text-xs uppercase flex items-center justify-center transition-all">
+        <button className="w-full bg-secondary hover:bg-primary text-white imbra-label !text-white py-2.5 flex items-center justify-center transition-all">
           <span className="material-icons text-sm mr-2">shopping_cart</span>
           Añadir al carrito
         </button>

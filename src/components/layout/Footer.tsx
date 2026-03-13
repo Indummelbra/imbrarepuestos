@@ -22,14 +22,16 @@ export default function Footer() {
           
           {/* COLUMNA MARCA (Izquierda - 1/4) */}
           <div className="lg:w-1/4 lg:pr-12 lg:border-r border-gray-700">
-            <div className="flex items-center mb-6">
-              <span className="material-icons text-[#ffbc50] text-3xl mr-3">settings</span>
-              <span className="text-2xl font-bold tracking-tight uppercase">
-                IMBRA<span className="text-[#ffbc50]">REPUESTOS</span>
-              </span>
-            </div>
+            <Link href="/" className="flex items-center group mb-8">
+              <img 
+                src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png" 
+                alt="Imbra Repuestos" 
+                className="h-12 w-auto object-contain"
+                style={{ filter: 'invert(1) hue-rotate(180deg)' }}
+              />
+            </Link>
             
-            <p className="text-gray-400 text-sm leading-relaxed mb-10">
+            <p className="!text-white text-sm leading-relaxed mb-10">
               Indummelbra S.A.S. cuenta con 50 años de experiencia en la manufactura de repuestos y herramientas para motocicletas en Colombia y Centroamérica.
             </p>
             
@@ -37,16 +39,16 @@ export default function Footer() {
             <div className="flex items-start">
               <div className="relative mr-4 mt-1">
                 <span className="material-icons text-gray-500 text-4xl">chat_bubble_outline</span>
-                <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#ffbc50] rounded-full border-2 border-[#1a1c1e]"></div>
+                <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#F18700] rounded-full border-2 border-[#1a1c1e]"></div>
               </div>
               <div>
-                <h4 className="text-[#ffbc50] text-sm font-bold mb-1">Feedback</h4>
+                <h4 className="text-[#F18700] text-sm font-bold mb-1">Feedback</h4>
                 <p className="text-gray-400 text-xs mb-2">Tus comentarios nos ayudan a mejorar nuestro sitio.</p>
                 <Link 
                   href="#" 
-                  className="text-white font-semibold text-xs flex items-center hover:text-[#ffbc50] transition-colors"
+                  className="text-white font-semibold text-xs flex items-center hover:text-[#F18700] transition-colors"
                 >
-                  Envíanos tus comentarios <FontAwesomeIcon icon={faChevronRight} className="text-[#ffbc50] text-[10px] ml-1" />
+                  Envíanos tus comentarios <FontAwesomeIcon icon={faChevronRight} className="text-[#F18700] text-[10px] ml-1" />
                 </Link>
               </div>
             </div>
@@ -58,34 +60,34 @@ export default function Footer() {
             {/* FILA 1: CONTACTO */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               <div className="flex items-start gap-3">
-                <FontAwesomeIcon icon={faPhone} className="text-[#ffbc50] text-lg mt-1" />
+                <FontAwesomeIcon icon={faPhone} className="text-[#F18700] text-lg mt-1" />
                 <div>
-                  <p className="text-gray-500 text-[9px] font-bold tracking-widest uppercase mb-1">Teléfono</p>
-                  <p className="text-lg font-bold">(+57) 322 846 48 00</p>
+                  <p className="!text-white text-[9px] font-bold tracking-widest uppercase mb-1">Teléfono</p>
+                  <span className="imbra-price text-lg">(+57) 322 846 4800</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <FontAwesomeIcon icon={faHeadset} className="text-[#ffbc50] text-lg mt-1" />
+                <FontAwesomeIcon icon={faHeadset} className="text-[#F18700] text-lg mt-1" />
                 <div>
-                  <p className="text-gray-500 text-[9px] font-bold tracking-widest uppercase mb-1">Soporte Técnico</p>
-                  <p className="text-lg font-bold">PBX: (1) 335 0591</p>
+                  <p className="!text-white text-[9px] font-bold tracking-widest uppercase mb-1">Soporte Técnico</p>
+                  <p className="text-lg font-bold !text-[#F18700]">PBX: (1) 335 0591</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <FontAwesomeIcon icon={faClock} className="text-[#ffbc50] text-lg mt-1" />
+                <FontAwesomeIcon icon={faClock} className="text-[#F18700] text-lg mt-1" />
                 <div>
-                  <p className="text-gray-500 text-[9px] font-bold tracking-widest uppercase mb-1">Horario</p>
-                  <p className="text-base font-bold">LUN - VIE: 6AM-5PM</p>
-                  <p className="text-xs text-gray-400 font-bold uppercase">SAB: 8AM-1PM</p>
+                  <p className="!text-white text-[9px] font-bold tracking-widest uppercase mb-1">Horario</p>
+                  <p className="text-base font-bold !text-[#F18700]">LUN - VIE: 6AM-5PM</p>
+                  <p className="text-xs !text-[#F18700] font-bold uppercase">SAB: 8AM-1PM</p>
                 </div>
               </div>
             </div>
 
             {/* FILA 2: BOTÓN Y REDES */}
             <div className="flex flex-wrap items-center gap-6 mb-10">
-              <button className="bg-[#ffbc50] hover:bg-yellow-600 text-[#1a1c1e] px-8 py-3 font-bold text-xs uppercase flex items-center gap-2 transition-all">
+              <button className="bg-[#F18700] hover:bg-orange-600 text-[#1a1c1e] px-8 py-3 font-bold text-xs uppercase flex items-center gap-2 transition-all">
                 <FontAwesomeIcon icon={faMap} />
                 VER MAPA
               </button>
@@ -99,7 +101,7 @@ export default function Footer() {
                   <Link 
                     key={i}
                     href="#" 
-                    className={`w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-[#ffbc50] transition-all text-gray-400 ${social.color}`}
+                    className={`w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-[#F18700] transition-all text-gray-400 ${social.color}`}
                   >
                     <FontAwesomeIcon icon={social.icon} className="text-sm" />
                   </Link>
@@ -112,44 +114,52 @@ export default function Footer() {
             {/* FILA 3: ENLACES GRID - Títulos Proporcionales */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div>
-                <div className="!text-white font-black !text-[12px] mb-8 uppercase tracking-[0.2em] opacity-100 block">Mapa del Sitio</div>
-                <ul className="space-y-4">
+                <h3 className="imbra-label !text-white mb-4">
+                  Mapa de Sitio
+                </h3>
+                <ul className="space-y-4 mt-6">
                   {['Home', 'Productos', 'Quiénes Somos', 'Rastrea tu compra', 'Contáctenos'].map((item) => (
                     <li key={item}>
-                      <Link href="#" className="text-gray-400 hover:text-[#ffbc50] text-[13px] transition-colors">{item}</Link>
+                      <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">{item}</Link>
                     </li>
                   ))}
                 </ul>
               </div>
               
               <div>
-                <div className="!text-white font-black !text-[12px] mb-8 uppercase tracking-[0.2em] opacity-100 block">Información</div>
-                <ul className="space-y-4">
+                <h3 className="imbra-label !text-white mb-4">
+                  Información
+                </h3>
+                <ul className="space-y-4 mt-6">
                   {['Política de Privacidad', 'Gestión de Devoluciones', 'Política de Envíos', 'Términos del Servicio', 'FAQ'].map((item) => (
                     <li key={item}>
-                      <Link href="#" className="text-gray-400 hover:text-[#ffbc50] text-[13px] transition-colors">{item}</Link>
+                      <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">{item}</Link>
                     </li>
                   ))}
                 </ul>
               </div>
 
               <div>
-                <div className="!text-white font-black !text-[12px] mb-8 uppercase tracking-[0.2em] opacity-100 block">Categorías</div>
-                <ul className="space-y-4">
+                <h3 className="imbra-label !text-white mb-4">
+                  Categorías
+                </h3>
+                <ul className="space-y-4 mt-6">
                   {['Herramienta Especializada', 'Eléctricos', 'Frenos', 'Direccionales'].map((item) => (
                     <li key={item}>
-                      <Link href="#" className="text-gray-400 hover:text-[#ffbc50] text-[13px] transition-colors">{item}</Link>
+                      <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">{item}</Link>
                     </li>
                   ))}
                 </ul>
               </div>
 
               <div>
-                <div className="!text-white font-black !text-[12px] mb-8 uppercase tracking-[0.2em] opacity-100 block">Asistencia</div>
-                <ul className="space-y-4">
+                <h3 className="imbra-label !text-white mb-4">
+                  Asistencia
+                </h3>
+                <ul className="space-y-4 mt-6">
                   {['Mi cuenta', 'Ingresar', 'Crear cuenta', 'Favoritos'].map((item) => (
                     <li key={item}>
-                      <Link href="#" className="text-gray-400 hover:text-[#ffbc50] text-[13px] transition-colors">{item}</Link>
+                      <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">{item}</Link>
                     </li>
                   ))}
                 </ul>
@@ -161,15 +171,15 @@ export default function Footer() {
         {/* BARRA LEGAL */}
         <div className="pt-8 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-wrap items-center gap-x-2 text-[13px] md:text-[14px]">
-            <p className="text-gray-500 font-medium tracking-tight">
-              INDUMMELBRA SAS © 2026
+            <p className="imbra-body !text-[13px] text-gray-500">
+              © 2024 IMBRA Repuestos. Todos los derechos reservados.
             </p>
             <span className="text-gray-600 hidden md:inline">|</span>
             <span className="text-gray-500">Diseño y Desarrollo por</span>
             <Link 
               href="https://wa.me/573218737931" 
               target="_blank"
-              className="font-black bg-gradient-to-r from-[#ffbc50] via-white to-[#ffbc50] bg-clip-text text-transparent hover:scale-105 transition-transform"
+              className="font-black bg-gradient-to-r from-[#F18700] via-white to-[#F18700] bg-clip-text text-transparent hover:scale-105 transition-transform"
             >
               iAnGo Agencia de Desarrollo y Automatizaciones con IA
             </Link>
@@ -178,7 +188,7 @@ export default function Footer() {
             <span className="text-gray-600">|</span>
             <Link 
               href="tel:+573218737931" 
-              className="text-[#ffbc50] font-black hover:underline flex items-center gap-1"
+              className="text-[#F18700] font-black hover:underline flex items-center gap-1"
             >
               <FontAwesomeIcon icon={faPhone} className="text-[11px]" />
               +57 321 873 7931

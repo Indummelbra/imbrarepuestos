@@ -67,8 +67,8 @@ const renderStars = (rating: number) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   for (let i = 0; i < 5; i++) {
-    if (i < fullStars) stars.push(<span key={i} className="material-icons text-[#ffbc50] text-[14px]">star</span>);
-    else if (i === fullStars && hasHalfStar) stars.push(<span key={i} className="material-icons text-[#ffbc50] text-[14px]">star_half</span>);
+    if (i < fullStars) stars.push(<span key={i} className="material-icons text-[#F18700] text-[14px]">star</span>);
+    else if (i === fullStars && hasHalfStar) stars.push(<span key={i} className="material-icons text-[#F18700] text-[14px]">star_half</span>);
     else stars.push(<span key={i} className="material-icons text-gray-300 dark:text-gray-700 text-[14px]">star</span>);
   }
   return stars;
@@ -109,14 +109,14 @@ export default function TestimonialsBenefits() {
   return (
     <section className="w-full py-16 bg-[#f8f9fa] dark:bg-gray-950 overflow-hidden">
       <div className="imbra-content-container">
-        <div className="max-w-[88%] mx-auto relative px-0">
+        <div className="relative px-0">
           
           {/* TÍTULO CON LÍNEA DE PRECISIÓN */}
           <div className="relative flex flex-col items-center justify-center mb-12 px-4 md:px-0">
             <div className="absolute w-full h-px bg-gray-200 dark:bg-gray-800 -z-0"></div>
             <div className="relative z-10 px-10 bg-[#f8f9fa] dark:bg-gray-950 flex flex-col items-center">
-              <h2 className="text-gray-900 dark:text-white text-3xl md:text-[34px] font-black uppercase tracking-tighter font-display mb-1">
-                Experiencias <span className="text-primary italic">Imbra</span>
+              <h2 className="imbra-h3 mb-6 text-center text-secondary dark:text-white">
+                Por qué los expertos eligen IMBRA
               </h2>
               <div className="flex flex-col items-center space-y-1.5">
                 <div className="flex items-center space-x-2">
@@ -139,32 +139,36 @@ export default function TestimonialsBenefits() {
 
           {/* ZONA DE TESTIMONIOS (39 REALES) */}
           <div className="relative mb-16">
-            <button onClick={() => scroll("left")} className="absolute -left-2 lg:-left-20 top-1/2 -translate-y-1/2 z-30 w-8 h-12 lg:w-10 lg:h-16 bg-white border border-gray-200 dark:border-gray-800 rounded-sm flex items-center justify-center shadow-xl hover:bg-primary hover:text-white transition-all active:scale-95">
+            <button onClick={() => scroll("left")} className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-8 h-12 lg:w-10 lg:h-16 bg-white rounded-sm flex items-center justify-center shadow-xl hover:bg-primary hover:text-white transition-all active:scale-95">
               <FontAwesomeIcon icon={faChevronLeft} className="text-xs" />
             </button>
 
             <div ref={scrollRef} className="w-full overflow-x-hidden flex items-start justify-start scroll-smooth">
               {/* Contenedor del Carrusel Ajustado para 117 ítems */}
               <div className="flex flex-none w-[3900%] divide-x divide-gray-200 dark:divide-gray-800">
-                {infiniteTestimonials.map((t, index) => (
-                  <div key={`${t.id}-${index}`} className="w-[calc(100%/117)] flex flex-col items-center px-8 lg:px-12 py-2">
+                {infiniteTestimonials.map((testimonial, index) => (
+                  <div key={`${testimonial.id}-${index}`} className="w-[calc(100%/117)] flex flex-col items-center px-8 lg:px-12 py-2">
                     <div className="flex flex-col items-center text-center w-full">
                       <div className="flex items-center space-x-5 mb-4 justify-center">
-                        <span className="text-5xl lg:text-6xl font-black text-primary leading-none tracking-tighter">{t.rating}</span>
+                        <span className="text-5xl lg:text-6xl font-black text-primary leading-none tracking-tighter">{testimonial.rating}</span>
                         <div className="flex flex-col text-left">
-                          <h4 className="text-[15px] font-black text-gray-900 dark:text-white uppercase tracking-tight leading-none mb-1">{t.name}</h4>
-                          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] mb-1.5 leading-none">{t.company}</span>
-                          <div className="flex space-x-0.5">{renderStars(t.stars)}</div>
+                          <h4 className="imbra-h3 !text-sm text-secondary dark:text-white">
+                          {testimonial.name}
+                        </h4>
+                          <p className="imbra-label">
+                          {testimonial.company}
+                        </p>
+                          <div className="flex space-x-0.5">{renderStars(testimonial.stars)}</div>
                         </div>
                       </div>
-                      <p className="text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed max-w-[280px] lg:max-w-md font-medium italic">{t.text}</p>
+                      <p className="text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed max-w-[280px] lg:max-w-md font-medium italic">{testimonial.text}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <button onClick={() => scroll("right")} className="absolute -right-2 lg:-right-20 top-1/2 -translate-y-1/2 z-30 w-8 h-12 lg:w-10 lg:h-16 bg-white border border-gray-200 dark:border-gray-800 rounded-sm flex items-center justify-center shadow-xl hover:bg-primary hover:text-white transition-all active:scale-95">
+            <button onClick={() => scroll("right")} className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-8 h-12 lg:w-10 lg:h-16 bg-white rounded-sm flex items-center justify-center shadow-xl hover:bg-primary hover:text-white transition-all active:scale-95">
               <FontAwesomeIcon icon={faChevronRight} className="text-xs" />
             </button>
           </div>
@@ -172,15 +176,19 @@ export default function TestimonialsBenefits() {
           <div className="border-t border-gray-200 dark:border-gray-800 mb-12 opacity-50"></div>
 
           {/* BARRA DE BENEFICIOS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-y-8 lg:gap-x-4 px-4 lg:px-0">
-            {benefits.map((b, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-y-8 lg:gap-x-4 px-4 lg:px-0 max-w-7xl mx-auto justify-items-center">
+            {benefits.map((benefit, i) => (
               <div key={i} className="flex items-center lg:items-start space-x-4 group hover:scale-[1.02] transition-transform duration-300">
-                <div className="flex-shrink-0 text-gray-900 dark:text-gray-100 mt-1">
-                  <span className="material-icons text-[40px] drop-shadow-sm group-hover:rotate-6 transition-transform">{b.icon}</span>
+                <div className="flex-shrink-0 text-[#F18700] mt-1">
+                  <span className="material-icons text-[40px] drop-shadow-sm group-hover:rotate-6 transition-transform">{benefit.icon}</span>
                 </div>
                 <div className="flex flex-col">
-                  <h5 className="text-[13px] font-bold text-gray-900 dark:text-white uppercase tracking-tight leading-tight mb-0.5">{b.title}</h5>
-                  <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium leading-snug">{b.desc}</p>
+                    <h5 className="imbra-label !text-secondary dark:!text-white group-hover:!text-primary transition-colors">
+                      {benefit.title}
+                    </h5>
+                    <p className="imbra-body !text-[11px] !leading-relaxed">
+                      {benefit.desc}
+                    </p>
                 </div>
               </div>
             ))}

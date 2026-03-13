@@ -2,18 +2,18 @@
 
 export default function MotoSelector() {
   return (
-    <section className="w-full bg-transparent px-3 lg:px-4 xl:px-5 py-0 relative z-20">
+    <section className="w-full bg-transparent px-5 py-0 relative z-20">
       {/* NIVEL 2: Contenedor 1920px con fondo negro imbra (Ahora reducido por el padding del padre) */}
-      <div className="max-w-[1920px] mx-auto bg-[#212221] shadow-2xl border border-white/5">
+      <div className="w-full bg-[#212221] border border-white/5">
 
-        {/* DIV 3: BLOQUE DE CONTENIDO (Reducido al 80% del Div 2 y centrado) */}
-        <div className="max-w-[80%] mx-auto flex flex-col xl:flex-row items-center font-display pt-[32px] pb-[20px] gap-8 xl:gap-6">
+        {/* DIV 3: BLOQUE DE CONTENIDO (Ancho completo alineado a 20px) */}
+        <div className="flex flex-col xl:flex-row items-center font-display pt-[32px] pb-[20px] gap-8 xl:gap-6 px-4 md:px-[60px] lg:px-[100px]">
 
           {/* 1. SECCIÓN TÍTULO */}
           <div className="w-full xl:w-auto flex items-center justify-start space-x-4 xl:pr-10 xl:border-r border-white/10 shrink-0">
             <span className="material-icons text-primary text-4xl">two_wheeler</span>
             <div className="flex flex-col text-white min-w-max justify-center">
-              <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tighter leading-none">SELECCIONA</span>
+              <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-tighter leading-none">SELECCIONA</span>
               <span className="text-[10px] md:text-[11px] font-normal uppercase tracking-[0.2em] leading-none text-white/70">TU VEHÍCULO</span>
             </div>
           </div>
@@ -42,8 +42,9 @@ export default function MotoSelector() {
 
           {/* 3. SECCIÓN BOTÓN */}
           <div className="w-full xl:w-auto shrink-0">
-            <button className="w-full xl:w-[200px] bg-primary hover:bg-orange-600 text-white font-black px-8 h-12 text-sm uppercase flex items-center justify-center transition-all active:scale-95 shadow-lg group">
-              BUSCAR <span className="material-icons text-lg ml-2 group-hover:translate-x-1 transition-transform">search</span>
+            <button className="bg-primary hover:bg-orange-600 text-secondary imbra-label !text-secondary py-4 px-8 transition-all active:scale-95 flex items-center justify-center group w-full md:w-auto">
+              <span className="material-icons mr-2 group-hover:rotate-12 transition-transform">search</span>
+              Buscar Repuestos
             </button>
           </div>
         </div>

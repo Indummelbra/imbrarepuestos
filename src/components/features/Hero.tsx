@@ -17,20 +17,20 @@ export default function Hero() {
           {/* Overlay para asegurar legibilidad */}
           <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent z-0"></div>
           
-          <div className="relative z-10 w-full px-6 md:px-12 lg:px-20">
+          <div className="relative z-10 w-full pl-4 md:pl-[50px]">
             <div className="w-full md:w-1/2 text-left">
-              <span className="inline-block text-primary font-black uppercase tracking-[0.2em] mb-3 text-xs md:text-sm">
+              <span className="imbra-label-orange mb-3">
                 PROMOCIÓN DEL DÍA
               </span>
-              <h1 className="imbra-h1-industrial mb-4 text-[#212221] text-4xl md:text-5xl lg:text-7xl text-balance">
+              <h1 className="imbra-h1 mb-4 text-secondary text-balance">
                 KIT DE <span className="text-primary italic">ARRASTRE</span> <br />
                 IMBRA PROFESIONAL
               </h1>
-              <p className="text-base md:text-lg text-gray-700 mb-8 font-medium max-w-md">
-                Ahorra hasta un 25% en repuestos seleccionados para tu sistema de tracción. Calidad que se siente en cada aceleración.
+              <p className="imbra-body mb-8 max-w-lg">
+                Descubre nuestra línea de kits de arrastre profesionales. Calidad garantizada para cada kilómetro de tu viaje.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 items-start md:items-center">
-                <button className="bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-wider px-10 h-14 shadow-xl transition-all active:scale-95 flex items-center justify-center group">
+                <button className="bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-wider px-10 h-14 transition-all active:scale-95 flex items-center justify-center group">
                   SABER MÁS <span className="material-icons ml-2 text-xl group-hover:translate-x-1 transition-transform">chevron_right</span>
                 </button>
                 <div className="flex flex-col">

@@ -16,14 +16,14 @@ import { useRef, useEffect } from "react";
  */
 
 const categories = [
-  { id: 1, name: "Suspension Systems", count: 2, img: "/categories/suspension.png" },
-  { id: 2, name: "Electric", count: 6, img: "/categories/electricos.png" },
-  { id: 3, name: "Exhaust System", count: 6, img: "/categories/escape.png" },
-  { id: 4, name: "Lighting", count: 6, img: "/categories/iluminacion.png" },
-  { id: 5, name: "Filters", count: 1, img: "/categories/filtros.png" },
-  { id: 6, name: "Wheels & Tires", count: 1, img: "/categories/wheels_tires.png" },
-  { id: 7, name: "Brakes System", count: 2, img: "/categories/frenos.png" },
-  { id: 8, name: "Seat Parts", count: 8, img: "/categories/asientos.png" },
+  { id: 1, name: "Sistemas de Suspensión", count: 2, img: "/categories/suspension.png" },
+  { id: 2, name: "Eléctricos", count: 6, img: "/categories/electricos.png" },
+  { id: 3, name: "Sistemas de Escape", count: 6, img: "/categories/escape.png" },
+  { id: 4, name: "Iluminación", count: 6, img: "/categories/iluminacion.png" },
+  { id: 5, name: "Filtros", count: 1, img: "/categories/filtros.png" },
+  { id: 6, name: "Rines y Llantas", count: 1, img: "/categories/wheels_tires.png" },
+  { id: 7, name: "Sistemas de Frenos", count: 2, img: "/categories/frenos.png" },
+  { id: 8, name: "Asientos y Partes", count: 8, img: "/categories/asientos.png" },
 ];
 
 // Triplicamos los items para el efecto infinito real
@@ -78,12 +78,12 @@ export default function CategoryCarousel() {
       <div className="imbra-content-container">
         {/* DIV 2: Contenedor Maestro (1920px Centrado) */}
         
-        <div className="max-w-[80%] mx-auto relative py-4 group">
+        <div className="relative py-4 group px-4 md:px-[40px]">
           {/* DIV 3: BLOQUE DE CONTENIDO (Réplica MotoSelector 80% + Navegación) */}
 
           <button 
             onClick={() => scroll("left")}
-            className="absolute -left-10 lg:-left-25 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-xl hover:bg-primary hover:text-white transition-all focus:outline-none"
+            className="absolute left-6 md:left-10 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all focus:outline-none shadow-lg"
           >
             <FontAwesomeIcon icon={faChevronLeft} className="text-xs" />
           </button>
@@ -109,12 +109,11 @@ export default function CategoryCarousel() {
                       className="max-w-[70%] max-h-[70%] object-contain"
                     />
                   </div>
-                  
-                  <h3 className="text-[#212221] dark:text-white !font-bold text-[14px] leading-tight mb-1 group-hover/item:text-primary transition-colors !normal-case tracking-tight text-center px-1">
-                    {cat.name}
-                  </h3>
+                                    <span className="imbra-label !text-secondary group-hover:!text-primary transition-colors text-center leading-tight">
+                        {cat.name}
+                      </span>
                   <p className="text-gray-400 text-[11px] font-normal normal-case text-center">
-                    {cat.count} {cat.count === 1 ? 'product' : 'products'}
+                    {cat.count} {cat.count === 1 ? 'producto' : 'productos'}
                   </p>
                 </Link>
               ))}
@@ -123,7 +122,7 @@ export default function CategoryCarousel() {
 
           <button 
             onClick={() => scroll("right")}
-            className="absolute -right-10 lg:-right-25 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-xl hover:bg-primary hover:text-white transition-all focus:outline-none"
+            className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all focus:outline-none shadow-lg"
           >
             <FontAwesomeIcon icon={faChevronRight} className="text-xs" />
           </button>
