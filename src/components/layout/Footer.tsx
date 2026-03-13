@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebookF, faTwitter, faInstagram, faPinterestP } from "@fortawesome/free-brands-svg-icons";
 import { faPhone, faHeadset, faClock, faMap, faChevronRight } from "@fortawesome/free-solid-svg-icons";
@@ -23,11 +24,14 @@ export default function Footer() {
           {/* COLUMNA MARCA (Izquierda - 1/4) */}
           <div className="lg:w-1/4 lg:pr-12 lg:border-r border-gray-700">
             <Link href="/" className="flex items-center group mb-8">
-              <img 
+              <Image 
                 src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png" 
                 alt="Imbra Repuestos" 
+                width={120}
+                height={48}
                 className="h-12 w-auto object-contain"
                 style={{ filter: 'invert(1) hue-rotate(180deg)' }}
+                unoptimized
               />
             </Link>
             
@@ -197,17 +201,17 @@ export default function Footer() {
           
           <div className="flex gap-2">
             {/* Logos de Pago Con URLs Oficiales */}
-            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" className="h-4 object-contain" alt="Mastercard" />
+            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm relative w-16">
+              <Image src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" fill className="object-contain p-1.5" alt="Mastercard" unoptimized />
             </div>
-            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
-              <img src="https://www.svgrepo.com/show/303225/visa-logo.svg" className="h-3 object-contain" alt="Visa" />
+            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm relative w-12">
+              <Image src="https://www.svgrepo.com/show/303225/visa-logo.svg" fill className="object-contain p-1.5" alt="Visa" unoptimized />
             </div>
-            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
-              <img src="https://cdn.worldvectorlogo.com/logos/nequi-2.svg" className="h-4 object-contain" alt="Nequi" />
+            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm relative w-12">
+              <Image src="https://cdn.worldvectorlogo.com/logos/nequi-2.svg" fill className="object-contain p-1.5" alt="Nequi" unoptimized />
             </div>
-            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
-              <img src="https://placetopay.dev/_astro/logo-placetopay.zD2RPUwO.svg" className="h-4 object-contain" alt="Placetopay" />
+            <div className="bg-white px-3 py-1.5 rounded flex items-center justify-center h-8 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm relative w-20">
+              <Image src="https://placetopay.dev/_astro/logo-placetopay.zD2RPUwO.svg" fill className="object-contain p-1.5" alt="Placetopay" unoptimized />
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CheckCircle2, XCircle, Clock, ArrowRight } from 'lucide-react';
+import { Clock, ArrowRight } from 'lucide-react';
 
 interface ResultPageProps {
   searchParams: Promise<{

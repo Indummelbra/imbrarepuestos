@@ -1,19 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { useCart } from "@/context/CartContext";
+import LiveSearch from "../search/LiveSearch";
 
 export default function Header() {
+  const { totalItems, totalPrice } = useCart();
+
+  const formattedPrice = new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0
+  }).format(totalPrice);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white">
       {/* SECCIÓN 1: TOP BAR */}
       <div className="w-full bg-[#f3f4f6] dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
-        {/* DIV 1: FONDO (Full Width) */}
-        
         <div className="imbra-content-container">
-          {/* DIV 2: CONTENEDOR (1920px + padding global) */}
-          
           <div className="py-2.5 flex justify-between items-center imbra-label">
-            {/* DIV 3: CONTENIDO INTERNO */}
             <div> REPUESTOS ORIGINALES · CALIDAD GARANTIZADA </div>
             <div className="flex items-center space-x-6">
               <Link href="#" className="hover:text-primary transition-colors">Catálogo</Link>
@@ -33,16 +39,18 @@ export default function Header() {
 
       {/* SECCIÓN 2: MIDDLE BAR */}
       <div className="w-full bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-900">
-        {/* DIV 1: FONDO (Full Width) */}
-        
         <div className="imbra-content-container">
-          {/* DIV 2: CONTENEDOR (1920px + padding global) */}
-          
           <div className="py-5 flex items-center justify-between gap-8">
-            {/* DIV 3: CONTENIDO INTERNO */}
             <div className="flex items-center space-x-10">
               <Link href="/" className="flex items-center group shrink-0">
-                <img src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png" alt="Imbra Repuestos" className="h-14 w-auto object-contain dark:brightness-0 dark:invert" />
+                <Image 
+                  src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png" 
+                  alt="Imbra Repuestos" 
+                  width={140}
+                  height={56}
+                  className="h-14 w-auto object-contain dark:brightness-0 dark:invert" 
+                  unoptimized
+                />
               </Link>
               <button className="flex items-center space-x-2 text-gray-900 dark:text-white font-bold hover:text-primary transition-colors group">
                 <span className="material-icons text-xl group-hover:scale-110 transition-transform">menu</span>
@@ -50,12 +58,7 @@ export default function Header() {
               </button>
             </div>
             <div className="flex-1 max-w-2xl">
-              <div className="relative flex items-center bg-[#f8f9fa] dark:bg-gray-900 rounded-lg group border border-transparent focus-within:border-primary/30 focus-within:ring-4 focus-within:ring-primary/5 transition-all">
-                <input className="w-full px-6 py-3.5 bg-transparent text-sm focus:outline-none dark:text-white placeholder:text-gray-400 font-semibold" placeholder="Busca tus repuestos, productos..." type="text" />
-                <button className="pr-6 text-gray-400 group-focus-within:text-primary transition-colors">
-                  <span className="material-icons text-2xl">search</span>
-                </button>
-              </div>
+              <LiveSearch />
             </div>
             <div className="flex items-center space-x-8 shrink-0">
               <div className="hidden xl:flex items-center space-x-3 group cursor-pointer border-r border-gray-100 dark:border-gray-800 pr-8">
@@ -72,14 +75,18 @@ export default function Header() {
                   <span className="material-icons text-3xl group-hover:text-primary transition-all">favorite_border</span>
                   <span className="absolute top-0 right-0 bg-[#F18700] rounded-full h-3 w-3 border-2 border-white dark:border-gray-900"></span>
                 </Link>
-                <Link href="#" className="flex items-center space-x-3 group text-gray-900 dark:text-white">
+                <Link href="/cart" className="flex items-center space-x-3 group text-gray-900 dark:text-white">
                   <div className="relative">
                     <span className="material-icons text-3xl group-hover:text-primary transition-all">shopping_cart</span>
-                    <span className="absolute -top-1 -right-2 bg-primary text-white text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white dark:border-gray-900">0</span>
+                    {totalItems > 0 && (
+                      <span className="absolute -top-1 -right-2 bg-primary text-white text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white dark:border-gray-900 animate-in zoom-in duration-300">
+                        {totalItems}
+                      </span>
+                    )}
                   </div>
                   <div className="hidden lg:flex flex-col">
                     <span className="imbra-label mb-1">Carrito</span>
-                    <span className="imbra-price !text-sm">$0.00</span>
+                    <span className="imbra-price !text-sm">{formattedPrice}</span>
                   </div>
                 </Link>
               </div>
@@ -90,13 +97,8 @@ export default function Header() {
 
       {/* SECCIÓN 3: BOTTOM BAR */}
       <nav className="w-full bg-white dark:bg-gray-950 font-display">
-        {/* DIV 1: FONDO (Full Width) */}
-        
         <div className="imbra-content-container">
-          {/* DIV 2: CONTENEDOR (1920px + padding global) */}
-          
           <div className="flex justify-between items-center py-4">
-            {/* DIV 3: CONTENIDO INTERNO */}
             <ul className="flex space-x-10 imbra-label !text-[12px] text-secondary dark:text-white">
               <li><Link href="/" className="text-primary hover:text-primary transition-colors flex items-center">INICIO <span className="material-icons text-sm ml-1">expand_more</span></Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors flex items-center group">TIENDA <span className="material-icons text-sm ml-1 text-gray-400 group-hover:text-primary transition-colors">expand_more</span></Link></li>

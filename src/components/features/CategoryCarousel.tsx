@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useEffect } from "react";
@@ -99,14 +100,13 @@ export default function CategoryCarousel() {
                   key={`${cat.id}-${index}`}
                   className="flex-shrink-0 w-[calc(100%/24)] flex flex-col items-center text-center group/item"
                 >
-                  <div className="w-full aspect-square mb-3 flex items-center justify-center transition-all duration-500 transform group-hover/item:-translate-y-1">
-                    <img 
+                  <div className="w-full aspect-square mb-3 flex items-center justify-center transition-all duration-500 transform group-hover/item:-translate-y-1 relative">
+                    <Image 
                       src={cat.img} 
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://placehold.co/200x200?text=${cat.name}`;
-                      }}
                       alt={cat.name}
-                      className="max-w-[70%] max-h-[70%] object-contain"
+                      fill
+                      className="object-contain p-4"
+                      unoptimized={cat.img.startsWith('/')}
                     />
                   </div>
                                     <span className="imbra-label !text-secondary group-hover:!text-primary transition-colors text-center leading-tight">

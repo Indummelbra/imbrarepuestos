@@ -3,6 +3,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useEffect } from "react";
+import Image from "next/image";
 
 /**
  * TESTIMONIALS AND BENEFITS COMPONENT - IMBRA DESIGN SYSTEM
@@ -131,7 +132,14 @@ export default function TestimonialsBenefits() {
                   <span className="text-[13px] font-bold text-gray-400 uppercase tracking-widest">(39 opiniones)</span>
                 </div>
                 <div className="flex items-center mt-1">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/3840px-Google_2015_logo.svg.png" alt="Google" className="h-4 w-auto object-contain opacity-90" />
+                  <Image 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/3840px-Google_2015_logo.svg.png" 
+                    alt="Google" 
+                    width={80}
+                    height={16}
+                    className="h-4 w-auto object-contain opacity-90"
+                    unoptimized
+                  />
                 </div>
               </div>
             </div>

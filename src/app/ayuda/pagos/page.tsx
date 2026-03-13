@@ -1,4 +1,5 @@
-import { ShieldCheck, CreditCard, Lock, HelpCircle } from 'lucide-react';
+import { ShieldCheck, HelpCircle } from 'lucide-react';
+import Image from 'next/image';
 
 export default function PaymentsFAQPage() {
   const faqs = [
@@ -56,10 +57,13 @@ export default function PaymentsFAQPage() {
           </p>
         </div>
         <div className="flex gap-4 items-center">
-          <img 
+          <Image 
             src="https://static.placetopay.com/placetopay-logo-dark-background.svg" 
             alt="PlacetoPay" 
-            className="h-10 opacity-80"
+            width={120}
+            height={40}
+            className="h-10 w-auto opacity-80"
+            unoptimized
           />
         </div>
       </div>

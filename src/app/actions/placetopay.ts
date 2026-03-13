@@ -46,11 +46,12 @@ export async function initiatePayment(params: InitiatePaymentParams) {
       success: false,
       error: response.status.message || 'No se pudo generar la URL de pago',
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Action initiatePayment error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Error interno al procesar el pago';
     return {
       success: false,
-      error: error.message || 'Error interno al procesar el pago',
+      error: errorMessage,
     };
   }
 }

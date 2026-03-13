@@ -26,6 +26,8 @@ export const metadata: Metadata = {
   description: "La tienda líder en repuestos industriales y accesorios para motos. Calidad garantizada para profesionales.",
 };
 
+import { CartProvider } from "@/context/CartContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,7 +42,9 @@ export default function RootLayout({
         className={`${inter.variable} ${montserrat.variable} ${archivo.variable} font-sans antialiased min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        {children}
+        <CartProvider>
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

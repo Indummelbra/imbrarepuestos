@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 /**
  * PROMOBANNERS - Estructura 3 Niveles
@@ -22,10 +23,12 @@ export default function PromoBanners() {
 
           {/* Banner 1: Rines (Naranja Corporativo) */}
           <div className="lg:col-span-5 relative group overflow-hidden bg-primary h-[300px] md:h-auto">
-            <img 
+            <Image 
               src="/banners/rim-yellow.png" 
               alt="Repuestos Originales" 
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-80 group-hover:scale-105 transition-transform duration-700"
+              fill
+              className="object-cover mix-blend-multiply opacity-80 group-hover:scale-105 transition-transform duration-700"
+              unoptimized
             />
             <div className="absolute inset-0 p-8 flex flex-col justify-center items-start z-10">
               <span className="imbra-label !text-white mb-2">
@@ -49,10 +52,12 @@ export default function PromoBanners() {
 
           {/* Banner 2: Amortiguación (Negro Corporativo) */}
           <div className="lg:col-span-4 relative group overflow-hidden bg-secondary h-[300px] md:h-auto border-l border-white/5">
-            <img 
+            <Image 
               src="/banners/shock-blue.png" 
               alt="Equipamiento Esencial" 
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-60 group-hover:scale-105 transition-transform duration-700"
+              fill
+              className="object-cover mix-blend-multiply opacity-60 group-hover:scale-105 transition-transform duration-700"
+              unoptimized
             />
             <div className="absolute inset-0 p-8 flex flex-col justify-center items-start z-10">
               <span className="imbra-label-orange mb-2">
@@ -78,10 +83,12 @@ export default function PromoBanners() {
           <div className="lg:col-span-3 flex flex-col h-full">
             {/* Banner 3: Llantas */}
             <div className="relative h-1/2 group overflow-hidden bg-primary flex-1 min-h-[250px] border-b border-white/5">
-              <img 
+              <Image 
                 src="/banners/tires-dark.png" 
                 alt="Accesorios" 
-                className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-70 group-hover:scale-110 transition-transform duration-1000"
+                fill
+                className="object-cover mix-blend-multiply opacity-70 group-hover:scale-110 transition-transform duration-1000"
+                unoptimized
               />
               <div className="absolute inset-0 p-8 flex flex-col justify-center z-10">
                 <h3 className="imbra-h3 text-white !text-white !text-xl md:!text-2xl">
@@ -94,10 +101,12 @@ export default function PromoBanners() {
             </div>
             {/* Banner 4: Baterías */}
             <div className="relative h-1/2 group overflow-hidden bg-secondary flex-1 min-h-[250px] border-l border-white/5">
-              <img 
+              <Image 
                 src="/banners/battery-dark.png" 
                 alt="Baterías" 
-                className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-1000"
+                fill
+                className="object-cover opacity-40 group-hover:scale-110 transition-transform duration-1000"
+                unoptimized
               />
               <div className="absolute inset-0 p-8 flex flex-col justify-center items-end text-right z-10">
                 <span className="imbra-label-orange mb-2">

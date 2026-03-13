@@ -2,6 +2,7 @@ import Header from "@/components/layout/Header";
 import MotoSelector from "@/components/features/MotoSelector";
 import Hero from "@/components/features/Hero";
 import CategoryCarousel from "@/components/features/CategoryCarousel";
+import ProductShowcase from "@/components/features/ProductShowcase";
 import PromoBanners from "@/components/features/PromoBanners";
 import ProfessionalCTA from "@/components/features/ProfessionalCTA";
 import TestimonialsBenefits from "@/components/features/TestimonialsBenefits";
@@ -16,6 +17,7 @@ export default function Home() {
         <MotoSelector />
         <Hero />
         <CategoryCarousel />
+        <ProductShowcase />
         <PromoBanners />
         <ProfessionalCTA />
         <TestimonialsBenefits />

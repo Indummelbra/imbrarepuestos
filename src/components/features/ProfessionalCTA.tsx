@@ -13,11 +13,6 @@ import { motion } from 'framer-motion';
  */
 
 const ProfessionalCTA = () => {
-  const benefits = [
-    { title: "Descuento adicional del 10% sobre precios de fábrica" },
-    { title: "Envío nacional priorizado y soporte técnico especializado" },
-    { title: "Acceso a inventario exclusivo y preventas industriales" }
-  ];
 
   return (
     <section className="w-full bg-white py-16 lg:py-24" id="div-1">
