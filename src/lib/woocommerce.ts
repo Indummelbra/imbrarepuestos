@@ -49,22 +49,33 @@ async function fetchWooGraphQL(query: string, variables: Record<string, unknown>
   if (!WOOCOMMERCE_URL) {
     throw new Error("Faltan variables de entorno de WooCommerce (URL)");
   }
-  const response = await fetch(GRAPHQL_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query, variables }),
-    ...options,
-  });
+  try {
+    const response = await fetch(GRAPHQL_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query, variables }),
+      ...options,
+    });
 
-  const json = await response.json();
-  if (json.errors) {
-    console.error('GraphQL Errors:', json.errors);
-    throw new Error('Error en la petición GraphQL');
+    if (!response.ok) {
+      console.error(`GraphQL HTTP Error: ${response.status}`);
+      return null;
+    }
+
+    const json = await response.json();
+    if (json.errors) {
+      console.error('GraphQL Errors Details:', JSON.stringify(json.errors, null, 2));
+      // No lanzamos error para permitir que getProducts intente el fallback REST
+      return null;
+    }
+
+    return json.data;
+  } catch (error) {
+    console.error('fetchWooGraphQL Exception:', error);
+    return null;
   }
-
-  return json.data;
 }
 
 /**
@@ -125,6 +136,10 @@ export async function getProducts(): Promise<Product[]> {
 
     const data = await fetchWooGraphQL(query, {}, { next: { tags: ['products'], revalidate: 3600 } });
     
+    if (!data || !data.products) {
+      throw new Error("GraphQL no devolvió datos de productos");
+    }
+
     interface GQLNode {
       databaseId: number;
       name: string;
