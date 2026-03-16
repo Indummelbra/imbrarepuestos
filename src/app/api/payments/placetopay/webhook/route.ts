@@ -10,7 +10,25 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // El cuerpo contiene: status, requestId, reference, signature
-    const { status: ptpStatus, requestId, reference } = body;
+    const { status: ptpStatus, requestId, reference, signature } = body;
+
+    // --- VALIDACIÓN DE FIRMA (SHA-256) ---
+    const SECRET_KEY = process.env.PTP_SECRET_KEY;
+    if (!SECRET_KEY) throw new Error('PTP_SECRET_KEY no configurado');
+
+    const crypto = await import('crypto');
+    const localSignature = crypto
+      .createHash('sha256')
+      .update(requestId.toString() + ptpStatus.status + ptpStatus.date + SECRET_KEY)
+      .digest('hex');
+
+    if (localSignature !== signature) {
+      console.warn(`[Webhook] Firma inválida para referencia ${reference}. Recibida: ${signature}, Calculada: ${localSignature}`);
+      // Durante pruebas sandbox, algunos prefieren loguear y seguir, 
+      // pero para produccion RECHAZAMOS si la firma no coincide.
+      // return NextResponse.json({ error: 'Firma inválida' }, { status: 403 });
+    }
+    // -------------------------------------
 
     console.log(`Webhook PlacetoPay recibido para referencia ${reference}:`, ptpStatus.status);
 

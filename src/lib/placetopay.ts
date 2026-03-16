@@ -17,7 +17,7 @@ export function generateAuth(): PTPAuth {
   const nonceRaw = crypto.randomBytes(16);
   const nonce = nonceRaw.toString('base64');
   
-  const hash = crypto.createHash('sha1');
+  const hash = crypto.createHash('sha256');
   hash.update(nonceRaw);
   hash.update(seed);
   hash.update(SECRET_KEY);
