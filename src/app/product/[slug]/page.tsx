@@ -48,7 +48,7 @@ export default async function ProductPage({ params }: PageProps) {
               
               {/* Div 1: Imágenes */}
               <div className="space-y-4">
-                <div className="relative aspect-square bg-gray-50 border border-gray-100 overflow-hidden group">
+                <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden group">
                   <Image 
                     src={product.images[0]?.src || "/placeholder.png"} 
                     alt={product.images[0]?.alt || product.name}
@@ -66,7 +66,7 @@ export default async function ProductPage({ params }: PageProps) {
                 {product.images.length > 1 && (
                   <div className="grid grid-cols-4 gap-4">
                     {product.images.slice(0, 4).map((img, i) => (
-                      <div key={i} className="aspect-square bg-gray-50 border border-gray-100 cursor-pointer hover:border-primary transition-colors p-2 relative">
+                      <div key={i} className="aspect-square bg-white border border-gray-100 cursor-pointer hover:border-primary transition-colors p-2 relative">
                         <Image 
                           src={img.src} 
                           alt={img.alt || product.name} 

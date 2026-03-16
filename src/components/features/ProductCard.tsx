@@ -17,7 +17,7 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
       {/* Product Image */}
-      <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-900">
+      <div className="relative aspect-square overflow-hidden bg-white dark:bg-gray-900">
         <Link href={`/product/${product.slug}`} className="block w-full h-full">
           <div className="w-full h-full flex items-center justify-center p-4 group-hover:scale-110 transition-transform duration-500 relative">
             <Image 

@@ -7,6 +7,12 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'movil.indummelbra.com',
+        port: '50101',
+        pathname: '/Imbrapp/images/**',
+      },
     ],
   },
 };

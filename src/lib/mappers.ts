@@ -48,13 +48,16 @@ export function mapWooProductToImbra(wooProduct: WooProductRaw): Product {
   // Un producto es comprable solo si tiene stock real > 0 Y el estado es 'instock'
   const is_comprable = stock_quantity > 0 && stock_status === 'instock';
 
-  // 3. Normalización de Imágenes
-  const images = wooProduct.images && wooProduct.images.length > 0 
-    ? wooProduct.images.map((img) => ({
-        src: img.src || img.sourceUrl || "/images/placeholder.png",
-        alt: img.alt || wooProduct.name
-      }))
-    : [{ src: "/images/placeholder.png", alt: wooProduct.name }];
+  // 3. Normalización de Imágenes SAP (Fuente única de verdad)
+  const cleanSku = (wooProduct.sku || "").toLowerCase().replace(/b$/, "");
+  const sapImageUrl = cleanSku 
+    ? `https://movil.indummelbra.com:50101/Imbrapp/images/${cleanSku}.png`
+    : "/images/placeholder.png";
+
+  const images = [{ 
+    src: sapImageUrl, 
+    alt: wooProduct.name 
+  }];
 
   // 4. Mapeo Final
   return {

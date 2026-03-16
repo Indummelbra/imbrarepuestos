@@ -59,7 +59,7 @@ export default function CartPage() {
                     <div key={item.product.id} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center py-6 border-b border-gray-100 group">
                       {/* Info Mini */}
                       <div className="lg:col-span-6 flex items-center space-x-4">
-                        <div className="relative w-24 aspect-square bg-gray-50 border border-gray-100 p-2 overflow-hidden">
+                        <div className="relative w-24 aspect-square bg-white border border-gray-100 p-2 overflow-hidden">
                           <Image 
                             src={item.product.images[0]?.src || "/placeholder.png"} 
                             alt={item.product.name}
