@@ -1,14 +1,18 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useCart } from "@/context/CartContext";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { initiatePayment } from '@/app/actions/placetopay';
 
 export default function CheckoutForm() {
-  const { items, totalPrice, clearCart } = useCart();
-  const router = useRouter();
+  const { items, totalPrice } = useCart();
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Referencia para bloqueo sincrono anti-doble-clic (Guia WC, punto 3.1)
+  const isSubmitting = useRef(false);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -16,23 +20,45 @@ export default function CheckoutForm() {
     email: '',
     phone: '',
     address: '',
-    city: 'Bogotá',
-    state: 'Cundinamarca'
+    city: 'Bogota',
+    state: 'Cundinamarca',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  /**
+   * Flujo completo de pago:
+   * 1. Bloqueo anti-doble-clic
+   * 2. Obtener IP real del usuario
+   * 3. Crear orden en WooCommerce (estado "pending")
+   * 4. Crear sesion en PlacetoPay via Server Action
+   * 5. Guardar requestId en sessionStorage
+   * 6. Redirigir al portal de pagos PlacetoPay
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Bloqueo sincrono — previene doble envio antes de que React re-renderice (Guia WC, punto 3.1)
+    if (isSubmitting.current) return;
+    isSubmitting.current = true;
     setLoading(true);
+    setErrorMsg(null);
 
     try {
-      // 1. Validar Stock Real-Time (Opcional pero recomendado)
-      // await fetch('/api/checkout/validate-stock', { ... })
+      // PASO 1: Obtener la IP real del cliente (Guia WC, punto 3.5)
+      let clientIp = '127.0.0.1';
+      try {
+        const ipRes = await fetch('/api/user-ip');
+        const ipData = await ipRes.json();
+        clientIp = ipData.ip || '127.0.0.1';
+      } catch {
+        // Si falla, usamos fallback — no bloqueamos el pago
+        console.warn('No se pudo obtener la IP del cliente, usando fallback.');
+      }
 
-      // 2. Crear Orden en WooCommerce
+      // PASO 2: Crear la orden en WooCommerce con estado "pending"
       const orderPayload = {
         billing: {
           first_name: formData.firstName,
@@ -42,58 +68,90 @@ export default function CheckoutForm() {
           state: formData.state,
           email: formData.email,
           phone: formData.phone,
-          country: 'CO'
+          country: 'CO',
         },
         line_items: items.map(item => ({
           product_id: item.product.id,
-          quantity: item.quantity
+          quantity: item.quantity,
         })),
         payment_method: 'placetopay',
         payment_method_title: 'PlacetoPay (PSE/Tarjetas)',
         meta_data: [
-          { key: '_billing_dni', value: formData.dni }
-        ]
+          { key: '_billing_dni', value: formData.dni },
+        ],
       };
 
-      const response = await fetch('/api/checkout/create-order', {
+      const orderRes = await fetch('/api/checkout/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderPayload)
+        body: JSON.stringify(orderPayload),
       });
 
-      const data = await response.json();
+      const orderData = await orderRes.json();
 
-      if (data.success) {
-        // En una implementación real aquí redirigiríamos a PlacetoPay
-        // console.log("Redirigiendo a pago para orderId:", data.orderId);
-        
-        // Simulación:
-        alert("¡Pedido creado con éxito en WooCommerce! ID: " + data.orderId);
-        clearCart();
-        router.push('/'); 
-      } else {
-        alert("Error al crear el pedido: " + data.message);
+      if (!orderData.success) {
+        setErrorMsg(orderData.message || 'Error al crear el pedido. Intenta de nuevo.');
+        return;
       }
+
+      // PASO 3: Iniciar sesion de pago en PlacetoPay via Server Action
+      const ptpResult = await initiatePayment({
+        reference: String(orderData.orderId),
+        description: `Pedido Imbra Repuestos #${orderData.orderId}`,
+        amount: {
+          currency: 'COP',
+          total: Math.round(parseFloat(orderData.total)),
+        },
+        buyer: {
+          name: formData.firstName,
+          surname: formData.lastName,
+          email: formData.email,
+          mobile: formData.phone,
+          // Tipo y numero de documento (Guia WC, punto 3.5)
+          documentType: 'CC',
+          document: formData.dni,
+        },
+        ipAddress: clientIp,
+        userAgent: navigator.userAgent,
+      });
+
+      if (!ptpResult.success || !ptpResult.processUrl) {
+        setErrorMsg(ptpResult.error || 'No se pudo iniciar el pago. Intenta de nuevo.');
+        return;
+      }
+
+      // PASO 4: Guardar requestId en sessionStorage para que la pagina de resultado
+      // pueda consultar el estado con QuerySession sin depender de la URL original
+      if (ptpResult.requestId) {
+        sessionStorage.setItem('ptp_request_id', String(ptpResult.requestId));
+        sessionStorage.setItem('ptp_order_id', String(orderData.orderId));
+      }
+
+      // PASO 5: Redirigir al portal de pagos de PlacetoPay
+      window.location.href = ptpResult.processUrl;
+
     } catch (error) {
-      console.error(error);
-      alert("Error de conexión al procesar el pedido.");
+      console.error('Error en el proceso de pago:', error);
+      setErrorMsg('Error de conexion. Por favor intenta de nuevo.');
     } finally {
       setLoading(false);
+      isSubmitting.current = false;
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Columna Info Personal */}
+
+      {/* Columna informacion personal */}
       <div className="space-y-6">
         <h3 className="font-Archivo font-black text-secondary uppercase tracking-widest border-b-2 border-primary pb-2 inline-block">
           DATOS DEL CLIENTE
         </h3>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase">Nombre</label>
-            <input 
+            <input
               required
               name="firstName"
               value={formData.firstName}
@@ -103,7 +161,7 @@ export default function CheckoutForm() {
           </div>
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase">Apellido</label>
-            <input 
+            <input
               required
               name="lastName"
               value={formData.lastName}
@@ -114,12 +172,15 @@ export default function CheckoutForm() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-bold text-gray-400 uppercase">Cédula / NIT / DNI</label>
-          <input 
+          <label className="text-[10px] font-bold text-gray-400 uppercase">Cedula / NIT / DNI</label>
+          <input
             required
             name="dni"
             value={formData.dni}
             onChange={handleChange}
+            inputMode="numeric"
+            pattern="[0-9]+"
+            title="Solo numeros"
             className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
           />
         </div>
@@ -127,7 +188,7 @@ export default function CheckoutForm() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase">Email</label>
-            <input 
+            <input
               required
               type="email"
               name="email"
@@ -137,24 +198,25 @@ export default function CheckoutForm() {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">Teléfono</label>
-            <input 
+            <label className="text-[10px] font-bold text-gray-400 uppercase">Telefono</label>
+            <input
               required
               name="phone"
               value={formData.phone}
               onChange={handleChange}
+              inputMode="numeric"
               className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary text-sm"
             />
           </div>
         </div>
 
         <h3 className="font-Archivo font-black text-secondary uppercase tracking-widest pt-6 border-b-2 border-primary pb-2 inline-block">
-          DIRECCIÓN DE ENVÍO
+          DIRECCION DE ENVIO
         </h3>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-bold text-gray-400 uppercase">Dirección Completa</label>
-          <input 
+          <label className="text-[10px] font-bold text-gray-400 uppercase">Direccion Completa</label>
+          <input
             required
             name="address"
             placeholder="Calle, Carrera, Edificio, Apto..."
@@ -167,7 +229,7 @@ export default function CheckoutForm() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase">Ciudad</label>
-            <input 
+            <input
               required
               name="city"
               value={formData.city}
@@ -177,7 +239,7 @@ export default function CheckoutForm() {
           </div>
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase">Departamento</label>
-            <input 
+            <input
               required
               name="state"
               value={formData.state}
@@ -188,12 +250,13 @@ export default function CheckoutForm() {
         </div>
       </div>
 
-      {/* Columna Resumen y Pago */}
+      {/* Columna resumen y boton de pago */}
       <div className="bg-gray-50 p-8 border border-gray-200">
         <h3 className="font-Archivo font-black text-secondary uppercase tracking-widest mb-8 text-center border-b-4 border-primary pb-4">
           FINALIZAR TU PEDIDO
         </h3>
 
+        {/* Lista de productos en el carrito */}
         <div className="space-y-4 mb-8 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {items.map(item => (
             <div key={item.product.id} className="flex justify-between items-center text-xs pb-3 border-b border-gray-200">
@@ -208,13 +271,14 @@ export default function CheckoutForm() {
           ))}
         </div>
 
+        {/* Totales */}
         <div className="bg-white p-6 border border-gray-200 shadow-sm space-y-4 mb-8">
           <div className="flex justify-between items-center text-xs">
             <span className="font-bold text-gray-400 uppercase">SUBTOTAL</span>
             <span className="font-bold text-secondary">${totalPrice.toLocaleString('es-CO')}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="font-bold text-gray-400 uppercase">ENVÍO A {formData.city}</span>
+            <span className="font-bold text-gray-400 uppercase">ENVIO A {formData.city}</span>
             <span className="font-bold text-green-600 uppercase italic">POR CALCULAR</span>
           </div>
           <div className="pt-4 border-t border-gray-200 flex justify-between items-end">
@@ -225,26 +289,37 @@ export default function CheckoutForm() {
           </div>
         </div>
 
-        <button 
+        {/* Mensaje de error */}
+        {errorMsg && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-xs font-bold p-3 uppercase tracking-wide">
+            {errorMsg}
+          </div>
+        )}
+
+        {/* Boton de pago */}
+        <button
           type="submit"
           disabled={loading || items.length === 0}
           className={`w-full py-6 flex flex-col items-center justify-center transition-all shadow-xl
-            ${loading 
-              ? 'bg-gray-200 cursor-wait' 
+            ${loading
+              ? 'bg-gray-200 cursor-wait'
               : 'bg-primary text-secondary hover:bg-secondary hover:text-white shadow-primary/10'
             }`}
         >
           <span className="font-Archivo font-black text-lg tracking-[0.2em]">
             {loading ? 'PROCESANDO...' : 'PAGAR CON PLACETOPAY'}
           </span>
-          <span className="text-[10px] font-bold opacity-70 mt-1 uppercase tracking-widest">Pago 100% Seguro por PSE o Tarjetas</span>
+          <span className="text-[10px] font-bold opacity-70 mt-1 uppercase tracking-widest">
+            Pago 100% Seguro por PSE o Tarjetas
+          </span>
         </button>
 
+        {/* Logo PlacetoPay (Guia WC, punto 7.4) */}
         <div className="mt-8 pt-8 border-t border-gray-200 flex flex-col items-center space-y-4">
-           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em]">PROCESADO POR</p>
-           <Image 
-            src="https://checkout.placetopay.com/images/logos-color.png" 
-            alt="PlacetoPay" 
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em]">PROCESADO POR</p>
+          <Image
+            src="https://static.placetopay.com/placetopay-logo.svg"
+            alt="PlacetoPay by Evertec"
             width={120}
             height={32}
             className="h-8 w-auto"

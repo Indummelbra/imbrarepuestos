@@ -95,43 +95,61 @@ export async function getProducts(): Promise<Product[]> {
             description
             shortDescription
             onSale
-            ... on ProductWithPricing {
-              regularPrice
-              salePrice
-              price
-            }
             image {
               sourceUrl
               altText
             }
-            ... on ProductWithGallery {
+            ... on SimpleProduct {
+              price
+              regularPrice
+              salePrice
+              stockStatus
+              stockQuantity
               galleryImages {
                 nodes {
                   sourceUrl
                   altText
                 }
               }
-            }
-            productCategories {
-              nodes {
-                databaseId
-                name
-                slug
+              productCategories {
+                nodes {
+                  databaseId
+                  name
+                  slug
+                }
               }
-            }
-            attributes {
-              nodes {
-                name
-                options
+              attributes {
+                nodes {
+                  name
+                  options
+                }
               }
-            }
-            ... on SimpleProduct {
-              stockStatus
-              stockQuantity
             }
             ... on VariableProduct {
+              price
+              regularPrice
+              salePrice
               stockStatus
               stockQuantity
+              galleryImages {
+                nodes {
+                  sourceUrl
+                  altText
+                }
+              }
+              productCategories {
+                nodes {
+                  databaseId
+                  name
+                  slug
+                }
+              }
+              attributes {
+                nodes {
+                  name
+                  options
+                }
+              }
             }
           }
         }
