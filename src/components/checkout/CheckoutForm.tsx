@@ -357,9 +357,11 @@ export default function CheckoutForm() {
               }`}
             />
             {touched.email && !validateEmail(formData.email) && (
-              <p className="text-[10px] text-red-600 font-bold uppercase italic">
-                El correo debe incluir @, dominio y extensión (ej: .com)
-              </p>
+              <div className="flex items-center gap-1 mt-1 bg-red-50 text-red-600 px-2 py-0.5 rounded border border-red-100 w-fit animate-pulse">
+                <span className="text-[9px] font-bold uppercase">
+                  Email incompleto: requiere @ y dominio completo
+                </span>
+              </div>
             )}
           </div>
           <div className="space-y-1">
