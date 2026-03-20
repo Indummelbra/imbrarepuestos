@@ -99,6 +99,14 @@ export default function CheckoutForm() {
   };
 
   /**
+   * Valida el formato de email de forma estricta (usuario@dominio.ext)
+   */
+  const validateEmail = (email: string) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+
+  /**
    * Flujo completo de pago:
    * 1. Validaciones locales
    * 2. Bloqueo anti-doble-clic
@@ -126,6 +134,10 @@ export default function CheckoutForm() {
     }
     if (!validateDocument(formData.documentType, formData.dni)) {
       setErrorMsg(`El número de documento no es válido para el tipo ${formData.documentType}.`);
+      return;
+    }
+    if (!validateEmail(formData.email)) {
+      setErrorMsg('Por favor ingresa un correo electrónico válido (ej: usuario@dominio.com).');
       return;
     }
     if (!acceptTerms) {
