@@ -36,6 +36,7 @@ export async function initiatePayment(params: InitiatePaymentParams) {
         amount,
       },
       buyer,
+      payer: buyer, // Requisito implícito: a menudo ayuda en la gestión de fraudes
       // Requisito Guia WC punto 1: expiracion de 30 minutos
       expiration: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       // La referencia va en la URL para identificar el pedido al regresar
@@ -64,5 +65,22 @@ export async function initiatePayment(params: InitiatePaymentParams) {
       success: false,
       error: errorMessage,
     };
+  }
+}
+
+/**
+ * Guarda el requestId de PlacetoPay en los metadatos del pedido de WooCommerce
+ * para que la sonda (Cron) pueda consultarlo despues.
+ */
+export async function savePTPRequestId(orderId: number, requestId: number) {
+  try {
+    const { updateOrderMetadata } = await import('@/lib/woocommerce');
+    await updateOrderMetadata(orderId, [
+      { key: '_ptp_request_id', value: String(requestId) }
+    ]);
+    return { success: true };
+  } catch (error) {
+    console.error(`Error saving PTP requestId for order ${orderId}:`, error);
+    return { success: false };
   }
 }

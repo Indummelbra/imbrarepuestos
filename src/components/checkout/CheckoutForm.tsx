@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
+import Link from 'next/link';
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
-import { initiatePayment } from '@/app/actions/placetopay';
+import { initiatePayment, savePTPRequestId } from '@/app/actions/placetopay';
 
 export default function CheckoutForm() {
   const { items, totalPrice } = useCart();
@@ -16,6 +17,7 @@ export default function CheckoutForm() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    documentType: 'CC',
     dni: '',
     email: '',
     phone: '',
@@ -24,21 +26,89 @@ export default function CheckoutForm() {
     state: 'Cundinamarca',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Cargar datos persistidos al montar el componente
+  React.useEffect(() => {
+    const savedData = localStorage.getItem('imbra_checkout_data');
+    if (savedData) {
+      try {
+        setFormData(prev => ({ ...prev, ...JSON.parse(savedData) }));
+      } catch (e) {
+        console.error('Error parseando datos persistidos:', e);
+      }
+    }
+  }, []);
+
+  // Persistir datos cada vez que cambian
+  React.useEffect(() => {
+    localStorage.setItem('imbra_checkout_data', JSON.stringify(formData));
+  }, [formData]);
+
+  const [acceptTerms, setAcceptTerms] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   /**
+   * Valida que el nombre/apellido no contenga números ni caracteres especiales (excepto tildes y ñ)
+   */
+  const validateName = (text: string) => {
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    return regex.test(text);
+  };
+
+  /**
+   * Valida el número de documento según el tipo seleccionado (Colombia específico + Global)
+   */
+  const validateDocument = (type: string, doc: string) => {
+    switch (type) {
+      case 'CC': // Cedula de Ciudadania: 7-10 digitos
+        return /^\d{7,10}$/.test(doc);
+      case 'NIT': // NIT: 9 digitos + DV opcional
+      case 'RUT':
+        return /^\d{9}(-?[\dkK])?$/.test(doc);
+      case 'CE': // Cedula de Extranjeria: 6-10 digitos
+      case 'TI': // Tarjeta de Identidad: 6-10 digitos
+        return /^\d{6,10}$/.test(doc);
+      case 'PPN': // Pasaporte: Alfanumerico 6-20
+        return /^[a-zA-Z0-9]{6,20}$/.test(doc);
+      case 'DNI': // DNI (General): 6-15 digitos
+        return /^\d{6,15}$/.test(doc);
+      default:
+        return doc.length >= 5; // Fallback generico
+    }
+  };
+
+  /**
    * Flujo completo de pago:
-   * 1. Bloqueo anti-doble-clic
-   * 2. Obtener IP real del usuario
-   * 3. Crear orden en WooCommerce (estado "pending")
-   * 4. Crear sesion en PlacetoPay via Server Action
-   * 5. Guardar requestId en sessionStorage
-   * 6. Redirigir al portal de pagos PlacetoPay
+   * 1. Validaciones locales
+   * 2. Bloqueo anti-doble-clic
+   * 3. Obtener IP real del usuario
+   * 4. Crear orden en WooCommerce (estado "pending")
+   * 5. Crear sesion en PlacetoPay via Server Action
+   * 6. Guardar requestId en sessionStorage
+   * 7. Redirigir al portal de pagos PlacetoPay
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // VALIDACIONES PREVIAS
+    if (!validateName(formData.firstName)) {
+      setErrorMsg('El nombre no debe contener números ni caracteres especiales.');
+      return;
+    }
+    if (!validateName(formData.lastName)) {
+      setErrorMsg('El apellido no debe contener números ni caracteres especiales.');
+      return;
+    }
+    if (!validateDocument(formData.documentType, formData.dni)) {
+      setErrorMsg(`El número de documento no es válido para el tipo ${formData.documentType}.`);
+      return;
+    }
+    if (!acceptTerms) {
+      setErrorMsg('Debes aceptar los términos y condiciones para continuar.');
+      return;
+    }
 
     // Bloqueo sincrono — previene doble envio antes de que React re-renderice (Guia WC, punto 3.1)
     if (isSubmitting.current) return;
@@ -78,6 +148,7 @@ export default function CheckoutForm() {
         payment_method_title: 'PlacetoPay (PSE/Tarjetas)',
         meta_data: [
           { key: '_billing_dni', value: formData.dni },
+          { key: '_billing_document_type', value: formData.documentType },
         ],
       };
 
@@ -107,9 +178,14 @@ export default function CheckoutForm() {
           surname: formData.lastName,
           email: formData.email,
           mobile: formData.phone,
-          // Tipo y numero de documento (Guia WC, punto 3.5)
-          documentType: 'CC',
+          documentType: formData.documentType,
           document: formData.dni,
+          address: {
+            street: formData.address,
+            city: formData.city,
+            state: formData.state,
+            country: 'CO',
+          }
         },
         ipAddress: clientIp,
         userAgent: navigator.userAgent,
@@ -120,9 +196,12 @@ export default function CheckoutForm() {
         return;
       }
 
-      // PASO 4: Guardar requestId en sessionStorage para que la pagina de resultado
-      // pueda consultar el estado con QuerySession sin depender de la URL original
+      // PASO 4: Guardar requestId para la sonda (Cron) y sesion actual
       if (ptpResult.requestId) {
+        // En WooCommerce (metadatos)
+        await savePTPRequestId(orderData.orderId, ptpResult.requestId);
+        
+        // En sessionStorage para la pagina de resultado inmediata
         sessionStorage.setItem('ptp_request_id', String(ptpResult.requestId));
         sessionStorage.setItem('ptp_order_id', String(orderData.orderId));
       }
@@ -154,6 +233,7 @@ export default function CheckoutForm() {
             <input
               required
               name="firstName"
+              placeholder="Ej: Juan"
               value={formData.firstName}
               onChange={handleChange}
               className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
@@ -164,6 +244,7 @@ export default function CheckoutForm() {
             <input
               required
               name="lastName"
+              placeholder="Ej: Perez"
               value={formData.lastName}
               onChange={handleChange}
               className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
@@ -171,18 +252,42 @@ export default function CheckoutForm() {
           </div>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold text-gray-400 uppercase">Cedula / NIT / DNI</label>
-          <input
-            required
-            name="dni"
-            value={formData.dni}
-            onChange={handleChange}
-            inputMode="numeric"
-            pattern="[0-9]+"
-            title="Solo numeros"
-            className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
-          />
+        <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-gray-400 uppercase">Tipo</label>
+            <select
+              name="documentType"
+              value={formData.documentType}
+              onChange={handleChange}
+              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
+            >
+              {/* Colombia */}
+              <option value="CC">CC - Cédula de Ciudadanía</option>
+              <option value="CE">CE - Cédula de Extranjería</option>
+              <option value="NIT">NIT - Número Identificación Tributaria</option>
+              <option value="TI">TI - Tarjeta de Identidad</option>
+              <option value="RUT">RUT - Registro Único Tributario</option>
+              {/* Otros / Global */}
+              <option value="PPN">PPN - Pasaporte</option>
+              <option value="DNI">DNI - Documento Nacional Identidad</option>
+              <option value="CI">CI - Cédula de Identidad</option>
+              <option value="RUC">RUC - Registro Único Contribuyente</option>
+              <option value="CPF">CPF - Cadastro de Pessoas Físicas</option>
+              <option value="TAX">TAX - Tax Identification Number</option>
+            </select>
+          </div>
+          <div className="col-span-2 space-y-1">
+            <label className="text-[10px] font-bold text-gray-400 uppercase">Número de Identificación</label>
+            <input
+              required
+              name="dni"
+              value={formData.dni}
+              onChange={handleChange}
+              inputMode="numeric"
+              placeholder="Sin puntos ni guiones"
+              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -194,6 +299,7 @@ export default function CheckoutForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              placeholder="ejemplo@correo.com"
               className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary text-sm"
             />
           </div>
@@ -205,6 +311,7 @@ export default function CheckoutForm() {
               value={formData.phone}
               onChange={handleChange}
               inputMode="numeric"
+              placeholder="Ej: 3001234567"
               className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary text-sm"
             />
           </div>
@@ -287,6 +394,20 @@ export default function CheckoutForm() {
               ${totalPrice.toLocaleString('es-CO')}
             </span>
           </div>
+        </div>
+
+        {/* Términos y Condiciones */}
+        <div className="mb-6 flex items-start gap-3">
+          <input
+            type="checkbox"
+            id="acceptTerms"
+            checked={acceptTerms}
+            onChange={(e) => setAcceptTerms(e.target.checked)}
+            className="mt-1 w-4 h-4 accent-primary"
+          />
+          <label htmlFor="acceptTerms" className="text-[11px] font-bold text-gray-500 uppercase leading-tight cursor-pointer">
+            He leído y acepto los <Link href="/legal/terminos-y-condiciones" target="_blank" className="text-secondary border-b border-secondary">términos y condiciones</Link> de compra y la política de tratamiento de datos.
+          </label>
         </div>
 
         {/* Mensaje de error */}

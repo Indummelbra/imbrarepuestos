@@ -356,3 +356,29 @@ export async function updateOrderStatus(orderId: number, status: string, setPaid
     })
   });
 }
+
+/**
+ * Actualiza los metadatos de un pedido.
+ */
+export async function updateOrderMetadata(orderId: number, metaData: Array<{ key: string, value: string }>) {
+  return fetchWooRest(`orders/${orderId}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      meta_data: metaData
+    })
+  });
+}
+
+/**
+ * Obtiene pedidos con un estado específico.
+ */
+export async function getOrdersByStatus(status: string) {
+  return fetchWooRest(`orders?status=${status}&per_page=100`);
+}
+
+/**
+ * Obtiene un pedido específico por su ID.
+ */
+export async function getOrder(orderId: number) {
+  return fetchWooRest(`orders/${orderId}`);
+}

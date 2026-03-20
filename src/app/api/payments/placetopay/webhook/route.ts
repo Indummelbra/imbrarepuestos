@@ -16,16 +16,19 @@ export async function POST(request: NextRequest) {
     const SECRET_KEY = process.env.PTP_SECRET_KEY;
     if (!SECRET_KEY) throw new Error('PTP_SECRET_KEY no configurado');
 
+    // Limpiar el prefijo sha256: si está presente (Documentación PTP)
+    const receivedSignature = signature.startsWith('sha256:') 
+      ? signature.replace('sha256:', '') 
+      : signature;
+
     const crypto = await import('crypto');
     const localSignature = crypto
       .createHash('sha256')
       .update(requestId.toString() + ptpStatus.status + ptpStatus.date + SECRET_KEY)
       .digest('hex');
 
-    if (localSignature !== signature) {
-      console.warn(`[Webhook] Firma inválida para referencia ${reference}. Recibida: ${signature}, Calculada: ${localSignature}`);
-      // Durante pruebas sandbox, algunos prefieren loguear y seguir, 
-      // pero para produccion RECHAZAMOS si la firma no coincide.
+    if (localSignature !== receivedSignature) {
+      console.warn(`[Webhook] Firma inválida para referencia ${reference}. Recibida: ${receivedSignature}, Calculada: ${localSignature}`);
       // return NextResponse.json({ error: 'Firma inválida' }, { status: 403 });
     }
     // -------------------------------------

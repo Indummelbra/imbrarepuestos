@@ -17,6 +17,15 @@ export interface PTPAmount {
   total: number;
 }
 
+export interface PTPAddress {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  phone?: string;
+  postalCode?: string;
+}
+
 export interface PTPBuyer {
   document?: string;
   documentType?: string;
@@ -24,6 +33,7 @@ export interface PTPBuyer {
   surname: string;
   email: string;
   mobile?: string;
+  address?: PTPAddress;
 }
 
 export interface PTPPayment {
@@ -38,6 +48,7 @@ export interface PTPCreateSessionRequest {
   auth: PTPAuth;
   payment: PTPPayment;
   buyer?: PTPBuyer;
+  payer?: PTPBuyer;
   expiration: string;
   returnUrl: string;
   ipAddress: string;

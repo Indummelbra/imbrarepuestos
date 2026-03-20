@@ -132,14 +132,29 @@ export default function Footer() {
               
               <div>
                 <h3 className="imbra-label !text-white mb-4">
-                  Información
+                  Legal
                 </h3>
                 <ul className="space-y-4 mt-6">
-                  {['Política de Privacidad', 'Gestión de Devoluciones', 'Política de Envíos', 'Términos del Servicio', 'FAQ'].map((item) => (
-                    <li key={item}>
-                      <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">{item}</Link>
-                    </li>
-                  ))}
+                  <li>
+                    <Link href="/politica-de-proteccion-de-datos-personales" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">
+                      Protección de Datos
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/pagina-preguntas-frecuentes-sobre-pagos-electronicos" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">
+                      Preguntas Frecuentes Pagos
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">
+                      Términos y Condiciones
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">
+                      Política de Envíos
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
