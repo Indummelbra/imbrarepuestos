@@ -46,14 +46,33 @@ export default function CheckoutForm() {
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let finalValue = value;
+
+    // --- LIMPIEZA DE INPUTS EN TIEMPO REAL (REGLA iAnGo) ---
+    if (name === 'firstName' || name === 'lastName' || name === 'city' || name === 'state') {
+      // Solo letras y espacios
+      finalValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    } else if (name === 'address') {
+      // Letras, números y espacios (muy estricto según solicitud del usuario)
+      finalValue = value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '');
+    } else if (name === 'phone') {
+      // Solo números
+      finalValue = value.replace(/\D/g, '');
+    } else if (name === 'dni') {
+      // Solo números y guion (para NIT)
+      finalValue = value.replace(/[^0-9-]/g, '');
+    }
+
+    setFormData({ ...formData, [name]: finalValue });
   };
 
   /**
-   * Valida que el nombre/apellido no contenga números ni caracteres especiales (excepto tildes y ñ)
+   * Valida que el nombre/apellido no contenga números ni caracteres especiales
    */
   const validateName = (text: string) => {
-    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    // Solo letras y espacios (mínimo 2 caracteres)
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
     return regex.test(text);
   };
 
@@ -75,7 +94,7 @@ export default function CheckoutForm() {
       case 'DNI': // DNI (General): 6-15 digitos
         return /^\d{6,15}$/.test(doc);
       default:
-        return doc.length >= 5; // Fallback generico
+        return doc.length >= 5 && /^[a-zA-Z0-9-]+$/.test(doc); // Solo letras, números y guiones
     }
   };
 
