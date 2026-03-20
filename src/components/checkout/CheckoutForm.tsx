@@ -25,6 +25,7 @@ export default function CheckoutForm() {
     city: 'Bogota',
     state: 'Cundinamarca',
   });
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   // Cargar datos persistidos al montar el componente
   React.useEffect(() => {
@@ -65,6 +66,10 @@ export default function CheckoutForm() {
     }
 
     setFormData({ ...formData, [name]: finalValue });
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setTouched({ ...touched, [e.target.name]: true });
   };
 
   /**
@@ -272,7 +277,12 @@ export default function CheckoutForm() {
               placeholder="Ej: Juan"
               value={formData.firstName}
               onChange={handleChange}
-              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
+              onBlur={handleBlur}
+              className={`w-full bg-gray-50 border p-3 outline-none font-bold text-sm uppercase ${
+                touched.firstName && !validateName(formData.firstName)
+                  ? 'border-red-500 text-red-600 focus:border-red-700'
+                  : 'border-gray-100 focus:border-primary text-secondary'
+              }`}
             />
           </div>
           <div className="space-y-1">
@@ -283,7 +293,12 @@ export default function CheckoutForm() {
               placeholder="Ej: Perez"
               value={formData.lastName}
               onChange={handleChange}
-              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
+              onBlur={handleBlur}
+              className={`w-full bg-gray-50 border p-3 outline-none font-bold text-sm uppercase ${
+                touched.lastName && !validateName(formData.lastName)
+                  ? 'border-red-500 text-red-600 focus:border-red-700'
+                  : 'border-gray-100 focus:border-primary text-secondary'
+              }`}
             />
           </div>
         </div>
@@ -312,9 +327,14 @@ export default function CheckoutForm() {
               name="dni"
               value={formData.dni}
               onChange={handleChange}
+              onBlur={handleBlur}
               inputMode="numeric"
               placeholder="Sin puntos ni guiones"
-              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
+              className={`w-full bg-gray-50 border p-3 outline-none font-bold text-sm uppercase ${
+                touched.dni && !validateDocument(formData.documentType, formData.dni)
+                  ? 'border-red-500 text-red-600 focus:border-red-700'
+                  : 'border-gray-100 focus:border-primary text-secondary'
+              }`}
             />
           </div>
         </div>
@@ -328,9 +348,19 @@ export default function CheckoutForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              onBlur={handleBlur}
               placeholder="ejemplo@correo.com"
-              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary text-sm"
+              className={`w-full bg-gray-50 border p-3 outline-none font-bold text-sm ${
+                touched.email && !validateEmail(formData.email) 
+                  ? 'border-red-500 text-red-600 focus:border-red-700' 
+                  : 'border-gray-100 focus:border-primary text-secondary'
+              }`}
             />
+            {touched.email && !validateEmail(formData.email) && (
+              <p className="text-[10px] text-red-600 font-bold uppercase italic">
+                El correo debe incluir @, dominio y extensión (ej: .com)
+              </p>
+            )}
           </div>
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase">Telefono</label>
@@ -339,9 +369,14 @@ export default function CheckoutForm() {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
+              onBlur={handleBlur}
               inputMode="numeric"
               placeholder="Ej: 3001234567"
-              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary text-sm"
+              className={`w-full bg-gray-50 border p-3 outline-none font-bold text-sm ${
+                touched.phone && formData.phone.length < 7
+                  ? 'border-red-500 text-red-600 focus:border-red-700'
+                  : 'border-gray-100 focus:border-primary text-secondary'
+              }`}
             />
           </div>
         </div>
