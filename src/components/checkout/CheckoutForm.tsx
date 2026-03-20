@@ -99,10 +99,11 @@ export default function CheckoutForm() {
   };
 
   /**
-   * Valida el formato de email de forma estricta (usuario@dominio.ext)
+   * Valida el formato de email de forma extremadamente estricta (usuario@dominio.ext)
    */
   const validateEmail = (email: string) => {
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    // Requiere: texto + @ + dominio(s) con punto + extensión de al menos 2 letras
+    const regex = /^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
     return regex.test(email);
   };
 
