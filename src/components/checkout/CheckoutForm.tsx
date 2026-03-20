@@ -17,7 +17,7 @@ export default function CheckoutForm() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    documentType: 'CC',
+    documentType: '',
     dni: '',
     email: '',
     phone: '',
@@ -93,6 +93,10 @@ export default function CheckoutForm() {
     e.preventDefault();
 
     // VALIDACIONES PREVIAS
+    if (!formData.documentType) {
+      setErrorMsg('Por favor seleccione un tipo de documento.');
+      return;
+    }
     if (!validateName(formData.firstName)) {
       setErrorMsg('El nombre no debe contener números ni caracteres especiales.');
       return;
@@ -147,8 +151,8 @@ export default function CheckoutForm() {
         payment_method: 'placetopay',
         payment_method_title: 'PlacetoPay (PSE/Tarjetas)',
         meta_data: [
-          { key: '_billing_dni', value: formData.dni },
-          { key: '_billing_document_type', value: formData.documentType },
+          { key: '_billing_numero_documento', value: formData.dni },
+          { key: '_billing_tipo_documento', value: formData.documentType },
         ],
       };
 
@@ -261,19 +265,12 @@ export default function CheckoutForm() {
               onChange={handleChange}
               className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
             >
-              {/* Colombia */}
+              <option value="">Seleccione una opción</option>
               <option value="CC">CC - Cédula de Ciudadanía</option>
-              <option value="CE">CE - Cédula de Extranjería</option>
               <option value="NIT">NIT - Número Identificación Tributaria</option>
+              <option value="CE">CE - Cédula de Extranjería</option>
               <option value="TI">TI - Tarjeta de Identidad</option>
-              <option value="RUT">RUT - Registro Único Tributario</option>
-              {/* Otros / Global */}
               <option value="PPN">PPN - Pasaporte</option>
-              <option value="DNI">DNI - Documento Nacional Identidad</option>
-              <option value="CI">CI - Cédula de Identidad</option>
-              <option value="RUC">RUC - Registro Único Contribuyente</option>
-              <option value="CPF">CPF - Cadastro de Pessoas Físicas</option>
-              <option value="TAX">TAX - Tax Identification Number</option>
             </select>
           </div>
           <div className="col-span-2 space-y-1">

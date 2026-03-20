@@ -37,6 +37,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;
   font-family: var(--font-display);
+  text-transform: uppercase;
 }
 
 /* Clases de Utilidad Industrial (Sistema Maestro) */
@@ -48,8 +49,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700; /* Reducido a Bold para nitidez absoluta */
   line-height: 0.95;
   letter-spacing: -0.01em; 
-  font-style: italic;
-  text-transform: uppercase;
 }
 
 /* H2: Título de Sección (Impacto Directo) */
@@ -59,7 +58,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.01em;
-  text-transform: uppercase;
 }
 
 /* H3: Título de Bloque / Card */
@@ -69,7 +67,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700; /* Bold estándar para lectura clara */
   line-height: 1.2;
   letter-spacing: normal;
-  text-transform: uppercase;
 }
 
 /* Labels: Micro-textos de navegación y marcas técnicas */
@@ -113,7 +110,6 @@ p, .imbra-body {
   font-family: var(--font-display);
   font-weight: 900;
   color: var(--color-primary);
-  font-style: italic;
   letter-spacing: -0.02em;
 }
 
