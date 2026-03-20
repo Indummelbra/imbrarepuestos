@@ -357,10 +357,19 @@ export default function CheckoutForm() {
               }`}
             />
             {touched.email && !validateEmail(formData.email) && (
-              <div className="flex items-center gap-1 mt-1 bg-red-50 text-red-600 px-2 py-0.5 rounded border border-red-100 w-fit animate-pulse">
-                <span className="text-[9px] font-bold uppercase">
-                  Email incompleto: requiere @ y dominio completo
-                </span>
+              <div className="relative mt-2 animate-in fade-in slide-in-from-top-1">
+                {/* Triángulo del tooltip */}
+                <div className="absolute -top-1 left-6 w-2 h-2 bg-white border-t border-l border-gray-300 transform rotate-45 z-10"></div>
+                
+                {/* Cuerpo del badge */}
+                <div className="bg-white border border-gray-300 shadow-sm rounded p-2 flex items-center gap-2 w-fit relative z-20">
+                  <div className="bg-[#ff9800] text-white w-4 h-4 flex items-center justify-center rounded-sm text-[10px] font-black">
+                    !
+                  </div>
+                  <span className="text-[11px] font-medium text-secondary">
+                    Completa este campo bien
+                  </span>
+                </div>
               </div>
             )}
           </div>
