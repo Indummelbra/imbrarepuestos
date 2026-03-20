@@ -35,7 +35,7 @@ const CMSContent: React.FC<CMSContentProps> = ({ title, content, type, modifiedG
             </span>
           </div>
           
-          <h1 className="imbra-h1 text-white uppercase italic break-words max-w-5xl !text-4xl md:!text-6xl">
+          <h1 className="imbra-h1 text-white italic break-words max-w-5xl !text-4xl md:!text-6xl">
             {title}
           </h1>
           
@@ -52,7 +52,7 @@ const CMSContent: React.FC<CMSContentProps> = ({ title, content, type, modifiedG
         <div className="absolute top-0 right-0 h-full w-1 bg-gray-50"></div>
 
         <article className="cms-content prose prose-slate max-w-none 
-          prose-headings:font-display prose-headings:uppercase prose-headings:text-secondary prose-headings:font-black
+          prose-headings:font-display prose-headings:text-secondary prose-headings:font-black
           prose-h2:text-2xl prose-h2:border-l-4 prose-h2:border-primary prose-h2:pl-6 prose-h2:mt-12 prose-h2:mb-6
           prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-6
           prose-strong:text-secondary prose-strong:font-black
