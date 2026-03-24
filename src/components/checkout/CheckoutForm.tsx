@@ -1,10 +1,18 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import { initiatePayment, savePTPRequestId } from '@/app/actions/placetopay';
+import { DEPARTAMENTOS, DEPARTAMENTOS_LISTA } from '@/data/departamentos';
+
+// Tipo para las ciudades desde Supabase
+interface Ciudad {
+  Name: string;
+  Code: number;
+  State: number;
+}
 
 export default function CheckoutForm() {
   const { items, totalPrice } = useCart();
@@ -22,17 +30,32 @@ export default function CheckoutForm() {
     email: '',
     phone: '',
     address: '',
-    city: 'Bogota',
-    state: 'Cundinamarca',
+    city: '',
+    cityCode: 0,
+    state: '',
+    stateCode: 0,
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
+  // --- Estado para selector cascada Departamento -> Ciudad ---
+  const [ciudades, setCiudades] = useState<Ciudad[]>([]);
+  const [loadingCiudades, setLoadingCiudades] = useState(false);
+  const [citySearch, setCitySearch] = useState('');
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const cityInputRef = useRef<HTMLInputElement>(null);
+  const cityDropdownRef = useRef<HTMLDivElement>(null);
+
   // Cargar datos persistidos al montar el componente
-  React.useEffect(() => {
+  useEffect(() => {
     const savedData = localStorage.getItem('imbra_checkout_data');
     if (savedData) {
       try {
-        setFormData(prev => ({ ...prev, ...JSON.parse(savedData) }));
+        const parsed = JSON.parse(savedData);
+        setFormData(prev => ({ ...prev, ...parsed }));
+        // Si ya tenia ciudad guardada, mostrarla en el campo de busqueda
+        if (parsed.city) {
+          setCitySearch(parsed.city);
+        }
       } catch (e) {
         console.error('Error parseando datos persistidos:', e);
       }
@@ -40,9 +63,60 @@ export default function CheckoutForm() {
   }, []);
 
   // Persistir datos cada vez que cambian
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem('imbra_checkout_data', JSON.stringify(formData));
   }, [formData]);
+
+  // Cargar ciudades al cambiar el departamento
+  useEffect(() => {
+    if (!formData.stateCode) {
+      setCiudades([]);
+      return;
+    }
+
+    const cargarCiudades = async () => {
+      setLoadingCiudades(true);
+      try {
+        const res = await fetch(`/api/ciudades?state=${formData.stateCode}`);
+        if (res.ok) {
+          const data: Ciudad[] = await res.json();
+          setCiudades(data);
+        } else {
+          console.error('Error cargando ciudades:', res.status);
+          setCiudades([]);
+        }
+      } catch (error) {
+        console.error('Error de red al cargar ciudades:', error);
+        setCiudades([]);
+      } finally {
+        setLoadingCiudades(false);
+      }
+    };
+
+    cargarCiudades();
+  }, [formData.stateCode]);
+
+  // Cerrar dropdown de ciudades al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        cityDropdownRef.current &&
+        !cityDropdownRef.current.contains(event.target as Node) &&
+        cityInputRef.current &&
+        !cityInputRef.current.contains(event.target as Node)
+      ) {
+        setShowCityDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Ciudades filtradas por busqueda
+  const ciudadesFiltradas = ciudades.filter(c =>
+    c.Name.toLowerCase().includes(citySearch.toLowerCase())
+  );
 
   const [acceptTerms, setAcceptTerms] = useState(false);
 
@@ -51,38 +125,66 @@ export default function CheckoutForm() {
     let finalValue = value;
 
     // --- LIMPIEZA DE INPUTS EN TIEMPO REAL (REGLA iAnGo) ---
-    if (name === 'firstName' || name === 'lastName' || name === 'city' || name === 'state') {
+    if (name === 'firstName' || name === 'lastName') {
       // Solo letras y espacios
       finalValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
     } else if (name === 'address') {
-      // Letras, números y espacios (muy estricto según solicitud del usuario)
+      // Letras, numeros y espacios (muy estricto segun solicitud del usuario)
       finalValue = value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '');
     } else if (name === 'phone') {
-      // Solo números
+      // Solo numeros
       finalValue = value.replace(/\D/g, '');
     } else if (name === 'dni') {
-      // Solo números y guion (para NIT)
+      // Solo numeros y guion (para NIT)
       finalValue = value.replace(/[^0-9-]/g, '');
     }
 
     setFormData({ ...formData, [name]: finalValue });
   };
 
+  // Handler especifico para el cambio de departamento
+  const handleDepartamentoChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const code = Number(e.target.value);
+    const nombre = DEPARTAMENTOS[code] || '';
+
+    setFormData(prev => ({
+      ...prev,
+      state: nombre,
+      stateCode: code,
+      // Resetear la ciudad al cambiar de departamento
+      city: '',
+      cityCode: 0,
+    }));
+    setCitySearch('');
+    setCiudades([]);
+  }, []);
+
+  // Handler para seleccionar una ciudad del dropdown
+  const handleCitySelect = useCallback((ciudad: Ciudad) => {
+    setFormData(prev => ({
+      ...prev,
+      city: ciudad.Name,
+      cityCode: ciudad.Code,
+    }));
+    setCitySearch(ciudad.Name);
+    setShowCityDropdown(false);
+  }, []);
+
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     setTouched({ ...touched, [e.target.name]: true });
   };
 
   /**
-   * Valida que el nombre/apellido no contenga números ni caracteres especiales
+   * Valida que el nombre/apellido no contenga numeros ni caracteres especiales
    */
   const validateName = (text: string) => {
-    // Solo letras y espacios (mínimo 2 caracteres)
+    // Solo letras y espacios (minimo 2 caracteres)
     const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
     return regex.test(text);
   };
 
   /**
-   * Valida el número de documento según el tipo seleccionado (Colombia específico + Global)
+   * Valida el numero de documento segun el tipo seleccionado (Colombia especifico + Global)
    */
   const validateDocument = (type: string, doc: string) => {
     switch (type) {
@@ -99,7 +201,7 @@ export default function CheckoutForm() {
       case 'DNI': // DNI (General): 6-15 digitos
         return /^\d{6,15}$/.test(doc);
       default:
-        return doc.length >= 5 && /^[a-zA-Z0-9-]+$/.test(doc); // Solo letras, números y guiones
+        return doc.length >= 5 && /^[a-zA-Z0-9-]+$/.test(doc); // Solo letras, numeros y guiones
     }
   };
 
@@ -107,7 +209,7 @@ export default function CheckoutForm() {
    * Valida el formato de email de forma extremadamente estricta (usuario@dominio.ext)
    */
   const validateEmail = (email: string) => {
-    // Requiere: texto + @ + dominio(s) con punto + extensión de al menos 2 letras
+    // Requiere: texto + @ + dominio(s) con punto + extension de al menos 2 letras
     const regex = /^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
     return regex.test(email);
   };
@@ -131,23 +233,31 @@ export default function CheckoutForm() {
       return;
     }
     if (!validateName(formData.firstName)) {
-      setErrorMsg('El nombre no debe contener números ni caracteres especiales.');
+      setErrorMsg('El nombre no debe contener numeros ni caracteres especiales.');
       return;
     }
     if (!validateName(formData.lastName)) {
-      setErrorMsg('El apellido no debe contener números ni caracteres especiales.');
+      setErrorMsg('El apellido no debe contener numeros ni caracteres especiales.');
       return;
     }
     if (!validateDocument(formData.documentType, formData.dni)) {
-      setErrorMsg(`El número de documento no es válido para el tipo ${formData.documentType}.`);
+      setErrorMsg(`El numero de documento no es valido para el tipo ${formData.documentType}.`);
       return;
     }
     if (!validateEmail(formData.email)) {
-      setErrorMsg('Por favor ingresa un correo electrónico válido (ej: usuario@dominio.com).');
+      setErrorMsg('Por favor ingresa un correo electronico valido (ej: usuario@dominio.com).');
+      return;
+    }
+    if (!formData.stateCode) {
+      setErrorMsg('Por favor selecciona un departamento.');
+      return;
+    }
+    if (!formData.city) {
+      setErrorMsg('Por favor selecciona una ciudad.');
       return;
     }
     if (!acceptTerms) {
-      setErrorMsg('Debes aceptar los términos y condiciones para continuar.');
+      setErrorMsg('Debes aceptar los terminos y condiciones para continuar.');
       return;
     }
 
@@ -190,6 +300,8 @@ export default function CheckoutForm() {
         meta_data: [
           { key: '_billing_numero_documento', value: formData.dni },
           { key: '_billing_tipo_documento', value: formData.documentType },
+          { key: '_billing_city_code', value: String(formData.cityCode) },
+          { key: '_billing_state_code', value: String(formData.stateCode) },
         ],
       };
 
@@ -312,16 +424,16 @@ export default function CheckoutForm() {
               onChange={handleChange}
               className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
             >
-              <option value="">Seleccione una opción</option>
-              <option value="CC">CC - Cédula de Ciudadanía</option>
-              <option value="NIT">NIT - Número Identificación Tributaria</option>
-              <option value="CE">CE - Cédula de Extranjería</option>
+              <option value="">Seleccione una opcion</option>
+              <option value="CC">CC - Cedula de Ciudadania</option>
+              <option value="NIT">NIT - Numero Identificacion Tributaria</option>
+              <option value="CE">CE - Cedula de Extranjeria</option>
               <option value="TI">TI - Tarjeta de Identidad</option>
               <option value="PPN">PPN - Pasaporte</option>
             </select>
           </div>
           <div className="col-span-2 space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">Número de Identificación</label>
+            <label className="text-[10px] font-bold text-gray-400 uppercase">Numero de Identificacion</label>
             <input
               required
               name="dni"
@@ -358,7 +470,7 @@ export default function CheckoutForm() {
             />
             {touched.email && !validateEmail(formData.email) && (
               <div className="relative mt-2 animate-in fade-in slide-in-from-top-1">
-                {/* Triángulo del tooltip */}
+                {/* Triangulo del tooltip */}
                 <div className="absolute -top-1 left-6 w-2 h-2 bg-white border-t border-l border-gray-300 transform rotate-45 z-10"></div>
                 
                 {/* Cuerpo del badge */}
@@ -408,26 +520,119 @@ export default function CheckoutForm() {
           />
         </div>
 
+        {/* --- SELECTOR CASCADA: DEPARTAMENTO -> CIUDAD --- */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">Ciudad</label>
-            <input
-              required
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
-            />
-          </div>
+          {/* Selector de Departamento */}
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase">Departamento</label>
-            <input
-              required
+            <select
               name="state"
-              value={formData.state}
-              onChange={handleChange}
-              className="w-full bg-gray-50 border border-gray-100 p-3 focus:border-primary outline-none font-bold text-secondary uppercase text-sm"
+              value={formData.stateCode || ''}
+              onChange={handleDepartamentoChange}
+              className={`w-full bg-gray-50 border p-3 outline-none font-bold text-sm uppercase ${
+                touched.state && !formData.stateCode
+                  ? 'border-red-500 text-red-600 focus:border-red-700'
+                  : 'border-gray-100 focus:border-primary text-secondary'
+              }`}
+              onBlur={handleBlur}
+            >
+              <option value="">Selecciona departamento</option>
+              {DEPARTAMENTOS_LISTA.map(dep => (
+                <option key={dep.code} value={dep.code}>
+                  {dep.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Autocomplete de Ciudad */}
+          <div className="space-y-1 relative">
+            <label className="text-[10px] font-bold text-gray-400 uppercase">
+              Ciudad
+              {loadingCiudades && (
+                <span className="ml-2 text-primary animate-pulse">Cargando...</span>
+              )}
+            </label>
+            <input
+              ref={cityInputRef}
+              required
+              name="city"
+              placeholder={
+                !formData.stateCode
+                  ? 'Selecciona departamento primero'
+                  : loadingCiudades
+                  ? 'Cargando ciudades...'
+                  : 'Escribe para buscar...'
+              }
+              value={citySearch}
+              disabled={!formData.stateCode || loadingCiudades}
+              onChange={(e) => {
+                setCitySearch(e.target.value);
+                setShowCityDropdown(true);
+                // Si el usuario borra la busqueda, limpiamos la seleccion
+                if (!e.target.value) {
+                  setFormData(prev => ({ ...prev, city: '', cityCode: 0 }));
+                }
+              }}
+              onFocus={() => {
+                if (formData.stateCode && ciudades.length > 0) {
+                  setShowCityDropdown(true);
+                }
+              }}
+              onBlur={(e) => {
+                handleBlur(e);
+                // Pequeño delay para permitir el click en el dropdown
+                setTimeout(() => setShowCityDropdown(false), 200);
+              }}
+              autoComplete="off"
+              className={`w-full bg-gray-50 border p-3 outline-none font-bold text-sm uppercase ${
+                !formData.stateCode || loadingCiudades
+                  ? 'border-gray-100 text-gray-300 cursor-not-allowed'
+                  : touched.city && !formData.city
+                  ? 'border-red-500 text-red-600 focus:border-red-700'
+                  : 'border-gray-100 focus:border-primary text-secondary'
+              }`}
             />
+
+            {/* Dropdown de ciudades filtradas */}
+            {showCityDropdown && ciudadesFiltradas.length > 0 && (
+              <div
+                ref={cityDropdownRef}
+                className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-lg max-h-48 overflow-y-auto"
+              >
+                {ciudadesFiltradas.slice(0, 50).map(ciudad => (
+                  <button
+                    key={ciudad.Code}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleCitySelect(ciudad);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm font-bold uppercase transition-colors
+                      ${formData.cityCode === ciudad.Code
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-secondary hover:bg-gray-50'
+                      }`}
+                  >
+                    {ciudad.Name}
+                  </button>
+                ))}
+                {ciudadesFiltradas.length > 50 && (
+                  <div className="px-3 py-2 text-[10px] text-gray-400 font-bold uppercase text-center border-t">
+                    Escribe para filtrar mas resultados...
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Mensaje cuando no hay resultados */}
+            {showCityDropdown && citySearch.length > 0 && ciudadesFiltradas.length === 0 && !loadingCiudades && (
+              <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-lg">
+                <div className="px-3 py-3 text-xs text-gray-400 font-bold uppercase text-center">
+                  No se encontraron ciudades
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -460,7 +665,7 @@ export default function CheckoutForm() {
             <span className="font-bold text-secondary">${totalPrice.toLocaleString('es-CO')}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="font-bold text-gray-400 uppercase">ENVIO A {formData.city}</span>
+            <span className="font-bold text-gray-400 uppercase">ENVIO A {formData.city || '...'}</span>
             <span className="font-bold text-green-600 uppercase italic">POR CALCULAR</span>
           </div>
           <div className="pt-4 border-t border-gray-200 flex justify-between items-end">
@@ -471,7 +676,7 @@ export default function CheckoutForm() {
           </div>
         </div>
 
-        {/* Términos y Condiciones */}
+        {/* Terminos y Condiciones */}
         <div className="mb-6 flex items-start gap-3">
           <input
             type="checkbox"
@@ -481,7 +686,7 @@ export default function CheckoutForm() {
             className="mt-1 w-4 h-4 accent-primary"
           />
           <label htmlFor="acceptTerms" className="text-[11px] font-bold text-gray-500 uppercase leading-tight cursor-pointer">
-            He leído y acepto los <Link href="/legal/terminos-y-condiciones" target="_blank" className="text-secondary border-b border-secondary">términos y condiciones</Link> de compra y la política de tratamiento de datos.
+            He leido y acepto los <Link href="/legal/terminos-y-condiciones" target="_blank" className="text-secondary border-b border-secondary">terminos y condiciones</Link> de compra y la politica de tratamiento de datos.
           </label>
         </div>
 
