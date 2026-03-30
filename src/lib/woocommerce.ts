@@ -67,7 +67,6 @@ async function fetchWooGraphQL(query: string, variables: Record<string, unknown>
     const json = await response.json();
     if (json.errors) {
       console.error('GraphQL Errors Details:', JSON.stringify(json.errors, null, 2));
-      // No lanzamos error para permitir que getProducts intente el fallback REST
       return null;
     }
 
@@ -83,7 +82,6 @@ async function fetchWooGraphQL(query: string, variables: Record<string, unknown>
  */
 export async function getProducts(): Promise<Product[]> {
   try {
-    // 1. Intentar con GraphQL para mayor velocidad y menor peso de datos
     const query = `
       query GetProducts {
         products(first: 50, where: {status: "publish"}) {
@@ -181,7 +179,6 @@ export async function getProducts(): Promise<Product[]> {
       stockQuantity?: number;
     }
 
-    // Mapear la data de GraphQL (los campos pueden variar ligeramente)
     return data.products.nodes.map((node: GQLNode) => mapWooProductToImbra({
       id: node.databaseId,
       name: node.name,
@@ -206,7 +203,6 @@ export async function getProducts(): Promise<Product[]> {
   } catch (error) {
     console.warn("GraphQL falló, reintentando con REST API...", error);
     
-    // 2. Fallback a REST API
     try {
       const wooProducts = await fetchWooRest('products?status=publish&per_page=50', {
         next: { tags: ['products'], revalidate: 3600 }
@@ -234,9 +230,6 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
           description
           shortDescription
           onSale
-          regularPrice
-          salePrice
-          price
           image {
             sourceUrl
             altText
@@ -261,10 +254,16 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
             }
           }
           ... on SimpleProduct {
+            price
+            regularPrice
+            salePrice
             stockStatus
             stockQuantity
           }
           ... on VariableProduct {
+            price
+            regularPrice
+            salePrice
             stockStatus
             stockQuantity
           }
@@ -311,6 +310,69 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 }
 
 /**
+ * Obtiene los últimos productos publicados (para sidebar).
+ */
+export async function getRecentProducts(limit = 5): Promise<Product[]> {
+  try {
+    const wooProducts = await fetchWooRest(`products?status=publish&per_page=${limit}&orderby=date&order=desc`, {
+      next: { tags: ['products'], revalidate: 3600 }
+    });
+    return wooProducts.map(mapWooProductToImbra);
+  } catch (error) {
+    console.error("Error obteniendo productos recientes:", error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene productos de una categoría específica por su slug.
+ */
+export async function getProductsByCategory(categorySlug: string, limit = 20): Promise<Product[]> {
+  try {
+    // Primero obtenemos el ID de la categoría
+    const categories = await fetchWooRest(`products/categories?slug=${categorySlug}`, {
+      next: { tags: ['categories'], revalidate: 3600 }
+    });
+
+    if (!categories || categories.length === 0) return [];
+
+    const categoryId = categories[0].id;
+    const wooProducts = await fetchWooRest(`products?status=publish&category=${categoryId}&per_page=${limit}&orderby=date&order=desc`, {
+      next: { tags: [`category-${categorySlug}`], revalidate: 3600 }
+    });
+
+    return wooProducts.map(mapWooProductToImbra);
+  } catch (error) {
+    console.error("Error obteniendo productos por categoría:", error);
+    return [];
+  }
+}
+
+/**
+ * Navega al producto anterior / siguiente dentro de la misma categoría.
+ * Devuelve { prev, next } con slug y nombre del producto contiguo.
+ */
+export async function getAdjacentProductsInCategory(
+  currentSlug: string,
+  categorySlug: string
+): Promise<{ prev: { slug: string; name: string } | null; next: { slug: string; name: string } | null }> {
+  try {
+    const productos = await getProductsByCategory(categorySlug, 100);
+
+    const idx = productos.findIndex((p) => p.slug === currentSlug);
+    if (idx === -1) return { prev: null, next: null };
+
+    const prev = idx > 0 ? { slug: productos[idx - 1].slug, name: productos[idx - 1].name } : null;
+    const next = idx < productos.length - 1 ? { slug: productos[idx + 1].slug, name: productos[idx + 1].name } : null;
+
+    return { prev, next };
+  } catch (error) {
+    console.error("Error obteniendo productos adyacentes:", error);
+    return { prev: null, next: null };
+  }
+}
+
+/**
  * Verifica el stock de un producto directamente en la REST API (Bypass Caché).
  */
 export async function checkProductStock(productId: number): Promise<{ 
@@ -320,7 +382,7 @@ export async function checkProductStock(productId: number): Promise<{
 }> {
   try {
     const product = await fetchWooRest(`products/${productId}`, {
-      cache: 'no-store' // Forzar bypass de caché de Next.js
+      cache: 'no-store'
     });
 
     return {
@@ -381,4 +443,20 @@ export async function getOrdersByStatus(status: string) {
  */
 export async function getOrder(orderId: number) {
   return fetchWooRest(`orders/${orderId}`);
+}
+
+/**
+ * Obtiene los productos destacados (featured = true).
+ */
+export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
+  try {
+    const wooProducts = await fetchWooRest(
+      `products?status=publish&featured=true&per_page=${limit}&orderby=date&order=desc`,
+      { next: { tags: ['products'], revalidate: 3600 } }
+    );
+    return wooProducts.map(mapWooProductToImbra);
+  } catch (error) {
+    console.error("Error obteniendo productos destacados:", error);
+    return [];
+  }
 }

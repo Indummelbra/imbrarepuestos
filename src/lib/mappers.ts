@@ -1,4 +1,5 @@
 import { Product } from "@/types/product";
+import { extractBrand, extractModel, extractYears, extractPartCategory, extractCategorySlug } from "./vehicle-utils";
 
 /**
  * Mapper "Nivel Dios" para normalizar productos de WooCommerce.
@@ -42,9 +43,9 @@ export function mapWooProductToImbra(wooProduct: WooProductRaw): Product {
   }
 
   // 2. Lógica de Stock e Disponibilidad
-  const stock_quantity = wooProduct.stock_quantity || 0;
+  const stock_quantity = wooProduct.stock_quantity ?? 0;
   const stock_status = wooProduct.stock_status || 'outofstock';
-  
+
   // Un producto es comprable solo si tiene stock real > 0 Y el estado es 'instock'
   const is_comprable = stock_quantity > 0 && stock_status === 'instock';
 
@@ -59,7 +60,20 @@ export function mapWooProductToImbra(wooProduct: WooProductRaw): Product {
     alt: wooProduct.name 
   }];
 
-  // 4. Mapeo Final
+  // 4. Extracción de Datos de Vehículo (Aumentado para Buscador Faceteado)
+  const categoryNames = (wooProduct.categories || []).map((c) => c.name);
+  const vehicle_brand = extractBrand(wooProduct.name) || brand;
+  const vehicle_model = extractModel(wooProduct.name) || "";
+  const vehicle_years = extractYears(wooProduct.name);
+  const part_category = extractPartCategory(wooProduct.name, categoryNames);
+  const category_slug = extractCategorySlug(wooProduct.name, categoryNames);
+
+  // 5. Normalización de on_sale: sale_price > 0 y diferente al precio regular
+  const salePriceNum = parseFloat(wooProduct.sale_price || "0");
+  const regularPriceNum = parseFloat(wooProduct.regular_price || wooProduct.price || "0");
+  const on_sale = salePriceNum > 0 && salePriceNum < regularPriceNum;
+
+  // 6. Mapeo Final
   return {
     id: wooProduct.id || wooProduct.databaseId || 0,
     name: wooProduct.name,
@@ -67,15 +81,20 @@ export function mapWooProductToImbra(wooProduct: WooProductRaw): Product {
     sku: wooProduct.sku || "",
     price: wooProduct.price || "0",
     regular_price: wooProduct.regular_price || wooProduct.price || "0",
-    sale_price: wooProduct.sale_price || "",
-    on_sale: wooProduct.on_sale || false,
+    sale_price: on_sale ? wooProduct.sale_price! : "",
+    on_sale,
     description: wooProduct.description || "",
     short_description: wooProduct.short_description || "",
     permalink: wooProduct.permalink || "",
     images,
     categories: (wooProduct.categories || []) as Product['categories'],
     attributes: (wooProduct.attributes || []) as Product['attributes'],
-    brand,
+    brand: vehicle_brand,
+    vehicle_brand,
+    vehicle_model,
+    vehicle_years,
+    part_category,
+    category_slug,
     stock_status,
     stock_quantity,
     is_comprable,

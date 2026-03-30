@@ -37,6 +37,9 @@ export default function CheckoutForm() {
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
+  // --- LÓGICA DE ENVÍO SIMULADO ---
+  const [shippingCost, setShippingCost] = useState<number | null>(null);
+
   // --- Estado para selector cascada Departamento -> Ciudad ---
   const [ciudades, setCiudades] = useState<Ciudad[]>([]);
   const [loadingCiudades, setLoadingCiudades] = useState(false);
@@ -112,6 +115,25 @@ export default function CheckoutForm() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Calcular costo de envío basado en selección
+  useEffect(() => {
+    if (!formData.cityCode || !formData.stateCode) {
+      setShippingCost(null);
+      return;
+    }
+
+    if (totalPrice >= 50000) {
+      setShippingCost(0); // Envío Gratis
+    } else {
+      // Regla simulada: Bogotá (11 - 11001) cuesta 10,000 COP, resto del país 18,000 COP
+      if (formData.stateCode === 11 && formData.cityCode === 11001) {
+        setShippingCost(10000);
+      } else {
+        setShippingCost(18000);
+      }
+    }
+  }, [formData.cityCode, formData.stateCode, totalPrice]);
 
   // Ciudades filtradas por busqueda
   const ciudadesFiltradas = ciudades.filter(c =>
@@ -280,6 +302,26 @@ export default function CheckoutForm() {
       }
 
       // PASO 2: Crear la orden en WooCommerce con estado "pending"
+      const currentShippingCost = shippingCost || 0;
+      const totalToPay = totalPrice + currentShippingCost;
+
+      // Líneas de envío para WooCommerce
+      const shipping_lines = currentShippingCost === 0
+        ? [
+            {
+              method_id: 'free_shipping',
+              method_title: 'Envío Gratis',
+              total: '0'
+            }
+          ]
+        : [
+            {
+              method_id: 'flat_rate',
+              method_title: 'Costo de Envío',
+              total: String(currentShippingCost)
+            }
+          ];
+
       const orderPayload = {
         billing: {
           first_name: formData.firstName,
@@ -303,6 +345,7 @@ export default function CheckoutForm() {
           { key: '_billing_city_code', value: String(formData.cityCode) },
           { key: '_billing_state_code', value: String(formData.stateCode) },
         ],
+        shipping_lines,
       };
 
       const orderRes = await fetch('/api/checkout/create-order', {
@@ -324,7 +367,7 @@ export default function CheckoutForm() {
         description: `Pedido Imbra Repuestos #${orderData.orderId}`,
         amount: {
           currency: 'COP',
-          total: Math.round(parseFloat(orderData.total)),
+          total: Math.round(parseFloat(orderData.total)), // orderData.total viene de WooCommerce con el costo sumado
         },
         buyer: {
           name: formData.firstName,
@@ -377,7 +420,7 @@ export default function CheckoutForm() {
       {/* Columna informacion personal */}
       <div className="space-y-6">
         <h3 className="font-Archivo font-black text-secondary uppercase tracking-widest border-b-2 border-primary pb-2 inline-block">
-          DATOS DEL CLIENTE
+          ¿A QUIÉN LE ENVIAMOS?
         </h3>
 
         <div className="grid grid-cols-2 gap-4">
@@ -415,7 +458,7 @@ export default function CheckoutForm() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase">Tipo</label>
             <select
@@ -505,7 +548,7 @@ export default function CheckoutForm() {
         </div>
 
         <h3 className="font-Archivo font-black text-secondary uppercase tracking-widest pt-6 border-b-2 border-primary pb-2 inline-block">
-          DIRECCION DE ENVIO
+          ¿A DÓNDE MANDAMOS TU PEDIDO?
         </h3>
 
         <div className="space-y-1">
@@ -638,9 +681,9 @@ export default function CheckoutForm() {
       </div>
 
       {/* Columna resumen y boton de pago */}
-      <div className="bg-gray-50 p-8 border border-gray-200">
+      <div className="bg-gray-50 p-4 sm:p-8 border border-gray-200">
         <h3 className="font-Archivo font-black text-secondary uppercase tracking-widest mb-8 text-center border-b-4 border-primary pb-4">
-          FINALIZAR TU PEDIDO
+          RESUMEN FINAL
         </h3>
 
         {/* Lista de productos en el carrito */}
@@ -666,12 +709,18 @@ export default function CheckoutForm() {
           </div>
           <div className="flex justify-between items-center text-xs">
             <span className="font-bold text-gray-400 uppercase">ENVIO A {formData.city || '...'}</span>
-            <span className="font-bold text-green-600 uppercase italic">POR CALCULAR</span>
+            <span className={`font-bold uppercase ${shippingCost === 0 ? 'text-green-500' : 'text-secondary'}`}>
+              {shippingCost === null 
+                ? <span className="text-gray-400 italic">POR CALCULAR</span> 
+                : shippingCost === 0 
+                  ? 'GRATIS' 
+                  : `$${shippingCost.toLocaleString('es-CO')}`}
+            </span>
           </div>
           <div className="pt-4 border-t border-gray-200 flex justify-between items-end">
             <span className="font-Archivo font-black text-secondary text-lg uppercase leading-none">TOTAL A PAGAR</span>
             <span className="text-3xl font-Archivo font-black text-primary leading-none">
-              ${totalPrice.toLocaleString('es-CO')}
+              ${(totalPrice + (shippingCost || 0)).toLocaleString('es-CO')}
             </span>
           </div>
         </div>
@@ -686,7 +735,7 @@ export default function CheckoutForm() {
             className="mt-1 w-4 h-4 accent-primary"
           />
           <label htmlFor="acceptTerms" className="text-[11px] font-bold text-gray-500 uppercase leading-tight cursor-pointer">
-            He leido y acepto los <Link href="/legal/terminos-y-condiciones" target="_blank" className="text-secondary border-b border-secondary">terminos y condiciones</Link> de compra y la politica de tratamiento de datos.
+            Acepto los <Link href="/legal/terminos-y-condiciones" target="_blank" className="text-secondary border-b border-secondary">términos y condiciones</Link> y la política de datos personales.
           </label>
         </div>
 
@@ -708,10 +757,10 @@ export default function CheckoutForm() {
             }`}
         >
           <span className="font-Archivo font-black text-lg tracking-[0.2em]">
-            {loading ? 'PROCESANDO...' : 'PAGAR CON PLACETOPAY'}
+            {loading ? 'PROCESANDO...' : 'CONFIRMAR Y PAGAR CON PLACETOPAY'}
           </span>
           <span className="text-[10px] font-bold opacity-70 mt-1 uppercase tracking-widest">
-            Pago 100% Seguro por PSE o Tarjetas
+            Pago 100% seguro · PSE, tarjeta de crédito y débito
           </span>
         </button>
 

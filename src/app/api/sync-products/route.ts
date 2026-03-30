@@ -52,21 +52,30 @@ export async function GET(request: Request) {
     const mappedProducts = allProducts.map(p => {
       const productRaw = p as WooProductRaw & { status?: string };
       const imbraProduct = mapWooProductToImbra(productRaw);
+      const salePriceNum = parseFloat(imbraProduct.sale_price || "0");
       return {
         id: imbraProduct.id,
         name: imbraProduct.name,
         slug: imbraProduct.slug,
         sku: imbraProduct.sku,
+        brand: imbraProduct.brand,
         price: parseFloat(imbraProduct.price) || 0,
         regular_price: parseFloat(imbraProduct.regular_price) || 0,
-        sale_price: imbraProduct.sale_price ? parseFloat(imbraProduct.sale_price) : null,
+        sale_price: salePriceNum > 0 ? salePriceNum : null,
+        on_sale: imbraProduct.on_sale,
         description: imbraProduct.description,
         short_description: imbraProduct.short_description,
         image_url: imbraProduct.images[0]?.src || null,
-        categories: imbraProduct.categories, // Ahora se envía como JSONB
+        categories: imbraProduct.categories,
         stock_status: imbraProduct.stock_status,
         stock_quantity: imbraProduct.stock_quantity,
-        status: productRaw.status || 'publish'
+        is_comprable: imbraProduct.is_comprable,
+        vehicle_brand: imbraProduct.vehicle_brand,
+        vehicle_model: imbraProduct.vehicle_model,
+        vehicle_years: imbraProduct.vehicle_years,
+        part_category: imbraProduct.part_category,
+        category_slug: imbraProduct.category_slug,
+        status: productRaw.status || 'publish',
       };
     });
 

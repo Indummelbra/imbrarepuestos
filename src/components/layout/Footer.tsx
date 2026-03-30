@@ -122,9 +122,15 @@ export default function Footer() {
                   Mapa de Sitio
                 </h3>
                 <ul className="space-y-4 mt-6">
-                  {['Home', 'Productos', 'Quiénes Somos', 'Rastrea tu compra', 'Contáctenos'].map((item) => (
-                    <li key={item}>
-                      <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">{item}</Link>
+                  {[
+                    { label: 'Home',              href: '/' },
+                    { label: 'Productos',         href: '/tienda' },
+                    { label: 'Quiénes Somos',     href: '#' },
+                    { label: 'Rastrea tu compra', href: '/mis-pedidos' },
+                    { label: 'Contáctenos',       href: '/contacto' },
+                  ].map((item) => (
+                    <li key={item.label}>
+                      <Link href={item.href} className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">{item.label}</Link>
                     </li>
                   ))}
                 </ul>
@@ -146,12 +152,12 @@ export default function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">
+                    <Link href="/terminos-y-condiciones" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">
                       Términos y Condiciones
                     </Link>
                   </li>
                   <li>
-                    <Link href="#" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">
+                    <Link href="/politica-de-envios" className="text-gray-400 hover:text-[#F18700] text-[13px] transition-colors">
                       Política de Envíos
                     </Link>
                   </li>
@@ -214,7 +220,7 @@ export default function Footer() {
             </Link>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3 justify-center md:justify-end">
             {/* Logos de Pago Con URLs Oficiales */}
             <div className="bg-white px-2 py-1 rounded flex items-center justify-center h-6 grayscale hover:grayscale-0 transition-all cursor-pointer shadow-sm">
               <Image src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" width={32} height={20} className="h-4 w-auto object-contain" alt="Mastercard" unoptimized />

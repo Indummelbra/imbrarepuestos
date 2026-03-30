@@ -2,23 +2,26 @@ import type { Metadata } from "next";
 import { Inter, Montserrat, Archivo } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ 
-  subsets: ["latin"], 
-  weight: ["400", "500", "600", "700", "800"],
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
   variable: "--font-inter",
+  display: "swap",
 });
 
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "600", "700", "900"],
   variable: "--font-montserrat",
+  display: "swap",
 });
 
 const archivo = Archivo({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
+  weight: ["600", "700", "900"],
+  style: ["normal"],
   variable: "--font-archivo",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -27,6 +30,7 @@ export const metadata: Metadata = {
 };
 
 import { CartProvider } from "@/context/CartContext";
+import { CartSidebar } from "@/components/cart/CartSidebar";
 
 export default function RootLayout({
   children,
@@ -36,14 +40,17 @@ export default function RootLayout({
   return (
     <html lang="es" className="light" suppressHydrationWarning>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+        <meta name="theme-color" content="#F18700" />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
       </head>
-      <body 
+      <body
         className={`${inter.variable} ${montserrat.variable} ${archivo.variable} font-sans antialiased min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
         <CartProvider>
           {children}
+          <CartSidebar />
         </CartProvider>
       </body>
     </html>

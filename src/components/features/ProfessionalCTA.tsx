@@ -45,7 +45,7 @@ const ProfessionalCTA = () => {
             }} />
 
             {/* Capa 3: Bloque Naranja IMBRA (#F18700) */}
-            <div className="absolute top-0 right-0 w-[42%] h-full bg-[#F18700] z-30 p-6 flex flex-col justify-center items-center text-center">
+            <div className="hidden lg:flex absolute top-0 right-0 w-[42%] h-full bg-[#F18700] z-30 p-6 flex-col justify-center items-center text-center">
               <div className="mb-6">
                 <svg className="w-14 h-14 lg:w-20 lg:h-20 text-[#212221]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77z" />
@@ -69,22 +69,22 @@ const ProfessionalCTA = () => {
               viewport={{ once: true }}
             >
              <span className="imbra-label-orange mb-4">
-              ¿Eres un Profesional de la Mecánica?
+              PROGRAMA ALIADOS IMBRA — TALLERES Y DISTRIBUIDORES
             </span>
             <h2 className="imbra-h2 text-secondary mb-6">
-              ¡Te invitamos a ser un <br />
-              <span className="text-primary">Aliado Imbra!</span>
+              Compra directo al fabricante.<br />
+              <span className="text-primary">Vende con margen real.</span>
             </h2>
 
               <p className="imbra-body-bold text-secondary mb-6">
-              Únete a nuestro programa exclusivo y accede a beneficios diseñados para potenciar tu taller.
+              Si tienes taller o vendes repuestos, ahora puedes comprar directamente a quien los fabrica — sin intermediarios que se lleven tu utilidad.
             </p>
             <p className="imbra-body mb-8">
-              En Imbra Repuestos reconocemos la importancia de tu labor. Por eso, hemos creado un espacio donde la calidad de nuestros productos se une a tu experiencia técnica.
+              Somos Indummelbra S.A.S., fabricantes colombianos con 50 años de experiencia. Te damos el acceso que antes solo tenían los grandes distribuidores.
             </p>
 
               <ul className="space-y-4 mb-10">
-                    {["Descuentos preferenciales de fábrica", "Soporte técnico y asesoría prioritaria", "Acceso a capacitaciones y eventos técnicos"].map((benefit, index) => (
+                    {["Precio de fabricante — el margen más alto del mercado", "Asesoría técnica directa — hablamos con quien fabrica el repuesto", "Capacitaciones de fábrica — conoce el producto mejor que nadie"].map((benefit, index) => (
                       <li key={index} className="flex items-start space-x-3">
                         <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                         <span className="imbra-body !text-sm">{benefit}</span>
@@ -92,11 +92,11 @@ const ProfessionalCTA = () => {
                     ))}
               </ul>
 
-              <Link 
+              <Link
               href="/registro-profesional"
               className="bg-primary text-secondary imbra-label !text-secondary px-6 h-10 transition-all active:scale-95 flex items-center justify-center group w-fit"
             >
-              ¡Aplicar Ahora!
+              QUIERO COMPRAR DIRECTO AL FABRICANTE
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             </motion.div>

@@ -1,123 +1,132 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 
 /**
- * PROMOBANNERS - Estructura 3 Niveles
- * DIV 1: Full-width section con fondo adaptable
- * DIV 2: imbra-content-container (Max 1920px centrado)
- * DIV 3: Grid de banners con contenido interno
+ * PromoBanners — 4 banners editoriales con links a categorías reales.
+ * Layout: [Grande 5col] [Mediano 4col] [2 pequeños apilados 3col]
+ *
+ * Imágenes → categorías IMBRA:
+ *   rim-yellow  → /tienda?cat=ruedas
+ *   shock-blue  → /tienda?cat=suspension
+ *   tires-dark  → /tienda?cat=ruedas  (cauchos)
+ *   battery     → /tienda?cat=electricos
  */
-
 export default function PromoBanners() {
   return (
-    <section className="pt-0 pb-12 bg-white dark:bg-gray-950">
-      {/* DIV 1: FONDO (Inherent in section) */}
-      
+    <section className="w-full bg-white py-12">
       <div className="imbra-content-container">
-        {/* DIV 2: CONTENEDOR (1920px + standard padding) */}
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 h-auto min-h-[500px]">
-          {/* DIV 3: CONTENIDO INTERNO (Banners) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 min-h-[500px]">
 
-          {/* Banner 1: Rines (Naranja Corporativo) */}
-          <div className="lg:col-span-5 relative group overflow-hidden bg-primary h-[300px] md:h-auto">
-            <Image 
-              src="/banners/rim-yellow.png" 
-              alt="Repuestos Originales" 
+          {/* ── Banner 1: Rines y Llantas (grande) ───────────────── */}
+          <Link
+            href="/tienda?cat=ruedas"
+            className="lg:col-span-5 relative group overflow-hidden bg-primary h-[300px] md:h-auto block"
+          >
+            <Image
+              src="/banners/rim-yellow.png"
+              alt="Rines y Llantas"
               fill
               className="object-cover mix-blend-multiply opacity-80 group-hover:scale-105 transition-transform duration-700"
               unoptimized
             />
             <div className="absolute inset-0 p-8 flex flex-col justify-center items-start z-10">
-              <span className="imbra-label !text-white mb-2">
-                ¡NUEVA LLEGADA!
+              <span className="text-[10px] font-black uppercase tracking-widest text-white mb-2">
+                RUEDAS Y LLANTAS
               </span>
-              <h3 className="imbra-h3 text-white !text-white !text-3xl md:!text-4xl lg:!text-5xl mb-4">
-                EXPLORA NUESTROS <br /> RINES REFORZADOS
+              <h3 className="font-black text-white text-3xl md:text-4xl lg:text-5xl uppercase leading-tight mb-4">
+                EL AGARRE<br />QUE TU<br />MOTO MERECE
               </h3>
-              <p className="imbra-body !text-white mb-8">
-                Calidad superior para cada terreno
+              <p className="text-white text-sm mb-8">
+                Rines y cauchos seleccionados para cada terreno y cada moto.
               </p>
-              <Link 
-                href="#" 
-                className="bg-secondary !bg-[#212221] text-white !text-white px-8 py-3 font-black text-xs uppercase tracking-widest hover:bg-white hover:!text-[#212221] transition-all flex items-center group/btn active:scale-95"
-              >
-                COMPRAR AHORA 
-                <span className="material-icons text-sm ml-2 group-hover/btn:translate-x-1 transition-transform">chevron_right</span>
-              </Link>
+              <span className="bg-[#212221] text-white px-8 py-3 font-black text-xs uppercase tracking-widest hover:bg-white hover:text-[#212221] transition-all flex items-center gap-2 group-hover:gap-3">
+                VER RUEDAS Y LLANTAS
+                <span className="material-icons text-sm">chevron_right</span>
+              </span>
             </div>
-          </div>
+          </Link>
 
-          {/* Banner 2: Amortiguación (Negro Corporativo) */}
-          <div className="lg:col-span-4 relative group overflow-hidden bg-secondary h-[300px] md:h-auto border-l border-white/5">
-            <Image 
-              src="/banners/shock-blue.png" 
-              alt="Equipamiento Esencial" 
+          {/* ── Banner 2: Suspensión (mediano) ───────────────────── */}
+          <Link
+            href="/tienda?cat=suspension"
+            className="lg:col-span-4 relative group overflow-hidden bg-secondary h-[300px] md:h-auto border-l border-white/5 block"
+          >
+            <Image
+              src="/banners/shock-blue.png"
+              alt="Kits de Suspensión"
               fill
               className="object-cover mix-blend-multiply opacity-60 group-hover:scale-105 transition-transform duration-700"
               unoptimized
             />
             <div className="absolute inset-0 p-8 flex flex-col justify-center items-start z-10">
-              <span className="imbra-label-orange mb-2">
-                ¡SÓLO ESTA SEMANA!
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">
+                SUSPENSIÓN
               </span>
-              <h3 className="imbra-h3 text-white !text-white !text-2xl md:!text-3xl lg:!text-4xl mb-4">
-                KITS DE <br /> REPARACIÓN
+              <h3 className="font-black text-white text-2xl md:text-3xl lg:text-4xl uppercase leading-tight mb-4">
+                VIAJA SIN<br />GOLPES,<br />LLEGA ENTERO
               </h3>
-              <p className="imbra-body-bold !text-primary mb-8 !text-sm md:!text-base">
-                Mantenimiento profesional al mejor precio
+              <p className="text-primary font-bold text-sm mb-8">
+                Kits de amortiguación para calles, barrios y carreteras.
               </p>
-              <Link 
-                href="#" 
-                className="bg-primary !bg-[#F18700] text-white !text-white px-8 py-3 font-black text-xs uppercase tracking-widest hover:bg-white hover:!text-[#F18700] transition-all flex items-center group/btn active:scale-95"
-              >
-                COMPRAR AHORA 
-                <span className="material-icons text-sm ml-2 group-hover/btn:translate-x-1 transition-transform">chevron_right</span>
-              </Link>
+              <span className="bg-primary text-white px-8 py-3 font-black text-xs uppercase tracking-widest hover:bg-white hover:text-primary transition-all flex items-center gap-2 group-hover:gap-3">
+                VER SUSPENSIÓN IMBRA
+                <span className="material-icons text-sm">chevron_right</span>
+              </span>
             </div>
+          </Link>
+
+          {/* ── Banners 3 y 4 apilados (columna derecha) ─────────── */}
+          <div className="lg:col-span-3 flex flex-col">
+
+            {/* Banner 3: Cauchos */}
+            <Link
+              href="/tienda?cat=ruedas"
+              className="relative flex-1 group overflow-hidden bg-primary min-h-[250px] border-b border-white/10 block"
+            >
+              <Image
+                src="/banners/tires-dark.png"
+                alt="Cauchos originales"
+                fill
+                className="object-cover mix-blend-multiply opacity-70 group-hover:scale-110 transition-transform duration-700"
+                unoptimized
+              />
+              <div className="absolute inset-0 p-6 flex flex-col justify-end z-10">
+                <h3 className="font-black text-white text-xl md:text-2xl uppercase leading-tight">
+                  CAUCHOS<br />QUE NO TE FALLAN
+                </h3>
+                <span className="text-[10px] font-black text-white uppercase tracking-widest mt-1">
+                  VER CAUCHOS →
+                </span>
+              </div>
+            </Link>
+
+            {/* Banner 4: Partes Eléctricas */}
+            <Link
+              href="/tienda?cat=electricos"
+              className="relative flex-1 group overflow-hidden bg-secondary min-h-[250px] block"
+            >
+              <Image
+                src="/banners/battery-dark.png"
+                alt="Partes eléctricas"
+                fill
+                className="object-cover opacity-40 group-hover:scale-110 transition-transform duration-700"
+                unoptimized
+              />
+              <div className="absolute inset-0 p-6 flex flex-col justify-end items-end text-right z-10">
+                <span className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">
+                  ELÉCTRICO
+                </span>
+                <h3 className="font-black text-white text-xl md:text-2xl uppercase leading-tight">
+                  SIN CORTOS,<br />SIN PROBLEMAS
+                </h3>
+                <span className="text-[10px] font-black text-white uppercase tracking-widest mt-1">
+                  VER PARTES ELÉCTRICAS →
+                </span>
+              </div>
+            </Link>
+
           </div>
 
-          {/* Banners 3 & 4 (Stacked) */}
-          <div className="lg:col-span-3 flex flex-col h-full">
-            {/* Banner 3: Llantas */}
-            <div className="relative h-1/2 group overflow-hidden bg-primary flex-1 min-h-[250px] border-b border-white/5">
-              <Image 
-                src="/banners/tires-dark.png" 
-                alt="Accesorios" 
-                fill
-                className="object-cover mix-blend-multiply opacity-70 group-hover:scale-110 transition-transform duration-1000"
-                unoptimized
-              />
-              <div className="absolute inset-0 p-8 flex flex-col justify-center z-10">
-                <h3 className="imbra-h3 text-white !text-white !text-xl md:!text-2xl">
-                  TODO EN <br /> ACCESORIOS
-                </h3>
-                <p className="imbra-label !text-white mt-2">
-                  HASTA 25% DTO
-                </p>
-              </div>
-            </div>
-            {/* Banner 4: Baterías */}
-            <div className="relative h-1/2 group overflow-hidden bg-secondary flex-1 min-h-[250px] border-l border-white/5">
-              <Image 
-                src="/banners/battery-dark.png" 
-                alt="Baterías" 
-                fill
-                className="object-cover opacity-40 group-hover:scale-110 transition-transform duration-1000"
-                unoptimized
-              />
-              <div className="absolute inset-0 p-8 flex flex-col justify-center items-end text-right z-10">
-                <span className="imbra-label-orange mb-2">
-                  MÁXIMA CALIDAD
-                </span>
-                <h3 className="imbra-h3 text-white !text-white !text-xl md:!text-2xl">
-                  BATERÍAS <br /> IMBRA
-                </h3>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

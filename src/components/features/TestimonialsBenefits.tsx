@@ -56,11 +56,11 @@ const testimonialsData = [
 ];
 
 const benefits = [
-  { icon: "local_shipping", title: "Envíos a toda Colombia", desc: "Entregas rápidas y seguras." },
-  { icon: "verified", title: "Garantía Imbra", desc: "Calidad respaldada por 50 años." },
-  { icon: "sell", title: "Precios de Fábrica", desc: "Directos de Indummelbra." },
-  { icon: "support_agent", title: "Soporte Técnico", desc: "Asesoría por expertos." },
-  { icon: "security", title: "Pagos Seguros", desc: "Tarjeta de Crédito, PSE y Efecty." }
+  { icon: "local_shipping", title: "Envíos a toda Colombia", desc: "Tu repuesto llega donde estés — en días, no semanas." },
+  { icon: "verified", title: "Garantía del fabricante", desc: "Lo fabricamos nosotros — si falla, respondemos nosotros. 50 años lo avalan." },
+  { icon: "sell", title: "Precio directo del fabricante", desc: "Sin intermediarios. Pagas lo que paga el taller más grande del país." },
+  { icon: "support_agent", title: "Soporte del fabricante", desc: "Habla con quien fabrica el repuesto. No con un vendedor. Con el experto." },
+  { icon: "security", title: "Paga como prefieras", desc: "PSE, tarjeta de crédito o débito — el método que más te convenga." }
 ];
 
 const renderStars = (rating: number) => {
@@ -117,7 +117,7 @@ export default function TestimonialsBenefits() {
             <div className="absolute w-full h-px bg-gray-200 dark:bg-gray-800 -z-0"></div>
             <div className="relative z-10 px-10 bg-[#f8f9fa] dark:bg-gray-950 flex flex-col items-center">
               <h2 className="imbra-h3 mb-6 text-center text-secondary dark:text-white">
-                Por qué los expertos eligen IMBRA
+                Por qué los mecánicos expertos compran directo a IMBRA
               </h2>
               <div className="flex flex-col items-center space-y-1.5">
                 <div className="flex items-center space-x-2">
@@ -146,7 +146,7 @@ export default function TestimonialsBenefits() {
           </div>
 
           {/* ZONA DE TESTIMONIOS (39 REALES) */}
-          <div className="relative mb-16">
+          <div className="relative mb-16 overflow-hidden">
             <button onClick={() => scroll("left")} className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-8 h-12 lg:w-10 lg:h-16 bg-white rounded-sm flex items-center justify-center shadow-xl hover:bg-primary hover:text-white transition-all active:scale-95">
               <FontAwesomeIcon icon={faChevronLeft} className="text-xs" />
             </button>

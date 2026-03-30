@@ -5,7 +5,7 @@ import CMSContent from '@/components/layout/CMSContent';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -41,7 +41,7 @@ export default async function DynamicRootPage({ params }: PageProps) {
       {/* NAVEGACIÓN OFICIAL IMBRA */}
       <Header />
       
-      <main className="flex-grow pt-[180px] md:pt-[220px] bg-[#f8f7f5]">
+      <main className="flex-grow pt-0 bg-[#f8f7f5]">
         <div className="py-8 md:py-16">
           <CMSContent 
             title={page.title}

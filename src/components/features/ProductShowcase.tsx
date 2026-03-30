@@ -16,24 +16,28 @@ export default async function ProductShowcase() {
   }
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="w-full bg-white">
       <div className="imbra-content-container">
-        <div className="flex justify-between items-end mb-12">
+
+        {/* Header */}
+        <div className="flex justify-between items-end py-10 px-4 md:px-[40px]">
           <div>
-            <h4 className="imbra-label text-primary mb-2">CALIDAD GARANTIZADA</h4>
-            <h2 className="imbra-h2">PRODUCTOS DESTACADOS</h2>
+            <h4 className="imbra-label text-primary mb-1">FABRICADOS POR IMBRA</h4>
+            <h2 className="imbra-h2">REPUESTOS DE FÁBRICA — LOS MÁS ELEGIDOS</h2>
           </div>
-          <button className="imbra-label text-secondary hover:text-primary transition-colors flex items-center group">
-            VER TODOS LOS PRODUCTOS 
-            <span className="material-icons ml-2 group-hover:translate-x-1 transition-transform">arrow_forward</span>
-          </button>
+          <a href="/tienda" className="imbra-label text-secondary hover:text-primary transition-colors flex items-center group hidden sm:flex">
+            VER CATÁLOGO COMPLETO
+            <span className="material-icons ml-1 text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </a>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Grid mosaico — gap-px crea línea de 1px entre cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 bg-white">
           {products.slice(0, 8).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
+
       </div>
     </section>
   );

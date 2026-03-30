@@ -17,12 +17,21 @@ interface CartContextType {
   totalItems: number;
   totalPrice: number;
   getHandoverURL: () => string;
+  sidebarOpen: boolean;
+  openSidebar: () => void;
+  closeSidebar: () => void;
+  
+  // Shipping info
+  freeShippingThreshold: number;
+  isFreeShipping: boolean;
+  remainingForFreeShipping: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Cargar carrito desde localStorage
   useEffect(() => {
@@ -45,14 +54,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems(prev => {
       const existing = prev.find(item => item.product.id === product.id);
       if (existing) {
-        return prev.map(item => 
-          item.product.id === product.id 
-            ? { ...item, quantity: item.quantity + quantity } 
+        return prev.map(item =>
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
       return [...prev, { product, quantity }];
     });
+    setSidebarOpen(true); // ← abre sidebar automáticamente
   };
 
   const removeItem = (productId: number) => {
@@ -60,11 +70,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateQuantity = (productId: number, quantity: number) => {
-    if (quantity <= 0) {
-      removeItem(productId);
-      return;
-    }
-    setItems(prev => prev.map(item => 
+    if (quantity <= 0) { removeItem(productId); return; }
+    setItems(prev => prev.map(item =>
       item.product.id === productId ? { ...item, quantity } : item
     ));
   };
@@ -73,29 +80,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + (parseFloat(item.product.price) * item.quantity), 0);
+  
+  const freeShippingThreshold = 50000;
+  const isFreeShipping = totalPrice >= freeShippingThreshold;
+  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - totalPrice);
 
-  /**
-   * Genera la URL de Handover hacia WooCommerce.
-   * Formato: ?saprix_handover=1&items=id:qty,id:qty
-   */
   const getHandoverURL = () => {
     const wooUrl = process.env.NEXT_PUBLIC_WORDPRESS_URL || "";
     if (items.length === 0) return `${wooUrl}/checkout/`;
-
     const itemsParam = items.map(item => `${item.product.id}:${item.quantity}`).join(',');
     return `${wooUrl}/checkout/?saprix_handover=1&items=${itemsParam}`;
   };
 
   return (
-    <CartContext.Provider value={{ 
-      items, 
-      addItem, 
-      removeItem, 
-      updateQuantity, 
-      clearCart, 
-      totalItems, 
-      totalPrice,
-      getHandoverURL 
+    <CartContext.Provider value={{
+      items, addItem, removeItem, updateQuantity, clearCart,
+      totalItems, totalPrice, getHandoverURL,
+      sidebarOpen, openSidebar: () => setSidebarOpen(true), closeSidebar: () => setSidebarOpen(false),
+      freeShippingThreshold, isFreeShipping, remainingForFreeShipping
     }}>
       {children}
     </CartContext.Provider>
@@ -104,8 +106,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error('useCart debe ser usado dentro de un CartProvider');
-  }
+  if (context === undefined) throw new Error('useCart debe ser usado dentro de un CartProvider');
   return context;
 };

@@ -1,12 +1,32 @@
 @import "tailwindcss";
 
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 6s linear infinite;
+  will-change: transform;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
 @theme {
   --color-primary: #F18700;
   --color-secondary: #212221;
   --color-background-light: #f8f7f5;
   --color-background-dark: #212221;
-  
-  --radius-default: 0px; /* Estilo industrial: puntas rectas */
+
+  --radius-default: 0px;
+  /* Estilo industrial: puntas rectas */
   --radius-lg: 0px;
   --radius-xl: 0px;
   --radius-full: 9999px;
@@ -17,9 +37,14 @@
 
   /* IMBRA DESIGN SYSTEM TOKENS */
   --content-max-width: 1920px;
-  --safe-padding-mobile: 0.75rem; /* px-3 */
-  --safe-padding-lg: 1rem;       /* px-4 */
-  --safe-padding-xl: 1.25rem;    /* px-5 */
+  --safe-padding-mobile: 0.75rem;
+  /* px-3 */
+  --safe-padding-lg: 1rem;
+  /* px-4 */
+  --safe-padding-xl: 1.25rem;
+  /* px-5 */
+
+  /* IMBRA DESIGN SYSTEM TOKENS */
 }
 
 :root {
@@ -32,8 +57,23 @@
   --foreground: #f3f4f6;
 }
 
+/* Ocultar scrollbar horizontal sin perder funcionalidad */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* IMBRA GLOBAL RESET - Neutralización para control total por componente */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
   padding: 0;
   font-family: var(--font-display);
@@ -45,10 +85,11 @@ h1, h2, h3, h4, h5, h6 {
 /* H1: El Grito Industrial (Para Hero y secciones críticas) */
 .imbra-h1 {
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5.5vw, 4rem); 
-  font-weight: 700; /* Reducido a Bold para nitidez absoluta */
+  font-size: clamp(2.25rem, 5.5vw, 4rem);
+  font-weight: 700;
+  /* Reducido a Bold para nitidez absoluta */
   line-height: 0.95;
-  letter-spacing: -0.01em; 
+  letter-spacing: -0.01em;
 }
 
 /* H2: Título de Sección (Impacto Directo) */
@@ -64,7 +105,8 @@ h1, h2, h3, h4, h5, h6 {
 .imbra-h3 {
   font-family: var(--font-display);
   font-size: clamp(1.1rem, 2.5vw, 1.75rem);
-  font-weight: 700; /* Bold estándar para lectura clara */
+  font-weight: 700;
+  /* Bold estándar para lectura clara */
   line-height: 1.2;
   letter-spacing: normal;
 }
@@ -89,10 +131,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Body: Lectura Técnica (Montserrat) */
-p, .imbra-body {
+p,
+.imbra-body {
   font-family: var(--font-body);
   font-size: 0.95rem;
-  font-weight: 400; /* Regular para mejor legibilidad */
+  font-weight: 400;
+  /* Regular para mejor legibilidad */
   line-height: 1.5;
   color: #4b5563;
 }
@@ -101,7 +145,8 @@ p, .imbra-body {
   font-family: var(--font-body);
   font-size: 0.95rem;
   line-height: 1.5;
-  font-weight: 600; /* Semibold para destacar sin saturar */
+  font-weight: 600;
+  /* Semibold para destacar sin saturar */
   color: var(--color-secondary);
 }
 
@@ -127,8 +172,10 @@ select::-ms-expand {
 /* REGLAS DE ORO: CONTENEDORES IMBRA */
 .imbra-content-container {
   width: 100%;
-  padding-left: 1.25rem; /* 20px exactos desde el borde real de la ventana */
-  padding-right: 1.25rem; /* 20px exactos desde el borde real de la ventana */
+  padding-left: 1.25rem;
+  /* 20px exactos desde el borde real de la ventana */
+  padding-right: 1.25rem;
+  /* 20px exactos desde el borde real de la ventana */
 }
 
 /* IMBRA CMS CONTENT - Estilos para el Espejo de WordPress */
@@ -174,4 +221,24 @@ select::-ms-expand {
 
 .cms-content a:hover {
   text-decoration: underline;
+}
+
+/* ── UTILIDADES DE ESPACIADO ── */
+.safe-px {
+  padding-left: var(--safe-padding-mobile);
+  padding-right: var(--safe-padding-mobile);
+}
+
+@media (min-width: 1024px) {
+  .safe-px {
+    padding-left: var(--safe-padding-lg);
+    padding-right: var(--safe-padding-lg);
+  }
+}
+
+@media (min-width: 1280px) {
+  .safe-px {
+    padding-left: var(--safe-padding-xl);
+    padding-right: var(--safe-padding-xl);
+  }
 }
