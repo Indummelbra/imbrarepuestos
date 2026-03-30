@@ -30,7 +30,7 @@ export default function PageHero({
         }}
       />
 
-      <div className="relative px-4 md:px-[60px] lg:px-[100px] py-12 md:py-16">
+      <div className="relative px-5 py-12 md:py-16">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
             {label && (

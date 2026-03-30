@@ -151,9 +151,9 @@ export default function MotoSelector({
   const canSearch = !!(selectedGroup || selectedBrand);
 
   return (
-    <section className="relative z-40 px-5">
+    <section className="relative px-5">
       <div
-        className="w-full bg-[#1a1a1a] rounded-[0px] overflow-hidden shadow-none"
+        className="w-full bg-[#1a1a1a] rounded-[0px] shadow-none"
       >
         <div className="flex flex-col lg:flex-row items-center gap-4 lg:gap-6 p-5 lg:px-8 lg:py-6">
 

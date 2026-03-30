@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx tsc:*)",
       "Bash(curl -s \"http://localhost:3000/api/sync-products?secret=imbra-secret-2026\")",
-      "Bash(find 'F:\\\\CLIENTES\\\\IMBRA-MAPACHE\\\\Imbra Store' -type f \\\\\\(-name *auth* -o -name *login* -o -name *signin* -o -name *session* \\\\\\) ! -path */node_modules/* ! -path */.next/*)"
+      "Bash(find 'F:\\\\CLIENTES\\\\IMBRA-MAPACHE\\\\Imbra Store' -type f \\\\\\(-name *auth* -o -name *login* -o -name *signin* -o -name *session* \\\\\\) ! -path */node_modules/* ! -path */.next/*)",
+      "WebFetch(domain:localhost)"
     ]
   }
 }

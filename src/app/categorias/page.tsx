@@ -35,7 +35,7 @@ export default async function CategoriasPage() {
           badgeLabel="Categorías"
         />
 
-        <div className="px-4 md:px-[60px] lg:px-[100px] pt-10">
+        <div className="px-5 pt-10">
           <CategoriaGrid categories={categories} />
         </div>
       </main>

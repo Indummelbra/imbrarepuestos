@@ -94,7 +94,7 @@ export default function ContactoPage() {
         </div>
 
         {/* ── Segunda sección encajonada ── */}
-        <div className="relative z-10 pb-20 px-4 md:px-[60px] lg:px-[100px]">
+        <div className="relative z-10 pb-20 px-5">
           <div className="bg-white shadow-[0_4px_40px_rgba(0,0,0,0.14)] px-8 md:px-14 pt-14 pb-16">
 
             {/* Header centrado */}

@@ -38,6 +38,9 @@ export default function Header() {
 
   const menuRef = useRef<HTMLDivElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const navBarRef = useRef<HTMLDivElement>(null);
+  const [menuTop, setMenuTop] = useState(0);
   const menuTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const helpTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nosotrosTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -68,6 +71,9 @@ export default function Header() {
   /* Helpers de hover con delay anti-sensibilidad */
   const openMenu = () => {
     if (menuTimer.current) clearTimeout(menuTimer.current);
+    if (navBarRef.current) {
+      setMenuTop(navBarRef.current.getBoundingClientRect().bottom);
+    }
     setMenuPhase((p) => p === "closed" ? "col1" : p);
   };
   const closeMenu = useCallback(() => { menuTimer.current = setTimeout(() => setMenuPhase("closed"), 250); }, []);
@@ -81,9 +87,9 @@ export default function Header() {
   /* Cierre por click fuera + ESC */
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      const inTrigger = menuRef.current?.contains(e.target as Node);
-      const inPanel = megaMenuRef.current?.contains(e.target as Node);
-      if (!inTrigger && !inPanel) setMenuPhase("closed");
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuPhase("closed");
+      }
     }
     function onEsc(e: KeyboardEvent) {
       if (e.key === "Escape") setMenuPhase("closed");
@@ -114,7 +120,7 @@ export default function Header() {
           searchOpen={mobileSearchOpen}
         />
       </div>
-      <header className="relative z-50 bg-white border-b border-gray-100">
+      <header ref={headerRef} className="relative z-[60] bg-white border-b border-gray-100">
 
         {/* ── INFO BAR ── */}
         <div className="bg-gray-100 border-b border-gray-200/50 overflow-hidden">
@@ -210,7 +216,7 @@ export default function Header() {
         {/* ── MAIN NAV BAR ── desktop only */}
         <div className="hidden xl:block w-full bg-white border-b border-gray-100 relative">
           <div className="imbra-content-container">
-            <div className="py-10 flex items-center gap-3 xl:gap-8">
+            <div ref={navBarRef} className="py-10 flex items-center gap-3 xl:gap-8">
 
               <div className="flex items-center gap-6 shrink-0">
                 <Link href="/" className="shrink-0">
@@ -221,23 +227,138 @@ export default function Header() {
                   />
                 </Link>
 
-                {/* ── Trigger "Comprar por..." ── */}
+                {/* ── Trigger "Comprar por..." + Mega Menú ── */}
                 <div
                   ref={menuRef}
-                  className="hidden xl:flex"
+                  className="hidden xl:flex relative shrink-0"
                   onMouseEnter={openMenu}
                   onMouseLeave={closeMenu}
                 >
                   <button
-                    className={`flex items-center gap-2 font-bold transition-colors group ${menuPhase !== "closed" ? "text-primary" : "text-secondary hover:text-primary"}`}
+                    className={`flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider transition-colors group ${menuPhase !== "closed" ? "text-primary" : "text-secondary hover:text-primary"}`}
                     aria-haspopup="true"
                     aria-expanded={menuPhase !== "closed"}
                   >
                     {menuPhase !== "closed"
-                      ? <X size={20} />
-                      : <Menu size={20} className="group-hover:scale-110 transition-transform" />}
+                      ? <X size={15} />
+                      : <Menu size={15} className="group-hover:scale-110 transition-transform" />}
+                    <span>Comprar por...</span>
                   </button>
 
+                  {menuPhase !== "closed" && (
+                    <>
+                      {/* Backdrop */}
+                      <div
+                        className="fixed inset-0 z-30 bg-black/30"
+                        style={{ top: menuTop }}
+                        onClick={closeAll}
+                      />
+
+                      {/* Cajón mega menú */}
+                      <div
+                        ref={megaMenuRef}
+                        className="fixed z-40"
+                        style={{ top: menuTop, left: "calc(50vw - 650px)" }}
+                        onMouseEnter={keepMenu}
+                        onMouseLeave={closeMenu}
+                      >
+                        <div
+                          className="bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14)] border-t-2 border-primary transition-all duration-200 flex"
+                          style={{
+                            width: menuPhase === "full" ? "1300px" : "270px",
+                            maxHeight: `calc(100vh - ${menuTop}px - 10px)`,
+                          }}
+                        >
+                          {/* Col A: Grupos */}
+                          <div className="w-[270px] shrink-0 bg-white border-r border-gray-100 flex flex-col py-2 overflow-y-auto">
+                            {MEGA_GROUPS.map((g) => {
+                              const active = activeGroup === g.id && menuPhase === "full";
+                              return (
+                                <button
+                                  key={g.id}
+                                  onMouseEnter={() => { setActiveGroup(g.id); setMenuPhase("full"); }}
+                                  className={`flex items-center gap-3 px-5 py-3 w-full text-left transition-colors group/g border-b border-gray-100 ${active ? "bg-gray-50 text-primary" : "text-gray-900 hover:bg-gray-50 hover:text-primary"}`}
+                                >
+                                  <Image src={g.image} alt={g.name} width={30} height={30}
+                                    className="w-[30px] h-[30px] object-contain shrink-0 opacity-80 group-hover/g:opacity-100 transition-opacity"
+                                    unoptimized />
+                                  <span className={`text-[14px] flex-1 transition-colors ${active ? "font-black text-primary" : "font-bold"}`}>
+                                    {g.name}
+                                  </span>
+                                  <ChevronRight size={14}
+                                    className={`shrink-0 transition-colors ${active ? "text-primary" : "text-gray-300 group-hover/g:text-primary"}`} />
+                                </button>
+                              );
+                            })}
+                            <div className="mt-auto px-5 py-3 border-t border-gray-100">
+                              <Link href="/categorias" onClick={closeAll}
+                                className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
+                                <ArrowRight size={11} /> Ver todas
+                              </Link>
+                            </div>
+                          </div>
+
+                          {/* Col B + C */}
+                          {menuPhase === "full" && (
+                            <>
+                              {/* Col B: Subcategorías */}
+                              <div className="relative flex-1 bg-[#F5F6F8] px-10 py-7 flex flex-col min-w-0 overflow-y-auto">
+                                <Image src={currentGroup.image} alt="" width={320} height={320}
+                                  className="absolute bottom-6 right-4 w-[320px] h-[320px] object-contain opacity-10 pointer-events-none select-none"
+                                  unoptimized />
+                                <div className="flex items-center gap-3 mb-6 shrink-0">
+                                  <Image src={currentGroup.image} alt={currentGroup.name} width={22} height={22}
+                                    className="w-[22px] h-[22px] object-contain" unoptimized />
+                                  <h3 className="text-[15px] font-black text-gray-900 uppercase tracking-[1px]">
+                                    {currentGroup.name}
+                                  </h3>
+                                  <div className="h-px flex-1 bg-gray-300/40" />
+                                  <span className="text-[9px] text-gray-400 uppercase tracking-widest shrink-0">
+                                    {currentCats.length} {currentCats.length === 1 ? "categoría" : "categorías"}
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 content-start flex-1">
+                                  {currentCats.map((cat) => (
+                                    <Link key={cat.slug} href={`/tienda?woo_cat=${cat.slug}`} onClick={closeAll}
+                                      className="group/cat relative flex items-center gap-4 px-4 py-4 bg-white transition-all duration-300 hover:-translate-y-[3px] overflow-hidden"
+                                      style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
+                                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 18px rgba(0,0,0,0.10)"; }}
+                                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 4px rgba(0,0,0,0.06)"; }}
+                                    >
+                                      <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary origin-left scale-x-0 group-hover/cat:scale-x-100 transition-transform duration-300" />
+                                      <div className="w-14 h-14 flex items-center justify-center shrink-0">
+                                        {cat.image
+                                          ? <Image src={cat.image} alt="" width={48} height={48} className="w-12 h-12 object-contain" unoptimized />
+                                          : <ChevronRight size={20} className="text-gray-300" />}
+                                      </div>
+                                      <p className="text-[14px] font-semibold text-gray-700 group-hover/cat:text-primary transition-colors leading-tight">
+                                        {cat.name}
+                                      </p>
+                                    </Link>
+                                  ))}
+                                </div>
+                                <div className="shrink-0 mt-6 -mx-10 -mb-7 px-10 py-3 bg-white border-t border-gray-100 flex items-center justify-between">
+                                  <Link href="/tienda" onClick={closeAll}
+                                    className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-secondary hover:text-primary transition-colors">
+                                    <ArrowRight size={11} /> Ir a la tienda
+                                  </Link>
+                                  <Link href={`/tienda?woo_cat=${currentCats[0]?.slug ?? ""}`} onClick={closeAll}
+                                    className="text-[10px] font-bold text-primary hover:text-secondary transition-colors">
+                                    Ver {currentGroup.name} →
+                                  </Link>
+                                </div>
+                              </div>
+
+                              {/* Col C: Productos Destacados */}
+                              <div className="w-[380px] shrink-0 bg-white border-l border-gray-100 px-7 py-7 flex flex-col">
+                                <FeaturedCarousel onClose={closeAll} />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -328,120 +449,6 @@ export default function Header() {
             </div>
           </div>
 
-          {/* ══════════════════════════════════════════════
-            MEGA MENÚ — posicionado desde el nav bar completo
-        ══════════════════════════════════════════════ */}
-          {menuPhase !== "closed" && (
-            <>
-              {/* Backdrop */}
-              <div className="fixed inset-0 z-30 bg-black/30" onClick={closeAll} />
-
-              {/* Panel — absolute desde el nav bar (relative), top-full = justo abajo del header) */}
-              <div
-                ref={megaMenuRef}
-                className="absolute left-1/2 -translate-x-1/2 z-40"
-                style={{ top: "calc(100% - 40px)" }}
-                onMouseEnter={keepMenu}
-                onMouseLeave={closeMenu}
-              >
-                <div
-                  className="bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14)] border-t-2 border-primary overflow-hidden transition-all duration-200 flex"
-                  style={{
-                    width: menuPhase === "full" ? "min(1300px, 100vw)" : "270px",
-                    minHeight: "460px",
-                  }}
-                >
-                  {/* ── Col A: Grupos ── */}
-                  <div className="w-[270px] shrink-0 bg-white border-r border-gray-100 flex flex-col py-2">
-                    {MEGA_GROUPS.map((g) => {
-                      const active = activeGroup === g.id && menuPhase === "full";
-                      return (
-                        <button
-                          key={g.id}
-                          onMouseEnter={() => { setActiveGroup(g.id); setMenuPhase("full"); }}
-                          className={`flex items-center gap-3 px-5 py-3 w-full text-left transition-colors group/g border-b border-gray-100 ${active ? "bg-gray-50 text-primary" : "text-gray-900 hover:bg-gray-50 hover:text-primary"
-                            }`}
-                        >
-                          <Image src={g.image} alt={g.name} width={30} height={30}
-                            className="w-[30px] h-[30px] object-contain shrink-0 opacity-80 group-hover/g:opacity-100 transition-opacity"
-                            unoptimized />
-                          <span className={`text-[14px] flex-1 transition-colors ${active ? "font-black text-primary" : "font-bold"}`}>
-                            {g.name}
-                          </span>
-                          <ChevronRight size={14}
-                            className={`shrink-0 transition-colors ${active ? "text-primary" : "text-gray-300 group-hover/g:text-primary"}`} />
-                        </button>
-                      );
-                    })}
-                    <div className="mt-auto px-5 py-3 border-t border-gray-100">
-                      <Link href="/categorias" onClick={closeAll}
-                        className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
-                        <ArrowRight size={11} /> Ver todas
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* ── Col B + Col C (fase full) ── */}
-                  {menuPhase === "full" && (
-                    <>
-                      {/* Col B: Subcategorías */}
-                      <div className="relative flex-1 bg-[#F5F6F8] px-10 py-7 flex flex-col min-w-0 overflow-hidden">
-                        <Image src={currentGroup.image} alt="" width={320} height={320}
-                          className="absolute bottom-6 right-4 w-[320px] h-[320px] object-contain opacity-10 pointer-events-none select-none"
-                          unoptimized />
-                        <div className="flex items-center gap-3 mb-6 shrink-0">
-                          <Image src={currentGroup.image} alt={currentGroup.name} width={22} height={22}
-                            className="w-[22px] h-[22px] object-contain" unoptimized />
-                          <h3 className="text-[15px] font-black text-gray-900 uppercase tracking-[1px]">
-                            {currentGroup.name}
-                          </h3>
-                          <div className="h-px flex-1 bg-gray-300/40" />
-                          <span className="text-[9px] text-gray-400 uppercase tracking-widest shrink-0">
-                            {currentCats.length} {currentCats.length === 1 ? "categoría" : "categorías"}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3 content-start flex-1">
-                          {currentCats.map((cat) => (
-                            <Link key={cat.slug} href={`/tienda?woo_cat=${cat.slug}`} onClick={closeAll}
-                              className="group/cat relative flex items-center gap-4 px-4 py-4 bg-white transition-all duration-300 hover:-translate-y-[3px] overflow-hidden"
-                              style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
-                              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 18px rgba(0,0,0,0.10)"; }}
-                              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 4px rgba(0,0,0,0.06)"; }}
-                            >
-                              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary origin-left scale-x-0 group-hover/cat:scale-x-100 transition-transform duration-300" />
-                              <div className="w-14 h-14 flex items-center justify-center shrink-0">
-                                {cat.image
-                                  ? <Image src={cat.image} alt="" width={48} height={48} className="w-12 h-12 object-contain" unoptimized />
-                                  : <ChevronRight size={20} className="text-gray-300" />}
-                              </div>
-                              <p className="text-[14px] font-semibold text-gray-700 group-hover/cat:text-primary transition-colors leading-tight">
-                                {cat.name}
-                              </p>
-                            </Link>
-                          ))}
-                        </div>
-                        <div className="shrink-0 mt-6 -mx-10 -mb-7 px-10 py-3 bg-white border-t border-gray-100 flex items-center justify-between">
-                          <Link href="/tienda" onClick={closeAll}
-                            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-secondary hover:text-primary transition-colors">
-                            <ArrowRight size={11} /> Ir a la tienda
-                          </Link>
-                          <Link href={`/tienda?woo_cat=${currentCats[0]?.slug ?? ""}`} onClick={closeAll}
-                            className="text-[10px] font-bold text-primary hover:text-secondary transition-colors">
-                            Ver {currentGroup.name} →
-                          </Link>
-                        </div>
-                      </div>
-
-                      {/* Col C: Productos Destacados */}
-                      <div className="w-[380px] shrink-0 bg-white border-l border-gray-100 px-7 py-7 flex flex-col">
-                        <FeaturedCarousel onClose={closeAll} />
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
         </div>
 
         {/* ── MOBILE MAIN BAR ── */}

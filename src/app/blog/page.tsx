@@ -43,7 +43,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
           badgeLabel="Artículos"
         />
 
-        <div className="px-4 md:px-[60px] lg:px-[100px] pt-10">
+        <div className="px-5 pt-10">
           {/* Filtros de categoría */}
           <div className="flex flex-wrap gap-2 mb-10">
             <Link

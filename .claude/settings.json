@@ -8,7 +8,10 @@
       "Bash(node -e \":*)",
       "Bash(xargs ls:*)",
       "Bash(npx next:*)",
-      "Bash(npm audit:*)"
+      "Bash(npm audit:*)",
+      "Bash(/tmp/z_index_analysis.txt:*)",
+      "Read(//tmp/**)",
+      "Bash(sort -t':' -k3 -n)"
     ],
     "additionalDirectories": [
       "C:\\Users\\GVarg\\.claude\\projects\\f--CLIENTES-IMBRA-MAPACHE-Imbra-Store\\memory",

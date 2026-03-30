@@ -27,7 +27,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         {/* Hero del artículo */}
         <div className="w-full bg-[#212221] relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
-          <div className="px-4 md:px-[60px] lg:px-[100px] py-12 md:py-16">
+          <div className="px-5 py-12 md:py-16">
             <div className="max-w-3xl">
               {categories.length > 0 && (
                 <div className="flex gap-2 mb-4">
@@ -54,7 +54,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           <div className="absolute bottom-0 left-0 w-24 h-1 bg-primary" />
         </div>
 
-        <div className="px-4 md:px-[60px] lg:px-[100px] pt-10">
+        <div className="px-5 pt-10">
           <div className="max-w-3xl mx-auto">
             {/* Imagen destacada */}
             {image && (

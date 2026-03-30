@@ -30,13 +30,13 @@ export function CartSidebar() {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[60] bg-black/40 transition-opacity duration-300 ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 z-[90] bg-black/40 transition-opacity duration-300 ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         onClick={closeSidebar}
       />
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 right-0 h-full w-[90vw] max-w-[400px] z-[70] bg-white flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed top-0 right-0 h-full w-[90vw] max-w-[400px] z-[100] bg-white flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 shrink-0">

@@ -192,19 +192,19 @@ export default function StickyHeader({
                 {/* Cajón mega menú */}
                 <div
                   className="fixed z-40"
-                  style={{ top: menuTop, left: "calc(50vw - 650px)" }}
+                  style={{ top: STICKY_H, left: "calc(50vw - 650px)" }}
                   onMouseEnter={keepMenu}
                   onMouseLeave={closeMenu}
                 >
                   <div
-                    className="bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14)] border-t-2 border-primary overflow-hidden transition-all duration-200 flex"
+                    className="bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14)] border-t-2 border-primary transition-all duration-200 flex"
                     style={{
                       width:     menuPhase === "full" ? "1300px" : "270px",
-                      minHeight: "460px",
+                      maxHeight: `calc(100vh - ${STICKY_H}px - 10px)`,
                     }}
                   >
                     {/* Col A: Grupos */}
-                    <div className="w-[270px] shrink-0 bg-white border-r border-gray-100 flex flex-col py-2">
+                    <div className="w-[270px] shrink-0 bg-white border-r border-gray-100 flex flex-col py-2 overflow-y-auto">
                       {CATEGORY_GROUPS.map((g) => {
                         const active = activeGroup === g.id && menuPhase === "full";
                         return (
@@ -245,7 +245,7 @@ export default function StickyHeader({
                     {menuPhase === "full" && (
                       <>
                         {/* Col B: Subcategorías */}
-                        <div className="relative flex-1 bg-[#F5F6F8] px-10 py-7 flex flex-col min-w-0 overflow-hidden">
+                        <div className="relative flex-1 bg-[#F5F6F8] px-10 py-7 flex flex-col min-w-0 overflow-y-auto">
                           <Image
                             src={currentGroup.image} alt=""
                             width={320} height={320}
