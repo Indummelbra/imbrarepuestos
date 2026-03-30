@@ -235,6 +235,7 @@ export interface SidebarFilters {
  */
 export const getWooCategoriesWithCount = unstable_cache(
   async (): Promise<Array<{ slug: string; name: string; count: number }>> => {
+    if (!supabase) return [];
     const { data, error } = await supabase
       .from('products_search')
       .select('categories')

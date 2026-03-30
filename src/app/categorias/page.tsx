@@ -5,7 +5,7 @@ import PageHero from "@/components/ui/PageHero";
 import { getWooCategoriesWithCount } from "@/app/actions/vehicle-actions";
 import { WOO_CATEGORIES } from "@/lib/woo-categories";
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function CategoriasPage() {
   const counts = await getWooCategoriesWithCount();
