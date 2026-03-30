@@ -4,7 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useState } from "react";
 import {
-  MapPin, Phone, Mail, CheckCircle, MessageCircle,
+  MapPin, Phone, Mail, CheckCircle,
   Headphones, Navigation, ExternalLink, Star, SendHorizontal,
 } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

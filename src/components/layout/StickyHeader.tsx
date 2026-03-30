@@ -7,10 +7,8 @@ import LiveSearch from "../search/LiveSearch";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { WOO_CATEGORIES, CATEGORY_GROUPS } from "@/lib/woo-categories";
 import {
-  Menu, X, ChevronRight, ChevronDown, ShoppingCart, ArrowRight, ExternalLink, Headphones, Search
+  Menu, X, ChevronRight, ChevronDown, ShoppingCart, ArrowRight, ExternalLink, Search
 } from "lucide-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 
 const STICKY_H   = 60;   // px — altura de la barra sticky

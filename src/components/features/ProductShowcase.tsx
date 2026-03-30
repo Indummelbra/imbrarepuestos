@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getProducts } from "@/lib/woocommerce";
 import ProductCard from "./ProductCard";
 
@@ -25,10 +26,10 @@ export default async function ProductShowcase() {
             <h4 className="imbra-label text-primary mb-1">FABRICADOS POR IMBRA</h4>
             <h2 className="imbra-h2">REPUESTOS DE FÁBRICA — LOS MÁS ELEGIDOS</h2>
           </div>
-          <a href="/tienda" className="imbra-label text-secondary hover:text-primary transition-colors flex items-center group hidden sm:flex">
+          <Link href="/tienda" className="imbra-label text-secondary hover:text-primary transition-colors flex items-center group hidden sm:flex">
             VER CATÁLOGO COMPLETO
             <span className="material-icons ml-1 text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
-          </a>
+          </Link>
         </div>
 
         {/* Grid mosaico — gap-px crea línea de 1px entre cards */}

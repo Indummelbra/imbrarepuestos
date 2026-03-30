@@ -7,6 +7,7 @@ const inter = Inter({
   weight: ["400", "600", "700"],
   variable: "--font-inter",
   display: "swap",
+  preload: false,
 });
 
 const montserrat = Montserrat({
@@ -14,6 +15,7 @@ const montserrat = Montserrat({
   weight: ["400", "600", "700", "900"],
   variable: "--font-montserrat",
   display: "swap",
+  preload: false,
 });
 
 const archivo = Archivo({
@@ -22,6 +24,7 @@ const archivo = Archivo({
   style: ["normal"],
   variable: "--font-archivo",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {

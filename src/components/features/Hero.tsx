@@ -47,7 +47,7 @@ export default function Hero({ slides }: HeroProps) {
     dragRef.current.active = false;
     sectionRef.current?.releasePointerCapture(e.pointerId);
     const delta = dragRef.current.startX - e.clientX;
-    if (Math.abs(delta) > 50) delta > 0 ? next() : prev();
+    if (Math.abs(delta) > 50) { if (delta > 0) { next(); } else { prev(); } }
   };
 
   const slide = slides[active];

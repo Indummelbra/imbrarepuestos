@@ -152,13 +152,15 @@ function ProductGroup({
 ───────────────────────────────────────────────────────────────── */
 export default async function ProductRelatedSection({
   categoriaSlug,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   categoriaName,
   productoActualSlug,
 }: Props) {
-  let [relacionados, destacados] = await Promise.all([
+  const [relacionados, destacadosInit] = await Promise.all([
     getProductsByCategory(categoriaSlug, 20),
     getFeaturedProducts(12),
   ]);
+  let destacados = destacadosInit;
 
   // Fallback para destacados
   if (!destacados || destacados.length === 0) {

@@ -120,7 +120,7 @@ export function FeaturedCarousel({ onClose }: { onClose: () => void }) {
           )}
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation();
-              setLiked((w) => { const n = new Set(w); n.has(product.id) ? n.delete(product.id) : n.add(product.id); return n; });
+              setLiked((w) => { const n = new Set(w); if (n.has(product.id)) { n.delete(product.id); } else { n.add(product.id); } return n; });
             }}
             className={`absolute top-1 right-1 z-10 p-1.5 transition-colors ${liked.has(product.id) ? "text-red-500" : "text-gray-300 hover:text-red-400"}`}
           >

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:mkt.imbrarepuestos.com)",
+      "Bash(xargs grep:*)",
+      "Read(//f/CLIENTES/IMBRA-MAPACHE/**)",
+      "Bash(node tmp/copy-images.js)",
+      "Bash(node -e \":*)",
+      "Bash(xargs ls:*)",
+      "Bash(npx next:*)",
+      "Bash(npm audit:*)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\GVarg\\.claude\\projects\\f--CLIENTES-IMBRA-MAPACHE-Imbra-Store\\memory",
+      "f:\\CLIENTES\\IMBRA-MAPACHE\\Imbra Store\\src\\app\\product\\[slug]",
+      "f:\\CLIENTES\\IMBRA-MAPACHE\\Imbra Store\\src\\app\\blog\\[slug]"
+    ]
+  },
+  "effortLevel": "low",
+  "autoUpdatesChannel": "latest"
+}

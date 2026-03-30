@@ -8,22 +8,23 @@ import Image from "next/image";
 export const revalidate = 3600;
 
 interface PageProps {
-  searchParams: { cat?: string; page?: string };
+  searchParams: Promise<{ cat?: string; page?: string }>;
 }
 
 export default async function BlogPage({ searchParams }: PageProps) {
-  const currentPage = searchParams.page ? parseInt(searchParams.page) : 1;
+  const resolvedParams = await searchParams;
+  const currentPage = resolvedParams.page ? parseInt(resolvedParams.page) : 1;
 
   const [categoriesData, { posts, total, pages }] = await Promise.all([
     getCategories(),
     getPosts({
       perPage: 9,
       page: currentPage,
-      categories: searchParams.cat ? [parseInt(searchParams.cat)] : undefined,
+      categories: resolvedParams.cat ? [parseInt(resolvedParams.cat)] : undefined,
     }),
   ]);
 
-  const activeCategory = categoriesData.find((c) => String(c.id) === searchParams.cat);
+  const activeCategory = categoriesData.find((c) => String(c.id) === resolvedParams.cat);
 
   // Excluir "Sin categoría"
   const categories = categoriesData.filter((c) => c.slug !== "sin-categoria" && c.count > 0);
@@ -48,7 +49,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
             <Link
               href="/blog"
               className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 border transition-colors ${
-                !searchParams.cat
+                !resolvedParams.cat
                   ? "bg-secondary text-white border-secondary"
                   : "border-gray-200 text-gray-500 hover:border-secondary hover:text-secondary"
               }`}
@@ -60,7 +61,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                 key={cat.id}
                 href={`/blog?cat=${cat.id}`}
                 className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 border transition-colors ${
-                  String(cat.id) === searchParams.cat
+                  String(cat.id) === resolvedParams.cat
                     ? "bg-secondary text-white border-secondary"
                     : "border-gray-200 text-gray-500 hover:border-secondary hover:text-secondary"
                 }`}
@@ -133,7 +134,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                 <div className="flex justify-center gap-1 mt-12">
                   {currentPage > 1 && (
                     <Link
-                      href={`/blog?${searchParams.cat ? `cat=${searchParams.cat}&` : ""}page=${currentPage - 1}`}
+                      href={`/blog?${resolvedParams.cat ? `cat=${resolvedParams.cat}&` : ""}page=${currentPage - 1}`}
                       className="px-4 py-2 border border-gray-200 text-sm font-bold text-secondary hover:border-secondary transition-colors"
                     >
                       ‹ Anterior
@@ -142,7 +143,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                   {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
                     <Link
                       key={p}
-                      href={`/blog?${searchParams.cat ? `cat=${searchParams.cat}&` : ""}page=${p}`}
+                      href={`/blog?${resolvedParams.cat ? `cat=${resolvedParams.cat}&` : ""}page=${p}`}
                       className={`px-4 py-2 border text-sm font-bold transition-colors ${
                         p === currentPage
                           ? "bg-secondary text-white border-secondary"
@@ -154,7 +155,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                   ))}
                   {currentPage < pages && (
                     <Link
-                      href={`/blog?${searchParams.cat ? `cat=${searchParams.cat}&` : ""}page=${currentPage + 1}`}
+                      href={`/blog?${resolvedParams.cat ? `cat=${resolvedParams.cat}&` : ""}page=${currentPage + 1}`}
                       className="px-4 py-2 border border-gray-200 text-sm font-bold text-secondary hover:border-secondary transition-colors"
                     >
                       Siguiente ›

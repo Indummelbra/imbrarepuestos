@@ -13,11 +13,11 @@ import { getGroupProductCounts } from "@/app/actions/vehicle-actions";
 import { getHeroSlides } from "@/lib/wordpress";
 
 interface PageProps {
-  searchParams: { cat?: string; brand?: string; cc?: string; year?: string };
+  searchParams: Promise<{ cat?: string; brand?: string; cc?: string; year?: string }>;
 }
 
 export default async function Home({ searchParams }: PageProps) {
-  const { cat, brand, cc, year } = searchParams;
+  const { cat, brand, cc, year } = await searchParams;
 
   const [groupCounts, heroSlides] = await Promise.all([
     getGroupProductCounts(),

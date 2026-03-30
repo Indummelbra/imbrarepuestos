@@ -11,28 +11,29 @@ import {
 } from "@/app/actions/vehicle-actions";
 import { WOO_CATEGORIES, CATEGORY_GROUPS, getWooCategoryBySlug } from "@/lib/woo-categories";
 import Link from "next/link";
-import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
 type SortBy = "name" | "price_asc" | "price_desc";
 
+interface SearchParamsShape {
+  brand?: string;
+  model?: string;
+  year?: string;
+  cc?: string;
+  cat?: string;
+  woo_cat?: string;
+  min?: string;
+  max?: string;
+  stock?: string;
+  sale?: string;
+  sort?: string;
+  page?: string;
+  q?: string;
+}
+
 interface PageProps {
-  searchParams: {
-    brand?: string;
-    model?: string;
-    year?: string;
-    cc?: string;
-    cat?: string;
-    woo_cat?: string;
-    min?: string;
-    max?: string;
-    stock?: string;
-    sale?: string;
-    sort?: string;
-    page?: string;
-    q?: string;
-  };
+  searchParams: Promise<SearchParamsShape>;
 }
 
 function buildUrl(
@@ -49,7 +50,7 @@ function buildUrl(
 
 export default async function SearchPage({ searchParams }: PageProps) {
   const { brand, model, year, cc, cat, woo_cat, min, max, stock, sale, sort, page, q } =
-    searchParams;
+    await searchParams;
 
   const vehicleFilters = {
     vehicleBrand: brand,
@@ -251,6 +252,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
               <>
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                   {results.products.map((product) => (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     <ProductCard key={product.id} product={product as any} />
                   ))}
                 </div>

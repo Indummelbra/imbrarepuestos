@@ -1,0 +1,232 @@
+/**
+ * IMBRA Store — Order Tracking Fields
+ * Basado en PharmaPlus V2, adaptado para IMBRA Repuestos.
+ * Desarrollado por iAnGo | Agencia de Desarrollo y Automatizaciones con IA
+ *
+ * Meta keys usadas:
+ *   _imbra_shipping_carrier  → slug de la transportadora
+ *   _imbra_shipping_guide    → número de guía
+ *
+ * Expone en REST API como:
+ *   imbra_shipping_carrier
+ *   imbra_shipping_guide
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+// ══════════════════════════════════════════════════════════════════
+// 1. MOSTRAR CAMPOS EN EL ADMIN (dentro del pedido, bajo envío)
+// ══════════════════════════════════════════════════════════════════
+add_action( 'woocommerce_admin_order_data_after_shipping_address', 'imbra_tracking_add_fields_admin', 10, 1 );
+
+function imbra_tracking_add_fields_admin( $order ) {
+    $carrier        = $order->get_meta( '_imbra_shipping_carrier' );
+    $guide          = $order->get_meta( '_imbra_shipping_guide' );
+    $doc_tipo       = $order->get_meta( '_billing_tipo_documento' );
+    $doc_num        = $order->get_meta( '_billing_numero_documento' );
+    ?>
+    <div style="clear:both; width:100%; border-top:3px solid #F18700; margin-top:32px; padding-top:24px;">
+
+        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#212221;margin:0 0 16px;display:flex;align-items:center;gap:6px;">
+            🚚 <?php _e( 'Transportadora &amp; Guía de Envío', 'woocommerce' ); ?>
+        </h3>
+
+        <?php if ( $doc_tipo || $doc_num ) : ?>
+        <p style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:4px;padding:9px 12px;font-size:12px;color:#374151;margin:0 0 16px;">
+            <strong style="color:#4338ca;">Identificación cliente:</strong>
+            <?php echo esc_html( $doc_tipo ); ?> &mdash; <?php echo esc_html( $doc_num ); ?>
+        </p>
+        <?php endif; ?>
+
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+
+            <div style="flex:1;min-width:180px;">
+                <label for="_imbra_shipping_carrier" style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#555;margin-bottom:5px;">
+                    <?php _e( 'Transportadora', 'woocommerce' ); ?>
+                </label>
+                <select id="_imbra_shipping_carrier" name="_imbra_shipping_carrier" class="wc-enhanced-select" style="width:100%;">
+                    <option value="">— Seleccionar —</option>
+                    <option value="servientrega"    <?php selected( $carrier, 'servientrega' ); ?>>Servientrega</option>
+                    <option value="interrapidisimo" <?php selected( $carrier, 'interrapidisimo' ); ?>>Interrapidísimo</option>
+                    <option value="coordinadora"    <?php selected( $carrier, 'coordinadora' ); ?>>Coordinadora</option>
+                    <option value="envia"           <?php selected( $carrier, 'envia' ); ?>>Envía</option>
+                    <option value="tcc"             <?php selected( $carrier, 'tcc' ); ?>>TCC</option>
+                    <option value="deprisa"         <?php selected( $carrier, 'deprisa' ); ?>>Deprisa</option>
+                    <option value="472"             <?php selected( $carrier, '472' ); ?>>472 · Correos de Colombia</option>
+                    <option value="domina"          <?php selected( $carrier, 'domina' ); ?>>Domina</option>
+                    <option value="mensajeros"      <?php selected( $carrier, 'mensajeros' ); ?>>Mensajeros Urbanos</option>
+                    <option value="suppla"          <?php selected( $carrier, 'suppla' ); ?>>Suppla</option>
+                    <option value="otra"            <?php selected( $carrier, 'otra' ); ?>>Otra transportadora</option>
+                </select>
+            </div>
+
+            <div style="flex:1;min-width:180px;">
+                <label for="_imbra_shipping_guide" style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#555;margin-bottom:5px;">
+                    <?php _e( 'Número de Guía', 'woocommerce' ); ?>
+                </label>
+                <input type="text" id="_imbra_shipping_guide" name="_imbra_shipping_guide"
+                       value="<?php echo esc_attr( $guide ); ?>"
+                       placeholder="Ej: 9010234567890"
+                       style="width:100%;padding:6px 10px;border:1px solid #ddd;border-radius:4px;font-size:13px;" />
+            </div>
+
+        </div>
+
+        <?php if ( $carrier && $guide ) : ?>
+        <div style="margin-top:16px;background:#fff8ee;border:1px solid #F18700;border-radius:5px;padding:12px 14px;font-size:12px;line-height:1.7;">
+            <strong style="display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#F18700;margin-bottom:4px;">✅ Guía activa</strong>
+            <span style="color:#555;"><?php echo esc_html( imbra_tracking_carrier_name( $carrier ) ); ?></span><br>
+            <code style="font-size:15px;font-weight:700;color:#212221;"><?php echo esc_html( $guide ); ?></code>
+        </div>
+        <?php endif; ?>
+
+    </div>
+    <?php
+}
+
+// Helper: nombre legible de la transportadora
+function imbra_tracking_carrier_name( string $slug ): string {
+    $map = [
+        'servientrega'    => 'Servientrega',
+        'interrapidisimo' => 'Interrapidísimo',
+        'coordinadora'    => 'Coordinadora',
+        'envia'           => 'Envía',
+        'tcc'             => 'TCC',
+        'deprisa'         => 'Deprisa',
+        '472'             => '472 · Correos de Colombia',
+        'domina'          => 'Domina',
+        'mensajeros'      => 'Mensajeros Urbanos',
+        'suppla'          => 'Suppla',
+        'otra'            => 'Otra transportadora',
+    ];
+    return $map[ $slug ] ?? $slug;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 2. GUARDAR AL ACTUALIZAR EL PEDIDO
+//    - Legacy:  woocommerce_process_shop_order_meta
+//    - HPOS:    woocommerce_update_order
+// ══════════════════════════════════════════════════════════════════
+add_action( 'woocommerce_process_shop_order_meta', 'imbra_tracking_save_fields', 10, 1 ); // Legacy
+add_action( 'woocommerce_update_order',            'imbra_tracking_save_fields', 10, 1 ); // HPOS
+
+function imbra_tracking_save_fields( $order_id ): void {
+    $order = wc_get_order( $order_id );
+    if ( ! $order ) return;
+
+    if ( isset( $_POST['_imbra_shipping_carrier'] ) ) {
+        $order->update_meta_data( '_imbra_shipping_carrier', sanitize_text_field( $_POST['_imbra_shipping_carrier'] ) );
+    }
+    if ( isset( $_POST['_imbra_shipping_guide'] ) ) {
+        $guide = strtoupper( preg_replace( '/[^A-Za-z0-9\-]/', '', $_POST['_imbra_shipping_guide'] ) );
+        $order->update_meta_data( '_imbra_shipping_guide', $guide );
+    }
+    $order->save();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 3. EXPONER EN LA REST API DE WOOCOMMERCE
+//    Campos disponibles: imbra_shipping_carrier, imbra_shipping_guide
+// ══════════════════════════════════════════════════════════════════
+add_filter( 'woocommerce_rest_prepare_shop_order_object', 'imbra_tracking_add_to_api', 10, 3 );
+
+function imbra_tracking_add_to_api( $response, $order, $request ) {
+    $response->data['imbra_shipping_carrier'] = (string) $order->get_meta( '_imbra_shipping_carrier' );
+    $response->data['imbra_shipping_guide']   = (string) $order->get_meta( '_imbra_shipping_guide' );
+    return $response;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 4. MOSTRAR EN EMAILS DE WOOCOMMERCE
+// ══════════════════════════════════════════════════════════════════
+add_action( 'woocommerce_email_order_meta', 'imbra_tracking_add_to_emails', 10, 4 );
+
+function imbra_tracking_add_to_emails( $order, $sent_to_admin, $plain_text, $email ): void {
+    $carrier = $order->get_meta( '_imbra_shipping_carrier' );
+    $guide   = $order->get_meta( '_imbra_shipping_guide' );
+    if ( ! $carrier && ! $guide ) return;
+
+    $carrier_name = imbra_tracking_carrier_name( $carrier );
+
+    if ( $plain_text ) {
+        echo "\n" . strtoupper( __( 'Información de Envío', 'woocommerce' ) ) . "\n";
+        if ( $carrier ) echo __( 'Transportadora:', 'woocommerce' ) . ' ' . $carrier_name . "\n";
+        if ( $guide )   echo __( 'Número de Guía:', 'woocommerce' ) . ' ' . $guide . "\n";
+    } else { ?>
+        <div style="margin:20px 0;padding:15px;background:#fff8ee;border:1px solid #F18700;border-radius:6px;">
+            <h2 style="margin-top:0;color:#212221;font-size:16px;">🚚 <?php _e( 'Información de Envío', 'woocommerce' ); ?></h2>
+            <?php if ( $carrier ) : ?>
+                <p style="margin:5px 0;"><strong><?php _e( 'Transportadora:', 'woocommerce' ); ?></strong> <?php echo esc_html( $carrier_name ); ?></p>
+            <?php endif; ?>
+            <?php if ( $guide ) : ?>
+                <p style="margin:5px 0;"><strong><?php _e( 'Número de Guía:', 'woocommerce' ); ?></strong>
+                    <code style="background:#fff;padding:3px 8px;border-radius:3px;font-family:monospace;font-size:15px;font-weight:700;"><?php echo esc_html( $guide ); ?></code>
+                </p>
+            <?php endif; ?>
+        </div>
+    <?php }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 5. COLUMNA "TRACKING" EN LA LISTA DE PEDIDOS
+//    Legacy + HPOS
+// ══════════════════════════════════════════════════════════════════
+
+// Legacy
+add_filter( 'manage_edit-shop_order_columns', 'imbra_tracking_add_column', 20 );
+function imbra_tracking_add_column( $columns ): array {
+    $new = [];
+    foreach ( $columns as $key => $info ) {
+        $new[ $key ] = $info;
+        if ( 'order_status' === $key ) $new['imbra_tracking'] = __( 'Tracking', 'woocommerce' );
+    }
+    return $new;
+}
+add_action( 'manage_shop_order_posts_custom_column', 'imbra_tracking_column_content', 10, 2 );
+function imbra_tracking_column_content( $column, $order_id ): void {
+    if ( 'imbra_tracking' !== $column ) return;
+    $order   = wc_get_order( $order_id );
+    $carrier = $order->get_meta( '_imbra_shipping_carrier' );
+    $guide   = $order->get_meta( '_imbra_shipping_guide' );
+    if ( $carrier || $guide ) {
+        echo '<div style="font-size:11px;">';
+        if ( $carrier ) echo '<strong>' . esc_html( imbra_tracking_carrier_name( $carrier ) ) . '</strong><br>';
+        if ( $guide )   echo '<code style="font-size:10px;">' . esc_html( $guide ) . '</code>';
+        echo '</div>';
+    } else {
+        echo '<span style="color:#999;">—</span>';
+    }
+}
+
+// HPOS
+add_filter( 'woocommerce_shop_order_list_table_columns', 'imbra_tracking_add_column_hpos', 20 );
+function imbra_tracking_add_column_hpos( $columns ): array {
+    $new = [];
+    foreach ( $columns as $key => $info ) {
+        $new[ $key ] = $info;
+        if ( 'order_status' === $key ) $new['imbra_tracking'] = __( 'Tracking', 'woocommerce' );
+    }
+    return $new;
+}
+add_action( 'woocommerce_shop_order_list_table_custom_column', 'imbra_tracking_column_content_hpos', 10, 2 );
+function imbra_tracking_column_content_hpos( $column, $order ): void {
+    if ( 'imbra_tracking' !== $column ) return;
+    $carrier = $order->get_meta( '_imbra_shipping_carrier' );
+    $guide   = $order->get_meta( '_imbra_shipping_guide' );
+    if ( $carrier || $guide ) {
+        echo '<div style="font-size:11px;">';
+        if ( $carrier ) echo '<strong>' . esc_html( imbra_tracking_carrier_name( $carrier ) ) . '</strong><br>';
+        if ( $guide )   echo '<code style="font-size:10px;">' . esc_html( $guide ) . '</code>';
+        echo '</div>';
+    } else {
+        echo '<span style="color:#999;">—</span>';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 6. HACER BUSCABLE POR NÚMERO DE GUÍA
+// ══════════════════════════════════════════════════════════════════
+add_filter( 'woocommerce_shop_order_search_fields', function( $fields ) {
+    $fields[] = '_imbra_shipping_guide';
+    return $fields;
+} );

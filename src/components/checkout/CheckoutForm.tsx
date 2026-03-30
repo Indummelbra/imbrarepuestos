@@ -303,6 +303,7 @@ export default function CheckoutForm() {
 
       // PASO 2: Crear la orden en WooCommerce con estado "pending"
       const currentShippingCost = shippingCost || 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const totalToPay = totalPrice + currentShippingCost;
 
       // Líneas de envío para WooCommerce

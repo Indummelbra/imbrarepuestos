@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { Product } from "@/types/product";
 import { ShoppingBag, Shield, Truck, Star, CheckCircle2 } from "lucide-react";
