@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import PageHero from "@/components/ui/PageHero";
 import { getPostBySlug, getPostImage, getPostCategories, formatDate } from "@/lib/wordpress";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,35 +25,11 @@ export default async function BlogPostPage({ params }: PageProps) {
       <Header />
 
       <main className="flex-grow pt-0 pb-20">
-        {/* Hero del artículo */}
-        <div className="w-full bg-[#212221] relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
-          <div className="px-5 py-12 md:py-16">
-            <div className="max-w-3xl">
-              {categories.length > 0 && (
-                <div className="flex gap-2 mb-4">
-                  {categories.map((cat) => (
-                    <Link
-                      key={cat.id}
-                      href={`/blog?cat=${cat.id}`}
-                      className="text-[10px] font-black uppercase tracking-widest text-primary border border-primary/30 px-3 py-1 hover:bg-primary hover:text-white transition-colors"
-                    >
-                      {cat.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-              <h1
-                className="font-black uppercase tracking-tighter leading-tight text-white text-3xl md:text-4xl lg:text-5xl mb-4"
-                dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-              />
-              <p className="text-gray-400 text-sm uppercase tracking-widest">
-                {formatDate(post.date)}
-              </p>
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 w-24 h-1 bg-primary" />
-        </div>
+        <PageHero
+          label={categories.length > 0 ? categories.map(c => c.name).join(" · ") : "Blog"}
+          title={post.title.rendered.replace(/<[^>]+>/g, "")}
+          subtitle={formatDate(post.date)}
+        />
 
         <div className="px-5 pt-10">
           <div className="max-w-3xl mx-auto">

@@ -30,7 +30,6 @@ export default function StickyHeader({
   const [visible,        setVisible]        = useState(false);
   const [menuPhase,      setMenuPhase]       = useState<MenuPhase>("closed");
   const [activeGroup,    setActiveGroup]     = useState("frenos");
-  const [menuTop,        setMenuTop]         = useState(STICKY_H);
   const [nosotrosOpen,   setNosotrosOpen]    = useState(false);
 
   const menuRef       = useRef<HTMLDivElement>(null);
@@ -52,9 +51,6 @@ export default function StickyHeader({
   /* ── Mega menú helpers ── */
   const openMenu = () => {
     if (menuTimer.current) clearTimeout(menuTimer.current);
-    if (menuPhase === "closed" && menuRef.current) {
-      setMenuTop(menuRef.current.getBoundingClientRect().bottom);
-    }
     setMenuPhase((p) => (p === "closed" ? "col1" : p));
   };
   const closeMenu = useCallback(() => {

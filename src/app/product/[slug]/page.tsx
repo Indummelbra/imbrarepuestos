@@ -48,30 +48,30 @@ export default async function ProductPage({ params }: PageProps) {
       <main className="flex-grow pt-0 overflow-x-hidden">
 
         {/* ─── BREADCRUMB + NAVEGACION PREV/NEXT ─────────────────── */}
-        <div className="bg-white border-b border-gray-100/80">
+        <div className="bg-[#212221] border-b border-white/10">
           <div className="imbra-content-container">
             <div className="py-2.5 flex items-center justify-between gap-4">
               {/* Breadcrumb */}
               <nav
-                className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.15em] uppercase text-gray-400 overflow-hidden"
+                className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.15em] uppercase text-primary overflow-hidden"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                <Link href="/" className="hover:text-primary transition-colors shrink-0">
+                <Link href="/" className="hover:text-primary/70 transition-colors shrink-0">
                   INICIO
                 </Link>
-                <ChevronRight size={10} className="text-gray-300 shrink-0" />
+                <ChevronRight size={10} className="text-white shrink-0" />
                 {product.categories[0] && (
                   <div className="flex items-center gap-1.5 overflow-hidden">
                     <Link
                       href={`/tienda?woo_cat=${product.categories[0].slug}`}
-                      className="hover:text-primary transition-colors truncate"
+                      className="hover:text-primary/70 transition-colors truncate"
                     >
                       {product.categories[0].name.toUpperCase()}
                     </Link>
-                    <ChevronRight size={10} className="text-gray-300 shrink-0" />
+                    <ChevronRight size={10} className="text-white shrink-0" />
                   </div>
                 )}
-                <span className="text-secondary truncate font-black">
+                <span className="text-primary truncate font-black">
                   {product.name.toUpperCase()}
                 </span>
               </nav>
@@ -81,30 +81,30 @@ export default async function ProductPage({ params }: PageProps) {
                 {adyacentes.prev ? (
                   <Link
                     href={`/product/${adyacentes.prev.slug}`}
-                    className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-secondary hover:text-primary transition-colors group"
+                    className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors group"
                     title={adyacentes.prev.name}
                   >
                     <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
                     ANT
                   </Link>
                 ) : (
-                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-200 flex items-center gap-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-1">
                     <ChevronLeft size={14} />
                     ANT
                   </span>
                 )}
-                <span className="text-gray-200">|</span>
+                <span className="text-white">|</span>
                 {adyacentes.next ? (
                   <Link
                     href={`/product/${adyacentes.next.slug}`}
-                    className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-secondary hover:text-primary transition-colors group"
+                    className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors group"
                     title={adyacentes.next.name}
                   >
                     SIG
                     <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                 ) : (
-                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-200 flex items-center gap-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-1">
                     SIG
                     <ChevronRight size={14} />
                   </span>

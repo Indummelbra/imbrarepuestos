@@ -1,10 +1,11 @@
 interface PageHeroProps {
   label?: string;
   title: string;
-  titleAccent?: string; // parte del título en naranja
+  titleAccent?: string; // parte del título en naranja (o accentColor)
   subtitle?: string;
   badge?: string;       // número/stat destacado
   badgeLabel?: string;
+  accentColor?: string; // clase Tailwind para el color del acento, ej: "text-green-400"
 }
 
 export default function PageHero({
@@ -14,8 +15,10 @@ export default function PageHero({
   subtitle,
   badge,
   badgeLabel,
+  accentColor = "text-primary",
 }: PageHeroProps) {
   return (
+    <div className="px-5">
     <div className="w-full bg-[#212221] relative overflow-hidden">
       {/* Línea naranja superior */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
@@ -34,7 +37,7 @@ export default function PageHero({
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
             {label && (
-              <p className="!text-primary font-black text-[10px] uppercase tracking-[0.3em] mb-3 font-display">
+              <p className={`!${accentColor} font-black text-[10px] uppercase tracking-[0.3em] mb-3 font-display`}>
                 {label}
               </p>
             )}
@@ -42,7 +45,7 @@ export default function PageHero({
               {titleAccent ? (
                 <>
                   {title}{" "}
-                  <span className="text-primary">{titleAccent}</span>
+                  <span className={accentColor}>{titleAccent}</span>
                 </>
               ) : (
                 title
@@ -72,6 +75,7 @@ export default function PageHero({
 
       {/* Línea naranja inferior */}
       <div className="absolute bottom-0 left-0 w-24 h-1 bg-primary" />
+    </div>
     </div>
   );
 }

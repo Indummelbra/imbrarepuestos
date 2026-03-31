@@ -2,6 +2,7 @@
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import PageHero from "@/components/ui/PageHero";
 import { useState } from "react";
 import {
   MapPin, Phone, Mail, CheckCircle,
@@ -37,6 +38,13 @@ export default function ContactoPage() {
       <Header />
 
       <main className="flex-grow pt-0">
+
+        <PageHero
+          label="Estamos aquí para ti"
+          title="Contác"
+          titleAccent="tenos"
+          subtitle="Lunes a Domingo · 7am – 6pm · Bogotá, Colombia"
+        />
 
         {/* ── Franja del mapa ── */}
         <div className="relative w-full h-[420px] overflow-hidden">
@@ -97,11 +105,6 @@ export default function ContactoPage() {
         <div className="relative z-10 pb-20 px-5">
           <div className="bg-white shadow-[0_4px_40px_rgba(0,0,0,0.14)] px-8 md:px-14 pt-14 pb-16">
 
-            {/* Header centrado */}
-            <div className="text-center mb-12">
-              <h1 className="font-black text-secondary text-4xl uppercase tracking-tight">Contáctanos</h1>
-              <p className="text-gray-400 text-sm mt-3">¡Estamos a tu disposición los 7 días de la semana!</p>
-            </div>
 
             {/* Dos columnas */}
             <div className="flex flex-col md:flex-row gap-12 lg:gap-20">
