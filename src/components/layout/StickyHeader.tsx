@@ -350,7 +350,7 @@ export default function StickyHeader({
           </nav>
 
           {/* Buscador */}
-          <div className="w-[280px] shrink-0">
+          <div className="min-w-[160px] w-[200px] 2xl:w-[280px]">
             <LiveSearch />
           </div>
 
@@ -360,17 +360,17 @@ export default function StickyHeader({
             {/* Mis Pedidos */}
             <Link
               href="/mis-pedidos"
-              className="hidden md:flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 bg-primary text-secondary border border-primary hover:bg-secondary hover:text-primary transition-colors"
+              className="hidden 2xl:flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-primary text-secondary border border-primary hover:bg-secondary hover:text-primary transition-colors"
             >
               <span className="material-icons text-[14px]">receipt_long</span>
-              Ver mis pedidos
+              <span className="hidden 2xl:inline">Ver mis pedidos</span>
             </Link>
 
             {/* Pagar */}
             <a
               href="https://imbrarepuestos.com/pagos/"
               target="_blank" rel="noopener noreferrer"
-              className="text-[10px] font-black uppercase tracking-widest px-4 py-1.5 bg-secondary text-white border border-secondary hover:bg-white hover:text-secondary transition-colors"
+              className="hidden xl:block text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-secondary text-white border border-secondary hover:bg-white hover:text-secondary transition-colors"
             >
               Pagos B2B
             </a>
@@ -379,7 +379,7 @@ export default function StickyHeader({
             <a
               href="https://tpi.imbrarepuestos.com/imbraweb/"
               target="_blank" rel="noopener noreferrer"
-              className="text-[10px] font-black uppercase tracking-widest px-4 py-1.5 bg-primary text-white border border-primary hover:bg-white hover:text-primary transition-colors"
+              className="hidden xl:block text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-primary text-white border border-primary hover:bg-white hover:text-primary transition-colors"
             >
               Imbra Web
             </a>
