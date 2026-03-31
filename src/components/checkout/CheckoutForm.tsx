@@ -290,6 +290,23 @@ export default function CheckoutForm() {
     setErrorMsg(null);
 
     try {
+      // PASO 0: Validar stock en WooCommerce antes de crear la orden
+      const stockRes = await fetch('/api/checkout/validate-stock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(i => ({ id: i.product.id, quantity: i.quantity, name: i.product.name })),
+        }),
+      });
+      const stockData = await stockRes.json();
+      if (!stockData.success) {
+        const names = stockData.details?.map((d: { name: string }) => d.name).join(', ') || '';
+        setErrorMsg(`Producto(s) sin stock suficiente: ${names}. Por favor revisa tu carrito.`);
+        isSubmitting.current = false;
+        setLoading(false);
+        return;
+      }
+
       // PASO 1: Obtener la IP real del cliente (Guia WC, punto 3.5)
       let clientIp = '127.0.0.1';
       try {

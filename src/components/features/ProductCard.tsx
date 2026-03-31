@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mainImage = product.images?.[0]?.src || (product as any).image_url || "/images/placeholder.svg";
+  const rawImage = product.images?.[0]?.src || (product as any).image_url || "";
+  const [imgSrc, setImgSrc] = useState(rawImage || "/images/placeholder.svg");
   const price = parseFloat(product.price);
 
   return (
@@ -18,18 +19,19 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Imagen — ocupa la mayor parte de la card */}
       <Link href={`/product/${product.slug}`} className="relative block overflow-hidden bg-white" style={{ aspectRatio: "1 / 1" }}>
         <Image
-          src={mainImage}
+          src={imgSrc}
           alt={product.name}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-contain p-5 group-hover:scale-105 transition-transform duration-500"
-          unoptimized={mainImage.includes(".svg")}
+          unoptimized
+          onError={() => setImgSrc("/images/placeholder.svg")}
         />
 
-        {/* Badge oferta */}
-        {product.on_sale && (
-          <span className="absolute top-3 left-3 bg-primary text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5">
-            Oferta
+        {/* Badge % descuento */}
+        {product.on_sale && product.regular_price && parseFloat(product.regular_price) > price && (
+          <span className="absolute top-3 left-3 bg-red-500 text-white text-[9px] font-black px-2 py-1 leading-none">
+            -{Math.round((1 - price / parseFloat(product.regular_price)) * 100)}% OFF
           </span>
         )}
 
@@ -58,7 +60,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 <span className="text-[10px] text-gray-400 line-through leading-none">
                   ${parseFloat(product.regular_price).toLocaleString("es-CO")}
                 </span>
-                <span className="text-[15px] font-black text-primary leading-tight">
+                <span className="text-[15px] font-black text-red-500 leading-tight">
                   ${price.toLocaleString("es-CO")}
                 </span>
               </>

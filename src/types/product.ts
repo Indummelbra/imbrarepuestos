@@ -29,7 +29,7 @@ export interface Product {
   part_category: string;   // display name: "Suspensión", "Frenos", etc.
   category_slug: string;   // URL slug: "suspension", "frenos", etc.
   stock_status: 'instock' | 'outofstock' | 'onbackorder';
-  stock_quantity: number;
+  stock_quantity: number | null;
   on_sale: boolean;
   is_comprable: boolean;   // true si stock_quantity > 0 && stock_status === 'instock'
   meta_data: {

@@ -14,7 +14,7 @@ export default function StickyCartBar({ product }: StickyCartBarProps) {
   const [isVisible, setIsVisible] = useState(false);
   const { addItem } = useCart();
 
-  const hayStock = product.stock_status === "instock" && product.stock_quantity > 0;
+  const hayStock = product.is_comprable === true;
   const precioFormateado = parseFloat(product.price).toLocaleString("es-CO");
 
   useEffect(() => {

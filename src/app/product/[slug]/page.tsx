@@ -1,4 +1,5 @@
 import { getProductBySlug, getAdjacentProductsInCategory, getRecentProducts } from "@/lib/woocommerce";
+import { supabaseAdmin } from "@/lib/supabase";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ProductGallery from "@/components/product/ProductGallery";
@@ -19,9 +20,17 @@ interface PageProps {
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
 
-  /* Carga paralela: producto actual + últimos productos + navegación por categoría */
-  const product = await getProductBySlug(slug);
+  /* Carga paralela: producto actual + stock de Supabase (fuente de verdad única) */
+  const [product, supabaseStock] = await Promise.all([
+    getProductBySlug(slug),
+    supabaseAdmin.from("products_search").select("is_comprable").eq("slug", slug).single(),
+  ]);
   if (!product) notFound();
+
+  // Supabase (sincronizado desde WooCommerce REST) es la fuente de verdad para stock
+  if (supabaseStock.data) {
+    product.is_comprable = supabaseStock.data.is_comprable === true;
+  }
 
   const categoriaSlug = product.categories[0]?.slug || "";
 
@@ -38,8 +47,7 @@ export default async function ProductPage({ params }: PageProps) {
       )
     : 0;
 
-  const hayStock =
-    product.stock_status === "instock" && product.stock_quantity > 0;
+  const hayStock = product.is_comprable === true;
 
   return (
     <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">

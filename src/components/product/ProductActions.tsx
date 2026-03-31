@@ -17,7 +17,7 @@ export default function ProductActions({ product }: ProductActionsProps) {
     // Podríamos añadir un toast o notificación aquí
   };
 
-  const isInStock = product.stock_status === 'instock' && product.stock_quantity > 0;
+  const isInStock = product.is_comprable === true;
 
   return (
     <div className="space-y-6">

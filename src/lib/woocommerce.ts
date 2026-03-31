@@ -197,7 +197,7 @@ export async function getProducts(): Promise<Product[]> {
       categories: node.productCategories?.nodes.map((c) => ({ id: c.databaseId, name: c.name, slug: c.slug })),
       attributes: node.attributes?.nodes || [],
       stock_status: node.stockStatus?.toLowerCase() as Product['stock_status'],
-      stock_quantity: node.stockQuantity || 0
+      stock_quantity: node.stockQuantity ?? undefined
     }));
 
   } catch (error) {
@@ -294,7 +294,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       categories: node.productCategories?.nodes.map((c: { databaseId: number; name: string; slug: string }) => ({ id: c.databaseId, name: c.name, slug: c.slug })),
       attributes: node.attributes?.nodes || [],
       stock_status: node.stockStatus?.toLowerCase() as Product['stock_status'],
-      stock_quantity: node.stockQuantity || 0
+      stock_quantity: node.stockQuantity ?? undefined  // null = manage_stock:false, el mapper lo maneja
     });
   } catch (error) {
     console.warn("GraphQL falló para producto individual, reintentando con REST API...", error);

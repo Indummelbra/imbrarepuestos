@@ -13,8 +13,7 @@ export default function ProductCTAPanel({ product }: ProductCTAPanelProps) {
   const [cantidad, setCantidad] = useState(1);
   const { addItem } = useCart();
 
-  const hayStock =
-    product.stock_status === "instock" && product.stock_quantity > 0;
+  const hayStock = product.is_comprable === true;
 
   const handleAgregarAlCarrito = () => {
     addItem(product, cantidad);
@@ -26,36 +25,60 @@ export default function ProductCTAPanel({ product }: ProductCTAPanelProps) {
   return (
     <div className="flex flex-col gap-0 border border-gray-100 bg-white rounded-2xl overflow-hidden shadow-sm">
       {/* Bloque de precio premium */}
-      <div className="px-6 py-6 border-b border-gray-50 bg-gray-50/30">
+      <div className={`px-6 py-6 border-b border-gray-50 ${product.on_sale ? "bg-primary/5" : "bg-gray-50/30"}`}>
         <div className="flex items-center gap-2 mb-2">
           {product.on_sale && (
-            <span className="bg-primary text-black text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">
-              Oferta Especial
+            <span className="bg-primary text-black text-[9px] font-black px-2.5 py-1 uppercase tracking-widest animate-pulse">
+              🔥 OFERTA ESPECIAL
             </span>
           )}
           <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Precio Imbra Store</span>
         </div>
-        
-        <div className="flex items-baseline gap-3">
+
+        {product.on_sale && parseFloat(product.regular_price) > parseFloat(product.price) ? (
+          <>
+            {/* Precio antes tachado */}
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-bold text-gray-400 line-through">
+                Antes: ${precioRegularFormateado}
+              </span>
+              <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5">
+                -{Math.round((1 - parseFloat(product.price) / parseFloat(product.regular_price)) * 100)}% OFF
+              </span>
+            </div>
+            {/* Precio oferta grande */}
+            <div className="flex items-baseline gap-2">
+              <span
+                className="text-4xl font-black leading-none text-primary"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                ${precioFormateado}
+              </span>
+              <span className="text-[11px] font-black text-primary/70 uppercase">Precio oferta</span>
+            </div>
+            <div className="mt-2 text-[10px] font-bold text-primary uppercase tracking-widest">
+              Ahorras ${(parseFloat(product.regular_price) - parseFloat(product.price)).toLocaleString("es-CO")}
+            </div>
+          </>
+        ) : (
           <span
             className="text-4xl font-black leading-none text-secondary"
             style={{ fontFamily: "var(--font-display)" }}
           >
             ${precioFormateado}
           </span>
-          {product.on_sale && (
-            <span
-              className="text-lg font-bold line-through text-gray-300"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              ${precioRegularFormateado}
-            </span>
-          )}
-        </div>
+        )}
         <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-green-600 uppercase tracking-widest">
           <CheckCircle2 size={12} />
           <span>IVA Incluido • Envío Seguro</span>
         </div>
+
+        {hayStock && product.stock_quantity != null && product.stock_quantity > 0 && (
+          <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            <CheckCircle2 size={12} className="text-green-500" />
+            <span>Disponible para envío — <span className="text-green-600">{product.stock_quantity.toLocaleString("es-CO")} Un.</span></span>
+          </div>
+        )}
       </div>
 
       {/* Selector de cantidad y Botón */}

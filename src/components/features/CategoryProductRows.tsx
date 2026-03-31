@@ -39,6 +39,20 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+function ProductImage({ src, alt }: { src: string; alt: string }) {
+  const [imgSrc, setImgSrc] = useState(src || "/images/placeholder.png");
+  return (
+    <Image
+      src={imgSrc}
+      alt={alt}
+      fill
+      className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+      unoptimized
+      onError={() => setImgSrc("/images/placeholder.png")}
+    />
+  );
+}
+
 function CategoryRow({ group, products }: CategoryRowProps) {
   const { addItem } = useCart();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -211,16 +225,10 @@ function CategoryRow({ group, products }: CategoryRowProps) {
                       className="group bg-white flex flex-col w-[150px] sm:w-[175px] flex-shrink-0 overflow-hidden hover:z-10 border border-gray-100"
                     >
                       <div className="relative w-full aspect-square bg-white overflow-hidden border-b border-gray-100">
-                        <Image
-                          src={img}
-                          alt={product.name}
-                          fill
-                          className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-                          unoptimized
-                        />
-                        {product.on_sale && !isDuplicate && (
-                          <span className="absolute top-2 left-2 bg-primary text-white text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5">
-                            Oferta
+                        <ProductImage src={img} alt={product.name} />
+                        {product.on_sale && !isDuplicate && product.regular_price && product.regular_price > price && (
+                          <span className="absolute top-2 left-2 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5">
+                            -{Math.round((1 - price / product.regular_price) * 100)}% OFF
                           </span>
                         )}
                       </div>
@@ -237,7 +245,7 @@ function CategoryRow({ group, products }: CategoryRowProps) {
                             <span className="text-[10px] text-gray-400 line-through block leading-none">
                               ${product.regular_price.toLocaleString("es-CO")}
                             </span>
-                            <span className="text-[13px] font-black text-primary block leading-tight">
+                            <span className="text-[13px] font-black text-red-500 block leading-tight">
                               ${price.toLocaleString("es-CO")}
                             </span>
                           </div>
@@ -283,13 +291,10 @@ export default function CategoryProductRows() {
       const rows = await Promise.all(
         FEATURED_GROUPS.map(async (groupId) => {
           const group = CATEGORY_GROUPS.find((g) => g.id === groupId)!;
-          const { searchWithFilters } = await import("@/app/actions/vehicle-actions");
-          const { products } = await searchWithFilters({
-            filters: { categories: [groupId] },
-            perPage: 12,
-            sortBy: "name",
-          });
-          return { group, products: products as RowProduct[] };
+          const res = await fetch(`/api/products/by-category?group=${groupId}`);
+          const { products } = await res.json();
+
+          return { group, products: (products || []) as RowProduct[] };
         })
       );
       setAllProducts(rows);
