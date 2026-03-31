@@ -19,6 +19,9 @@ interface RowProduct {
   image_url: string | null;
   on_sale: boolean;
   brand: string | null;
+  stock_status?: string;
+  stock_quantity?: number;
+  is_comprable?: boolean;
 }
 
 interface CategoryRowProps {
@@ -113,8 +116,8 @@ function CategoryRow({ group, products }: CategoryRowProps) {
       short_description: "",
       permalink: `/product/${product.slug}`,
       images: [{ src: product.image_url || "", alt: product.name }],
-      stock_status: "instock",
-      stock_quantity: 1,
+      stock_status: (product.stock_status as "instock" | "outofstock" | "onbackorder") || "outofstock",
+      stock_quantity: product.stock_quantity ?? 0,
       brand: product.brand || "IMBRA",
       vehicle_brand: "",
       vehicle_model: "",
@@ -124,7 +127,7 @@ function CategoryRow({ group, products }: CategoryRowProps) {
       categories: [],
       attributes: [],
       on_sale: product.on_sale,
-      is_comprable: true,
+      is_comprable: product.is_comprable ?? false,
       meta_data: [],
     }, 1);
   };
@@ -231,13 +234,20 @@ function CategoryRow({ group, products }: CategoryRowProps) {
                         <span className="text-[13px] font-black text-secondary block mb-2">
                           ${price.toLocaleString("es-CO")}
                         </span>
-                        <button
-                          onClick={(e) => handleAddToCart(e, product)}
-                          className="w-full bg-primary text-secondary text-[9px] font-black uppercase tracking-widest py-2 hover:bg-secondary hover:text-primary transition-colors flex items-center justify-center gap-1.5"
-                        >
-                          <ShoppingCart className="w-3.5 h-3.5" />
-                          Agregar
-                        </button>
+                        {product.is_comprable !== false ? (
+                          <button
+                            onClick={(e) => handleAddToCart(e, product)}
+                            className="w-full bg-primary text-secondary text-[9px] font-black uppercase tracking-widest py-2 hover:bg-secondary hover:text-primary transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                            Agregar
+                          </button>
+                        ) : (
+                          <div className="w-full bg-gray-100 text-gray-300 text-[9px] font-black uppercase tracking-widest py-2 flex items-center justify-center gap-1.5 cursor-not-allowed">
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                            Agotado
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

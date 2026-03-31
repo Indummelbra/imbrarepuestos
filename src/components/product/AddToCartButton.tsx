@@ -7,6 +7,19 @@ import { ShoppingCart } from "lucide-react";
 export default function AddToCartButton({ product }: { product: Product }) {
   const { addItem } = useCart();
 
+  if (!product.is_comprable) {
+    return (
+      <button
+        disabled
+        className="w-full flex items-center justify-center gap-2 py-2 text-gray-400 text-[10px] font-black uppercase tracking-widest cursor-not-allowed bg-gray-100"
+        style={{ fontFamily: "var(--font-display)" }}
+      >
+        <ShoppingCart size={13} />
+        Agotado
+      </button>
+    );
+  }
+
   return (
     <button
       onClick={() => addItem(product, 1)}

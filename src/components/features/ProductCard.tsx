@@ -55,13 +55,22 @@ export default function ProductCard({ product }: { product: Product }) {
           <span className="text-[15px] font-black text-secondary">
             ${price.toLocaleString("es-CO")}
           </span>
-          <button
-            onClick={() => addItem(product, 1)}
-            title="Añadir al carrito"
-            className="w-8 h-8 bg-secondary hover:bg-primary text-white flex items-center justify-center transition-colors active:scale-95"
-          >
-            <span className="material-icons text-[16px]">add_shopping_cart</span>
-          </button>
+          {product.is_comprable ? (
+            <button
+              onClick={() => addItem(product, 1)}
+              title="Añadir al carrito"
+              className="w-8 h-8 bg-secondary hover:bg-primary text-white flex items-center justify-center transition-colors active:scale-95"
+            >
+              <span className="material-icons text-[16px]">add_shopping_cart</span>
+            </button>
+          ) : (
+            <span
+              title="Agotado"
+              className="w-8 h-8 bg-gray-100 text-gray-300 flex items-center justify-center cursor-not-allowed"
+            >
+              <span className="material-icons text-[16px]">remove_shopping_cart</span>
+            </span>
+          )}
         </div>
       </div>
 
