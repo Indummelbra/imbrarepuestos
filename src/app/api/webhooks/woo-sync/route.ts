@@ -44,21 +44,29 @@ export async function POST(request: Request) {
 
       const imbraProduct = mapWooProductToImbra(wooProduct as WooProductRaw);
       
-      // Mapear para Supabase
+      // Mapear para Supabase — todos los campos del producto normalizado
       const supabaseData = {
         id: imbraProduct.id,
         name: imbraProduct.name,
         slug: imbraProduct.slug,
         sku: imbraProduct.sku,
+        brand: imbraProduct.brand,
         price: parseFloat(imbraProduct.price) || 0,
         regular_price: parseFloat(imbraProduct.regular_price) || 0,
         sale_price: imbraProduct.sale_price ? parseFloat(imbraProduct.sale_price) : null,
+        on_sale: imbraProduct.on_sale,
         description: imbraProduct.description,
         short_description: imbraProduct.short_description,
         image_url: imbraProduct.images[0]?.src || null,
-        categories: imbraProduct.categories, // Ahora se envía como JSONB
+        categories: imbraProduct.categories,
         stock_status: imbraProduct.stock_status,
         stock_quantity: imbraProduct.stock_quantity,
+        is_comprable: imbraProduct.is_comprable,
+        vehicle_brand: imbraProduct.vehicle_brand || null,
+        vehicle_model: imbraProduct.vehicle_model || null,
+        vehicle_years: imbraProduct.vehicle_years || [],
+        part_category: imbraProduct.part_category || null,
+        category_slug: imbraProduct.category_slug || null,
         status: wooProduct.status || 'publish'
       };
 

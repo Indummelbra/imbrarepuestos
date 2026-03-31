@@ -16,6 +16,7 @@ interface RowProduct {
   name: string;
   slug: string;
   price: number;
+  regular_price?: number;
   image_url: string | null;
   on_sale: boolean;
   brand: string | null;
@@ -231,9 +232,20 @@ function CategoryRow({ group, products }: CategoryRowProps) {
                         <p className="text-[10px] font-bold text-secondary uppercase italic leading-tight line-clamp-2 flex-1 mb-2">
                           {product.name}
                         </p>
-                        <span className="text-[13px] font-black text-secondary block mb-2">
-                          ${price.toLocaleString("es-CO")}
-                        </span>
+                        {product.on_sale && product.regular_price && product.regular_price > price ? (
+                          <div className="mb-2">
+                            <span className="text-[10px] text-gray-400 line-through block leading-none">
+                              ${product.regular_price.toLocaleString("es-CO")}
+                            </span>
+                            <span className="text-[13px] font-black text-primary block leading-tight">
+                              ${price.toLocaleString("es-CO")}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-[13px] font-black text-secondary block mb-2">
+                            ${price.toLocaleString("es-CO")}
+                          </span>
+                        )}
                         {product.is_comprable !== false ? (
                           <button
                             onClick={(e) => handleAddToCart(e, product)}

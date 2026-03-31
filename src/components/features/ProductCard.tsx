@@ -52,9 +52,22 @@ export default function ProductCard({ product }: { product: Product }) {
         </h3>
 
         <div className="flex items-center justify-between mt-auto">
-          <span className="text-[15px] font-black text-secondary">
-            ${price.toLocaleString("es-CO")}
-          </span>
+          <div className="flex flex-col">
+            {product.on_sale && product.regular_price && parseFloat(product.regular_price) > price ? (
+              <>
+                <span className="text-[10px] text-gray-400 line-through leading-none">
+                  ${parseFloat(product.regular_price).toLocaleString("es-CO")}
+                </span>
+                <span className="text-[15px] font-black text-primary leading-tight">
+                  ${price.toLocaleString("es-CO")}
+                </span>
+              </>
+            ) : (
+              <span className="text-[15px] font-black text-secondary">
+                ${price.toLocaleString("es-CO")}
+              </span>
+            )}
+          </div>
           {product.is_comprable ? (
             <button
               onClick={() => addItem(product, 1)}

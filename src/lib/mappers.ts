@@ -43,11 +43,13 @@ export function mapWooProductToImbra(wooProduct: WooProductRaw): Product {
   }
 
   // 2. Lógica de Stock e Disponibilidad
-  const stock_quantity = wooProduct.stock_quantity ?? 0;
+  const rawQty = wooProduct.stock_quantity; // null = WooCommerce no gestiona cantidad (manage_stock: false)
+  const stock_quantity = rawQty ?? 0;
   const stock_status = wooProduct.stock_status || 'outofstock';
 
-  // Un producto es comprable solo si tiene stock real > 0 Y el estado es 'instock'
-  const is_comprable = stock_quantity > 0 && stock_status === 'instock';
+  // Si WooCommerce gestiona cantidad → requiere qty > 0 para ser comprable
+  // Si NO gestiona cantidad (rawQty === null) → basta con que status sea 'instock'
+  const is_comprable = stock_status === 'instock' && (rawQty === null || rawQty === undefined || rawQty > 0);
 
   // 3. Normalización de Imágenes SAP (Fuente única de verdad)
   const cleanSku = (wooProduct.sku || "").toLowerCase().replace(/b$/, "");
