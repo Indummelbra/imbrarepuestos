@@ -47,7 +47,6 @@ function ProductImage({ src, alt }: { src: string; alt: string }) {
       alt={alt}
       fill
       className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-      unoptimized
       onError={() => setImgSrc("/images/placeholder.png")}
     />
   );
@@ -161,7 +160,6 @@ function CategoryRow({ group, products }: CategoryRowProps) {
           alt={group.name}
           fill
           className="object-contain p-8 opacity-20"
-          unoptimized
         />
 
         <div className="relative z-10 h-full flex flex-col justify-between p-8">

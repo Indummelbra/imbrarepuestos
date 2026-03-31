@@ -24,7 +24,6 @@ export default function ProductCard({ product }: { product: Product }) {
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-contain p-5 group-hover:scale-105 transition-transform duration-500"
-          unoptimized
           onError={() => setImgSrc("/images/placeholder.svg")}
         />
 

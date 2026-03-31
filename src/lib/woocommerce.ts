@@ -357,13 +357,22 @@ export async function getAdjacentProductsInCategory(
   categorySlug: string
 ): Promise<{ prev: { slug: string; name: string } | null; next: { slug: string; name: string } | null }> {
   try {
-    const productos = await getProductsByCategory(categorySlug, 100);
+    // Buscar desde Supabase — solo slug y nombre, sin traer 100 productos completos
+    const { supabaseAdmin } = await import("@/lib/supabase");
+    const { data } = await supabaseAdmin
+      .from("products_search")
+      .select("slug, name")
+      .eq("category_slug", categorySlug)
+      .eq("status", "publish")
+      .order("name", { ascending: true });
 
-    const idx = productos.findIndex((p) => p.slug === currentSlug);
+    if (!data || data.length === 0) return { prev: null, next: null };
+
+    const idx = data.findIndex((p) => p.slug === currentSlug);
     if (idx === -1) return { prev: null, next: null };
 
-    const prev = idx > 0 ? { slug: productos[idx - 1].slug, name: productos[idx - 1].name } : null;
-    const next = idx < productos.length - 1 ? { slug: productos[idx + 1].slug, name: productos[idx + 1].name } : null;
+    const prev = idx > 0 ? { slug: data[idx - 1].slug, name: data[idx - 1].name } : null;
+    const next = idx < data.length - 1 ? { slug: data[idx + 1].slug, name: data[idx + 1].name } : null;
 
     return { prev, next };
   } catch (error) {

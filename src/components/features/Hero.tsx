@@ -85,7 +85,6 @@ export default function Hero({ slides }: HeroProps) {
                   fill
                   className="object-cover object-center"
                   priority={i === 0}
-                  unoptimized
                 />
               </div>
 

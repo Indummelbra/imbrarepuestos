@@ -7,7 +7,7 @@ const inter = Inter({
   weight: ["400", "600", "700"],
   variable: "--font-inter",
   display: "swap",
-  preload: false,
+  preload: true,
 });
 
 const montserrat = Montserrat({
@@ -15,7 +15,7 @@ const montserrat = Montserrat({
   weight: ["400", "600", "700", "900"],
   variable: "--font-montserrat",
   display: "swap",
-  preload: false,
+  preload: true,
 });
 
 const archivo = Archivo({
@@ -24,7 +24,7 @@ const archivo = Archivo({
   style: ["normal"],
   variable: "--font-archivo",
   display: "swap",
-  preload: false,
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -45,6 +45,8 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
         <meta name="theme-color" content="#F18700" />
+        {/* Material Icons — carga no bloqueante vía script */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
       </head>
       <body
