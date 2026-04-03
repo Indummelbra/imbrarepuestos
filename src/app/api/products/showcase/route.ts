@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-export const revalidate = 300; // cache 5 minutos
+// force-dynamic: evita que Next.js pre-renderice este endpoint en build-time
+// Las variables de Supabase solo existen en runtime (Dokploy), no durante el build de Docker
+export const dynamic = 'force-dynamic';
 import { supabaseAdmin } from "@/lib/supabase";
 
 export async function GET() {
