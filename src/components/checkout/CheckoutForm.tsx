@@ -358,10 +358,11 @@ export default function CheckoutForm() {
         payment_method: 'placetopay',
         payment_method_title: 'PlacetoPay (PSE/Tarjetas)',
         meta_data: [
+          // Prefijo _billing_ requerido por WooCommerce para vincular al campo de facturación
           { key: '_billing_numero_documento', value: formData.dni },
           { key: '_billing_tipo_documento', value: formData.documentType },
-          { key: '_billing_city_code', value: String(formData.cityCode) },
-          { key: '_billing_state_code', value: String(formData.stateCode) },
+          { key: 'billing_city_code', value: String(formData.cityCode) },
+          { key: 'billing_state_code', value: String(formData.stateCode) },
         ],
         shipping_lines,
       };
