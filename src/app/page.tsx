@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
-export const revalidate = 3600;
+// force-dynamic: garantiza renderizado en runtime con acceso a variables de entorno de Supabase
+export const dynamic = 'force-dynamic';
 import MotoSelector from "@/components/features/MotoSelector";
 import Hero from "@/components/features/Hero";
 import CategoryCarousel from "@/components/features/CategoryCarousel";

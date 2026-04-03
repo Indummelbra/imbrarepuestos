@@ -1,44 +1,20 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Clientes lazy: se crean bajo demanda para evitar que sean null durante el build de Docker
-// Las variables de entorno existen en runtime (Dokploy Environment Settings) pero no en build-time
+// Inicializacion directa con guard seguro
+// Si las variables no existen en build-time, los clientes quedan como null
+// Todos los llamadores ya manejan error o retornan [] cuando falla la query
 
-let _supabase: SupabaseClient | null = null;
-let _supabaseAdmin: SupabaseClient | null = null;
+const supabaseUrl       = process.env.NEXT_PUBLIC_SUPABASE_URL      ?? '';
+const supabaseAnonKey   = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY  ?? '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY     ?? '';
 
-function getSupabaseClient(): SupabaseClient {
-  if (!_supabase) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-    if (!url || !key) throw new Error('Supabase URL o ANON_KEY no configurados');
-    _supabase = createClient(url, key);
-  }
-  return _supabase;
-}
+// Cliente publico (anon) — para busquedas del lado del cliente
+export const supabase: SupabaseClient = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : (createClient('https://placeholder.supabase.co', 'placeholder') as SupabaseClient);
 
-function getSupabaseAdmin(): SupabaseClient {
-  if (!_supabaseAdmin) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-    if (!url || !key) throw new Error('Supabase URL o SERVICE_ROLE_KEY no configurados');
-    _supabaseAdmin = createClient(url, key);
-  }
-  return _supabaseAdmin;
-}
+// Cliente administrador (service_role) — para sync y operaciones server-side
+export const supabaseAdmin: SupabaseClient = supabaseUrl && supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : (createClient('https://placeholder.supabase.co', 'placeholder') as SupabaseClient);
 
-// Proxies que mantienen la misma interfaz de uso en el resto del codigo
-export const supabase = new Proxy({} as SupabaseClient, {
-  get: (_target, prop) => {
-    const client = getSupabaseClient();
-    const value = (client as unknown as Record<string | symbol, unknown>)[prop];
-    return typeof value === 'function' ? value.bind(client) : value;
-  },
-});
-
-export const supabaseAdmin = new Proxy({} as SupabaseClient, {
-  get: (_target, prop) => {
-    const client = getSupabaseAdmin();
-    const value = (client as unknown as Record<string | symbol, unknown>)[prop];
-    return typeof value === 'function' ? value.bind(client) : value;
-  },
-});
