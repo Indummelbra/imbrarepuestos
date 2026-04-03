@@ -358,35 +358,41 @@ export default function CheckoutForm() {
         payment_method: 'placetopay',
         payment_method_title: 'PlacetoPay (PSE/Tarjetas)',
         meta_data: [
-          // Prefijo _billing_ requerido por WooCommerce para vincular al campo de facturación
-          { key: '_billing_numero_documento', value: formData.dni },
-          { key: '_billing_tipo_documento', value: formData.documentType },
+          // Sin prefijo _ : WooCommerce HPOS 10.x rechaza meta_data con _ via REST API
+          { key: 'billing_numero_documento', value: formData.dni },
+          { key: 'billing_tipo_documento', value: formData.documentType },
           { key: 'billing_city_code', value: String(formData.cityCode) },
           { key: 'billing_state_code', value: String(formData.stateCode) },
         ],
         shipping_lines,
       };
 
-      const orderRes = await fetch('/api/checkout/create-order', {
+      // ─── FIX HPOS WC 10.x: FLUJO PARALELO ────────────────────────────────────
+      // WooCommerce 10.x con HPOS puede tardar 5-60 segundos en crear la orden
+      // (BatchProcessingController entra en bucle sincronizando ordenes historicas).
+      // Solucion: lanzar WC en background y PlacetoPay inmediatamente con referencia temporal.
+      // Cuando WC responde en background — se asocia el requestId al pedido.
+      // ─────────────────────────────────────────────────────────────────────────
+
+      // Referencia temporal para PlacetoPay (se reemplaza luego con el orderId real)
+      const tempReference = `IB-${Date.now()}`;
+
+      // Crear orden en WooCommerce en background — sin await, no bloqueamos PlacetoPay
+      const orderPromise = fetch('/api/checkout/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload),
-      });
+      })
+        .then(r => r.json())
+        .catch(() => ({ success: false }));
 
-      const orderData = await orderRes.json();
-
-      if (!orderData.success) {
-        setErrorMsg(orderData.message || 'Error al crear el pedido. Intenta de nuevo.');
-        return;
-      }
-
-      // PASO 3: Iniciar sesion de pago en PlacetoPay via Server Action
+      // PASO 3: Lanzar PlacetoPay INMEDIATAMENTE con la referencia temporal
       const ptpResult = await initiatePayment({
-        reference: String(orderData.orderId),
-        description: `Pedido Imbra Repuestos #${orderData.orderId}`,
+        reference: tempReference,
+        description: `Pedido Imbra Repuestos`,
         amount: {
           currency: 'COP',
-          total: Math.round(parseFloat(orderData.total)), // orderData.total viene de WooCommerce con el costo sumado
+          total: totalToPay,
         },
         buyer: {
           name: formData.firstName,
@@ -408,21 +414,27 @@ export default function CheckoutForm() {
 
       if (!ptpResult.success || !ptpResult.processUrl) {
         setErrorMsg(ptpResult.error || 'No se pudo iniciar el pago. Intenta de nuevo.');
+        isSubmitting.current = false;
+        setLoading(false);
         return;
       }
 
-      // PASO 4: Guardar requestId para la sonda (Cron) y sesion actual
+      // PASO 4: Guardar requestId en sessionStorage para la pagina de resultado
       if (ptpResult.requestId) {
-        // En WooCommerce (metadatos)
-        await savePTPRequestId(orderData.orderId, ptpResult.requestId);
-        
-        // En sessionStorage para la pagina de resultado inmediata
         sessionStorage.setItem('ptp_request_id', String(ptpResult.requestId));
-        sessionStorage.setItem('ptp_order_id', String(orderData.orderId));
       }
 
-      // PASO 5: Redirigir al portal de pagos de PlacetoPay
+      // PASO 5: Redirigir INMEDIATAMENTE al portal de PlacetoPay (no esperamos WC)
       window.location.href = ptpResult.processUrl;
+
+      // PASO 6 (background): Cuando WC responde, asociar requestId al pedido real
+      orderPromise.then((orderData) => {
+        if (orderData?.success && orderData?.orderId && ptpResult.requestId) {
+          // Guardar en WooCommerce y sessionStorage con el orderId real
+          savePTPRequestId(orderData.orderId, ptpResult.requestId);
+          sessionStorage.setItem('ptp_order_id', String(orderData.orderId));
+        }
+      });
 
     } catch (error) {
       console.error('Error en el proceso de pago:', error);
