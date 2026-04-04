@@ -50,10 +50,13 @@ export default async function CheckoutResultPage({ searchParams }: ResultPagePro
   let requestId = paramRequestId;
   let orderDataFromWC: WCOrder | null = null;
 
-  if (reference) {
+  // Solo buscamos la orden en WC si la referencia es un numero entero (orderId real)
+  const numericOrderId = reference && /^\d+$/.test(reference) ? Number(reference) : null;
+
+  if (numericOrderId) {
     try {
-      orderDataFromWC = await getOrder(Number(reference));
-      const ptpMeta = orderDataFromWC?.meta_data?.find((m) => m.key === '_ptp_request_id');
+      orderDataFromWC = await getOrder(numericOrderId);
+      const ptpMeta = orderDataFromWC?.meta_data?.find((m) => m.key === '_ptp_request_id' || m.key === 'ptp_request_id');
       if (!requestId && ptpMeta) requestId = String(ptpMeta.value);
     } catch (err) {
       console.error('Error recuperando pedido para el resultado:', err);
@@ -111,7 +114,7 @@ export default async function CheckoutResultPage({ searchParams }: ResultPagePro
   const ciudadEnvio = orderDataFromWC?.billing?.city || null;
 
   const isSuccess = estadoFinal === 'APPROVED' || estadoFinal === 'PENDING';
-  const isError = estadoFinal === 'REJECTED' || estadoFinal === 'FAILED';
+  const isError = estadoFinal === 'REJECTED' || estadoFinal === 'FAILED' || estadoFinal === 'CANCELLED';
 
   const estadoConfig: Record<string, {
     accentColor: string;
@@ -162,9 +165,18 @@ export default async function CheckoutResultPage({ searchParams }: ResultPagePro
       mensaje: 'Tu pago está siendo verificado. Te notificaremos por correo electrónico cuando se confirme.',
       barColor: 'bg-gray-400',
     },
+    CANCELLED: {
+      accentColor: 'text-gray-400',
+      heroTitle: 'Pago', heroAccent: 'Cancelado',
+      badgeText: 'CANCELADO', badgeBg: 'bg-gray-100', badgeColor: 'text-gray-600',
+      iconBg: 'bg-gray-500', iconColor: 'text-white',
+      iconPath: 'M6 18L18 6M6 6l12 12',
+      mensaje: 'Cancelaste el proceso de pago. Puedes intentarlo de nuevo cuando quieras.',
+      barColor: 'bg-gray-500',
+    },
   };
 
-  const cfg = estadoConfig[estadoFinal || 'PENDING'];
+  const cfg = estadoConfig[estadoFinal ?? 'PENDING'] ?? estadoConfig['PENDING'];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8F7F5]">

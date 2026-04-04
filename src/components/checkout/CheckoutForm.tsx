@@ -365,30 +365,49 @@ export default function CheckoutForm() {
           { key: 'billing_state_code', value: String(formData.stateCode) },
         ],
         shipping_lines,
+
       };
 
-      // ─── FIX HPOS WC 10.x: FLUJO PARALELO ────────────────────────────────────
-      // WooCommerce 10.x con HPOS puede tardar 5-60 segundos en crear la orden
-      // (BatchProcessingController entra en bucle sincronizando ordenes historicas).
-      // Solucion: lanzar WC en background y PlacetoPay inmediatamente con referencia temporal.
-      // Cuando WC responde en background — se asocia el requestId al pedido.
-      // ─────────────────────────────────────────────────────────────────────────
-
-      // Referencia temporal para PlacetoPay (se reemplaza luego con el orderId real)
+      // ─── ESTRATEGIA: RACE CON TIMEOUT 8s + keepalive ─────────────────────────────
+      // - keepalive: true garantiza que el fetch NO se cancela cuando la pagina navega
+      // - Esperamos MAXIMO 8s a que WC responda
+      //   Si responde: usamos el orderId real como referencia de PTP (flujo ideal)
+      //   Si no: usamos referencia temporal IB-xxx y WC sigue procesando en el servidor
+      // ────────────────────────────────────────────────────────────────────────
       const tempReference = `IB-${Date.now()}`;
 
-      // Crear orden en WooCommerce en background — sin await, no bloqueamos PlacetoPay
-      const orderPromise = fetch('/api/checkout/create-order', {
+      const wcFetch = fetch('/api/checkout/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload),
+        keepalive: true, // el browser NO cancela esta request aunque la pagina navegue
       })
         .then(r => r.json())
         .catch(() => ({ success: false }));
 
-      // PASO 3: Lanzar PlacetoPay INMEDIATAMENTE con la referencia temporal
+      // Timeout de 8 segundos: si WC tarda mas, lanzamos PTP con referencia temporal
+      const wcTimeout = new Promise<{ success: false }>(resolve =>
+        setTimeout(() => resolve({ success: false }), 8000)
+      );
+
+      const orderData = await Promise.race([wcFetch, wcTimeout]) as {
+        success: boolean;
+        orderId?: number;
+        message?: string;
+      };
+
+      // Referencia definitiva: orderId real si WC respondio a tiempo, IB-xxx si no
+      const ptpReference = (orderData.success && orderData.orderId)
+        ? String(orderData.orderId)
+        : tempReference;
+
+      const realOrderId: number | null = (orderData.success && orderData.orderId)
+        ? orderData.orderId
+        : null;
+
+      // PASO 3: Lanzar PlacetoPay con la referencia definitiva
       const ptpResult = await initiatePayment({
-        reference: tempReference,
+        reference: ptpReference,
         description: `Pedido Imbra Repuestos`,
         amount: {
           currency: 'COP',
@@ -419,22 +438,17 @@ export default function CheckoutForm() {
         return;
       }
 
-      // PASO 4: Guardar requestId en sessionStorage para la pagina de resultado
+      // PASO 4: Guardar en sessionStorage antes de navegar
       if (ptpResult.requestId) {
         sessionStorage.setItem('ptp_request_id', String(ptpResult.requestId));
       }
+      if (realOrderId) {
+        sessionStorage.setItem('ptp_order_id', String(realOrderId));
+        if (ptpResult.requestId) savePTPRequestId(realOrderId, ptpResult.requestId);
+      }
 
-      // PASO 5: Redirigir INMEDIATAMENTE al portal de PlacetoPay (no esperamos WC)
+      // PASO 5: Navegar al portal de PlacetoPay
       window.location.href = ptpResult.processUrl;
-
-      // PASO 6 (background): Cuando WC responde, asociar requestId al pedido real
-      orderPromise.then((orderData) => {
-        if (orderData?.success && orderData?.orderId && ptpResult.requestId) {
-          // Guardar en WooCommerce y sessionStorage con el orderId real
-          savePTPRequestId(orderData.orderId, ptpResult.requestId);
-          sessionStorage.setItem('ptp_order_id', String(orderData.orderId));
-        }
-      });
 
     } catch (error) {
       console.error('Error en el proceso de pago:', error);
