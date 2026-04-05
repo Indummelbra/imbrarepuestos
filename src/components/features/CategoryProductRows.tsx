@@ -142,6 +142,7 @@ function CategoryRow({ group, products }: CategoryRowProps) {
       attributes: [],
       on_sale: product.on_sale,
       is_comprable: product.is_comprable ?? false,
+      cc_class: null,
       meta_data: [],
     }, 1);
   };
