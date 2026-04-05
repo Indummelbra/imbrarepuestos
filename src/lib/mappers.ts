@@ -51,15 +51,16 @@ export function mapWooProductToImbra(wooProduct: WooProductRaw): Product {
   // Si NO gestiona cantidad (rawQty === null) → basta con que status sea 'instock'
   const is_comprable = stock_status === 'instock' && (rawQty === null || rawQty === undefined || rawQty > 0);
 
-  // 3. Normalización de Imágenes SAP (Fuente única de verdad)
+  // 3. Normalización de Imágenes (WooCommerce primero, SAP como fallback)
+  const wooImageSrc = wooProduct.images?.[0]?.src || wooProduct.images?.[0]?.sourceUrl || null;
   const cleanSku = (wooProduct.sku || "").toLowerCase().replace(/b$/, "");
-  const sapImageUrl = cleanSku 
+  const sapImageUrl = cleanSku
     ? `https://movil.indummelbra.com:50101/Imbrapp/images/${cleanSku}.png`
-    : "/images/placeholder.png";
+    : null;
 
-  const images = [{ 
-    src: sapImageUrl, 
-    alt: wooProduct.name 
+  const images = [{
+    src: wooImageSrc || sapImageUrl || "/images/placeholder.png",
+    alt: wooProduct.name
   }];
 
   // 4. Extracción de Datos de Vehículo (Aumentado para Buscador Faceteado)

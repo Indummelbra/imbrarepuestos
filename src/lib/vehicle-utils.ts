@@ -46,38 +46,53 @@ export function extractModel(title: string): string | null {
 export function extractYears(title: string): number[] {
   const years: number[] = [];
   const upperTitle = title.toUpperCase();
-  
-  // Buscar el patrón (MOD ...)
-  const modMatch = upperTitle.match(/\(MOD\s+([^)]+)\)/);
-  if (!modMatch) return [];
 
-  const content = modMatch[1].trim(); // Ejemplo: "11-15", "2024", "08-12 / 15"
-  
-  // Split por coma, guion o espacio
-  const parts = content.split(/[\s,/]+|(?<=\d)-(?=\d)/);
-  
-  for (const part of parts) {
-    if (part.includes('-')) {
-      // Rango: "11-15"
-      const [startStr, endStr] = part.split('-');
-      let start = parseInt(startStr);
-      let end = parseInt(endStr);
-      
-      if (!isNaN(start) && !isNaN(end)) {
-        start = normalizeYear(start);
-        end = normalizeYear(end);
-        
-        for (let y = Math.min(start, end); y <= Math.max(start, end); y++) {
-          years.push(y);
+  /**
+   * Parsea el contenido de un bloque de años, expandiendo rangos.
+   * Ej: "11-15", "2024", "08-12 / 15", "21-23"
+   */
+  function parseYearBlock(content: string) {
+    // Split por separadores (espacio, coma, slash) — NO por guion (es parte del rango)
+    const parts = content.split(/[\s,/]+/);
+    for (const part of parts) {
+      if (part.includes('-')) {
+        const [startStr, endStr] = part.split('-');
+        let start = parseInt(startStr);
+        let end = parseInt(endStr);
+        if (!isNaN(start) && !isNaN(end)) {
+          start = normalizeYear(start);
+          end = normalizeYear(end);
+          for (let y = Math.min(start, end); y <= Math.max(start, end); y++) {
+            years.push(y);
+          }
+        }
+      } else {
+        const year = parseInt(part);
+        if (!isNaN(year) && year >= 70) { // evita capturar números sueltos pequeños como CC
+          years.push(normalizeYear(year));
         }
       }
-    } else {
-      // Año único: "11" o "2024"
-      const year = parseInt(part);
-      if (!isNaN(year)) {
-        years.push(normalizeYear(year));
-      }
     }
+  }
+
+  // Patrón 1: (MOD 11-15), (MOD 2024)
+  const modMatches = upperTitle.matchAll(/\(MOD\s+([^)]+)\)/g);
+  for (const match of modMatches) {
+    parseYearBlock(match[1].trim());
+  }
+
+  // Patrón 2: (15-17), (21-23), (03-04) — paréntesis con rango sin "MOD"
+  // Solo si el contenido son 2-4 dígitos, guion, 2-4 dígitos (evita capturar otros paréntesis)
+  const bareRangeMatches = upperTitle.matchAll(/\((\d{2,4}-\d{2,4}(?:\s*\/\s*\d{2,4})*)\)/g);
+  for (const match of bareRangeMatches) {
+    parseYearBlock(match[1].trim());
+  }
+
+  // Patrón 3: año suelto entre paréntesis: (03), (2024)
+  const singleYearMatches = upperTitle.matchAll(/\((\d{2,4})\)/g);
+  for (const match of singleYearMatches) {
+    const year = parseInt(match[1]);
+    if (!isNaN(year)) years.push(normalizeYear(year));
   }
 
   return [...new Set(years)].sort();
@@ -131,7 +146,7 @@ export function extractCategorySlug(title: string, categories: string[] = []): s
 /**
  * Cilindradas conocidas en el catálogo IMBRA (en cc).
  */
-export const CC_CLASSES = ["50", "100", "110", "115", "125", "135", "150", "175", "200", "250", "300", "650"];
+export const CC_CLASSES = ["50", "80", "100", "110", "115", "125", "135", "150", "175", "190", "200", "250", "300", "650"];
 
 /**
  * Extrae la cilindrada del título o atributos del producto.
@@ -166,8 +181,9 @@ export function extractCCClass(
   }
 
   // 3. Número suelto que coincide con CC conocida (más largo primero para evitar "11" antes de "110")
+  // Usamos lookahead/lookbehind numérico en vez de \b para capturar "DT200", "GN125", etc.
   for (const cc of [...CC_CLASSES].sort((a, b) => b.length - a.length)) {
-    if (new RegExp(`\\b${cc}\\b`).test(upper)) return `${cc}cc`;
+    if (new RegExp(`(?<!\\d)${cc}(?!\\d)`).test(upper)) return `${cc}cc`;
   }
 
   return null;
