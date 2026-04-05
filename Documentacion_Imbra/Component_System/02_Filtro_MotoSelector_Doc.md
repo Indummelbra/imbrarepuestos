@@ -1,7 +1,7 @@
 # Documentación: Filtro MotoSelector — Sistema de Búsqueda por Vehículo
 
-**Última actualización:** 2026-03-29
-**Estado:** Implementado y funcionando
+**Última actualización:** 2026-04-05
+**Estado:** Implementado y funcionando — bugs de extracción corregidos
 **Archivo principal:** `src/components/features/MotoSelector.tsx`
 
 ---
@@ -166,6 +166,66 @@ Para queries instantáneas en el selector:
 ### ⚠️ Importante: Re-ejecutar tras sincronización
 
 Si se re-sincroniza el catálogo desde WooCommerce (ruta `/api/sync-products`), el sync sobreescribe `vehicle_brand`, `vehicle_model`, y `cc_class` con los valores del mapper (que solo cubre ~15 marcas y ~16 modelos). **Hay que volver a ejecutar el SQL después de cada sync masivo.**
+
+---
+
+## Bugs Resueltos (2026-04-05)
+
+### Bug 1: cc_class siempre NULL — regex `\b` no funciona con "DT200"
+
+**Síntoma:** El dropdown CILINDRADA aparecía vacío para todos los productos.
+
+**Causa:** `extractCCClass()` usaba `\b` (word boundary) para buscar números CC. En JavaScript, `\b` no detecta el límite entre letra y dígito. Por lo tanto `"DT200"` no producía match para `200cc`.
+
+**Fix aplicado en `src/lib/vehicle-utils.ts`:**
+```ts
+// ❌ ANTES — \b no funciona entre letra y dígito
+new RegExp(`\\b${cc}\\b`).test(upper)
+
+// ✅ DESPUÉS — lookbehind/lookahead numérico
+new RegExp(`(?<!\\d)${cc}(?!\\d)`).test(upper)
+```
+
+También se agregaron `80` y `190` a `CC_CLASSES` (antes faltaban).
+
+---
+
+### Bug 2: vehicle_years siempre vacío — solo detectaba formato `(MOD 11-15)`
+
+**Síntoma:** El dropdown AÑO aparecía siempre vacío.
+
+**Causa:** `extractYears()` solo buscaba el patrón `(MOD 11-15)` pero los productos SAP usan `(15-17)` sin prefijo "MOD".
+
+**Ejemplos reales de productos:**
+```
+DISCO DE FRENO DELANTERO SUZUKI GIXXER 150(15-17) - GIXXER 150 FI (21-23)
+DESLIZADOR DE CADENA HONDA NXR 125 BROSS (03-04)
+```
+
+**Fix:** La función ahora detecta 3 patrones:
+1. `(MOD 11-15)` — formato antiguo con prefijo
+2. `(15-17)` — rango sin prefijo (el más común en SAP)
+3. `(03)` — año suelto entre paréntesis
+
+Soporta múltiples bloques en el mismo nombre (ej: producto compatible con dos generaciones).
+
+---
+
+### Bug 3: Imágenes rotas — servidor SAP inaccesible
+
+**Síntoma:** Todas las imágenes del sitio mostraban error 404/timeout.
+
+**Causa:** El mapper usaba exclusivamente el servidor SAP `movil.indummelbra.com:50101` que no es accesible desde Internet.
+
+**Fix aplicado en `src/lib/mappers.ts`:**
+```ts
+// ✅ WooCommerce como fuente primaria, SAP como fallback
+const wooImageSrc = wooProduct.images?.[0]?.src || null;
+const sapImageUrl = cleanSku ? `https://movil.indummelbra.com:50101/...` : null;
+const images = [{ src: wooImageSrc || sapImageUrl || "/images/placeholder.png" }];
+```
+
+Ahora los productos muestran las imágenes cargadas en WooCommerce.
 
 ---
 

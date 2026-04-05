@@ -1,5 +1,5 @@
 # Sistema de Sincronización Diaria — WooCommerce → Supabase
-## Cron 4:00am vía n8n
+## Cron 4:00am vía cPanel (o n8n)
 
 ---
 
@@ -139,15 +139,20 @@ Clic en **"Execute workflow"** dentro del workflow. Debe responder en ~2 minutos
 
 ---
 
-## El lunes — cambio de dominio
+## Configuración del cron vía cPanel (recomendado)
 
-Cuando el dominio apunte a `imbrarepuestos.com`, actualizar la URL en el nodo HTTP Request de n8n:
+Si n8n presenta problemas, usar directamente cPanel → Cron Jobs:
 
 ```
-https://store.imbra.cloud/api/cron/sync-products
-→
-https://imbrarepuestos.com/api/cron/sync-products
+Minuto: 0
+Hora: 4
+Día: *
+Mes: *
+Día semana: *
+Comando: curl -s -H "Authorization: Bearer ImbraSecurityCron2026_XyZ" https://store.imbra.cloud/api/cron/sync-products
 ```
+
+Cuando el dominio cambie a `imbrarepuestos.com`, actualizar la URL en el comando.
 
 ---
 
@@ -178,7 +183,7 @@ curl -H "Authorization: Bearer ImbraSecurityCron2026_XyZ" \
 | regular_price | numeric | Precio regular |
 | sale_price | numeric | Precio oferta (null si no aplica) |
 | on_sale | boolean | ¿Está en oferta? |
-| image_url | text | URL imagen desde servidor SAP |
+| image_url | text | URL imagen — WooCommerce primero, SAP como fallback |
 | categories | jsonb | Array de categorías WooCommerce |
 | stock_status | text | instock / outofstock / onbackorder |
 | stock_quantity | int | Cantidad en stock |
