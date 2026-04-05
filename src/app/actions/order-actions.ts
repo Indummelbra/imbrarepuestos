@@ -110,7 +110,7 @@ export async function getOrdersByDocument(
     // Verificar documento + teléfono (factores de seguridad)
     const verified = raw.filter((order) => {
       const meta = (order.meta_data as Array<{ key: string; value: unknown }>) ?? [];
-      const storedDoc = getMeta(meta, '_billing_numero_documento').replace(/\D/g, '');
+      const storedDoc = getMeta(meta, 'billing_numero_documento').replace(/\D/g, '');
       if (storedDoc !== normalizedDoc) return false;
 
       // Verificación de teléfono: si se proporcionó Y la orden tiene teléfono, deben coincidir

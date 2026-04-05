@@ -358,57 +358,35 @@ export default function CheckoutForm() {
         payment_method: 'placetopay',
         payment_method_title: 'PlacetoPay (PSE/Tarjetas)',
         meta_data: [
-          // Sin prefijo _ : WooCommerce HPOS 10.x rechaza meta_data con _ via REST API
           { key: 'billing_numero_documento', value: formData.dni },
           { key: 'billing_tipo_documento', value: formData.documentType },
           { key: 'billing_city_code', value: String(formData.cityCode) },
           { key: 'billing_state_code', value: String(formData.stateCode) },
         ],
         shipping_lines,
-
       };
 
-      // ─── ESTRATEGIA: RACE CON TIMEOUT 8s + keepalive ─────────────────────────────
-      // - keepalive: true garantiza que el fetch NO se cancela cuando la pagina navega
-      // - Esperamos MAXIMO 8s a que WC responda
-      //   Si responde: usamos el orderId real como referencia de PTP (flujo ideal)
-      //   Si no: usamos referencia temporal IB-xxx y WC sigue procesando en el servidor
-      // ────────────────────────────────────────────────────────────────────────
-      const tempReference = `IB-${Date.now()}`;
-
-      const wcFetch = fetch('/api/checkout/create-order', {
+      // PASO 2: Crear la orden en WooCommerce SIN TIMEOUT FALSOS.
+      // Debe ser secuencial, porque n8n depende estrictamente de que PTP Reference == WooCommerce Order ID.
+      // Si GoDaddy tarda, mostraremos el UI de "Cargando..." todo el tiempo necesario.
+      const orderRes = await fetch('/api/checkout/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload),
-        keepalive: true, // el browser NO cancela esta request aunque la pagina navegue
-      })
-        .then(r => r.json())
-        .catch(() => ({ success: false }));
+      });
 
-      // Timeout de 8 segundos: si WC tarda mas, lanzamos PTP con referencia temporal
-      const wcTimeout = new Promise<{ success: false }>(resolve =>
-        setTimeout(() => resolve({ success: false }), 8000)
-      );
+      const orderData = await orderRes.json();
 
-      const orderData = await Promise.race([wcFetch, wcTimeout]) as {
-        success: boolean;
-        orderId?: number;
-        message?: string;
-      };
+      if (!orderData.success || !orderData.orderId) {
+        throw new Error(orderData.message || 'No se pudo crear la orden en WooCommerce');
+      }
 
-      // Referencia definitiva: orderId real si WC respondio a tiempo, IB-xxx si no
-      const ptpReference = (orderData.success && orderData.orderId)
-        ? String(orderData.orderId)
-        : tempReference;
+      const realOrderId = orderData.orderId;
 
-      const realOrderId: number | null = (orderData.success && orderData.orderId)
-        ? orderData.orderId
-        : null;
-
-      // PASO 3: Lanzar PlacetoPay con la referencia definitiva
+      // PASO 3: Lanzar PlacetoPay con la referencia DEFINITIVA y REAL
       const ptpResult = await initiatePayment({
-        reference: ptpReference,
-        description: `Pedido Imbra Repuestos`,
+        reference: String(realOrderId),
+        description: `Pedido Imbra Repuestos #${realOrderId}`,
         amount: {
           currency: 'COP',
           total: totalToPay,
@@ -432,30 +410,28 @@ export default function CheckoutForm() {
       });
 
       if (!ptpResult.success || !ptpResult.processUrl) {
-        setErrorMsg(ptpResult.error || 'No se pudo iniciar el pago. Intenta de nuevo.');
+        setErrorMsg(ptpResult.error || 'No se pudo iniciar el pago en PlacetoPay. Intenta de nuevo.');
         isSubmitting.current = false;
         setLoading(false);
         return;
       }
 
-      // PASO 4: Guardar en sessionStorage antes de navegar
+      // PASO 4: Guardar IDs en sessionStorage y BD antes de navegar
       if (ptpResult.requestId) {
         sessionStorage.setItem('ptp_request_id', String(ptpResult.requestId));
-      }
-      if (realOrderId) {
         sessionStorage.setItem('ptp_order_id', String(realOrderId));
-        if (ptpResult.requestId) savePTPRequestId(realOrderId, ptpResult.requestId);
+        // Sincronizar Request ID con WooCommerce para evitar el mismo problema a futuro
+        savePTPRequestId(realOrderId, ptpResult.requestId);
       }
 
       // PASO 5: Navegar al portal de PlacetoPay
       window.location.href = ptpResult.processUrl;
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error en el proceso de pago:', error);
-      setErrorMsg('Error de conexion. Por favor intenta de nuevo.');
-    } finally {
-      setLoading(false);
+      setErrorMsg(error?.message || 'Error de conexión. Por favor intenta de nuevo.');
       isSubmitting.current = false;
+      setLoading(false);
     }
   };
 

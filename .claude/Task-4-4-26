@@ -1,0 +1,23 @@
+Limpiar WC_INTERNAL_URL de woocommerce.ts (era para Docker interno, ya no aplica con cPanel)
+
+Confirmar URL WordPress cPanel y actualizar NEXT_PUBLIC_WORDPRESS_URL + WPGRAPHQL_URL en .env.local
+
+JWT Auth WordPress: instalar plugin + agregar constantes en wp-config.php (cPanel) + agregar WP_JWT_USER/WP_JWT_PASS en env
+
+Actualizar wordpress.ts para usar JWT: getWpToken() con cache + Bearer header en getPosts/getPostBySlug/getCategories
+
+Supabase: ejecutar SQL para crear tabla orders (flujo Supabase-First)
+
+Supabase: verificar que existe tabla products_search (usada en getAdjacentProductsInCategory) y crearla si falta
+
+PlacetoPay: reemplazar credenciales sandbox por las de producción en .env.local y Dokploy
+Listo. Tareas en orden de prioridad:
+
+#	Tarea	Bloquea
+1	Limpiar WC_INTERNAL_URL de woocommerce.ts	nada
+2	Confirmar URL WordPress cPanel → actualizar ENVs	JWT Auth
+3	JWT Auth WordPress: plugin + wp-config.php en cPanel + ENVs	tarea 4
+4	Actualizar wordpress.ts con JWT	—
+5	Supabase: SQL tabla orders	flujo Supabase-First
+6	Supabase: verificar tabla products_search	ya está usada en código
+7	PlacetoPay producción	—

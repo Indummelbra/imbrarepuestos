@@ -4,7 +4,13 @@
       "Bash(npx tsc:*)",
       "Bash(curl -s \"http://localhost:3000/api/sync-products?secret=imbra-secret-2026\")",
       "Bash(find 'F:\\\\CLIENTES\\\\IMBRA-MAPACHE\\\\Imbra Store' -type f \\\\\\(-name *auth* -o -name *login* -o -name *signin* -o -name *session* \\\\\\) ! -path */node_modules/* ! -path */.next/*)",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "Bash(grep -E \"PageHero|<h1|<h2\" head -60 \"f:/CLIENTES/IMBRA-MAPACHE/Imbra Store/src/app/mis-pedidos/page.tsx\")",
+      "Bash(grep -E \"PageHero|<h1|<h2\" head -60 \"f:/CLIENTES/IMBRA-MAPACHE/Imbra Store/src/app/ayuda/page.tsx\")",
+      "Bash(grep -E \"PageHero|<h1|<h2\" head -60 \"f:/CLIENTES/IMBRA-MAPACHE/Imbra Store/src/app/terminos/page.tsx\")",
+      "Bash(grep -E \"PageHero|<h1|<h2\" head -30 \"f:/CLIENTES/IMBRA-MAPACHE/Imbra Store/src/app/blog/[slug]/page.tsx\")",
+      "Bash(find '/f/CLIENTES/IMBRA-MAPACHE/Imbra Store' -type f \\\\\\(-name *.sql -o -name *schema* -o -name *migration* \\\\\\))",
+      "Bash(grep -r CREATE.*products_search '/f/CLIENTES/IMBRA-MAPACHE/Imbra Store' --include=*.sql)"
     ]
   }
 }

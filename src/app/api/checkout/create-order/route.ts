@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       meta_data: [
         ...(meta_data || []),
         {
-          key: '_created_via',
+          key: 'created_via',
           value: 'Imbra Headless Store'
         }
       ]
