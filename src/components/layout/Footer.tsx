@@ -25,7 +25,7 @@ export default function Footer() {
           <div className="lg:w-1/4 lg:pr-12 lg:border-r border-gray-700">
             <Link href="/" className="flex items-center group mb-8">
               <Image 
-                src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png" 
+                src="https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Logo-Imbra-Footer.png" 
                 alt="Imbra Repuestos" 
                 width={120}
                 height={48}

@@ -221,7 +221,7 @@ export default function Header() {
               <div className="flex items-center gap-6 shrink-0">
                 <Link href="/" className="shrink-0">
                   <Image
-                    src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png"
+                    src="https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Logo-Imbra.png"
                     alt="Imbra Repuestos" width={140} height={56}
                     className="h-14 w-auto object-contain" unoptimized
                   />
@@ -458,7 +458,7 @@ export default function Header() {
             {/* Logo a la izquierda */}
             <Link href="/" className="shrink-0 flex items-center">
               <Image
-                src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png"
+                src="https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Logo-Imbra.png"
                 alt="Imbra Repuestos" width={110} height={44}
                 className="h-9 w-auto object-contain"
                 unoptimized
@@ -575,7 +575,7 @@ export default function Header() {
         {/* Cabecera Sidebar */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 shrink-0 bg-white sticky top-0 z-10">
           <Image
-            src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png"
+            src="https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Logo-Imbra.png"
             alt="Imbra" width={110} height={44}
             className="h-8 w-auto object-contain"
             unoptimized

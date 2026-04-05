@@ -30,6 +30,13 @@ const archivo = Archivo({
 export const metadata: Metadata = {
   title: "Imbra Store | Repuestos para Motos de Alto Impacto",
   description: "La tienda líder en repuestos industriales y accesorios para motos. Calidad garantizada para profesionales.",
+  icons: {
+    icon: "https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Favicon-Imbra.png",
+    apple: "https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Favicon-Imbra.png",
+  },
+  openGraph: {
+    images: ["https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Favicon-Imbra.png"],
+  },
 };
 
 import { CartProvider } from "@/context/CartContext";

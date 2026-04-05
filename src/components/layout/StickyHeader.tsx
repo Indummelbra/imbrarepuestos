@@ -102,7 +102,7 @@ export default function StickyHeader({
           {/* Logo a la izquierda */}
           <Link href="/" className="shrink-0 flex items-center">
             <Image
-              src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png"
+              src="https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Logo-Imbra.png"
               alt="Imbra Repuestos" width={90} height={36}
               className="h-8 w-auto object-contain"
               unoptimized
@@ -146,7 +146,7 @@ export default function StickyHeader({
           {/* Logo */}
           <Link href="/" onClick={closeAll} className="shrink-0">
             <Image
-              src="https://imbrarepuestos.com/pagos/wp-content/uploads/2023/10/cropped-Logo-Imbra.png"
+              src="https://mkt.imbrarepuestos.com/wp-content/uploads/2026/04/Logo-Imbra.png"
               alt="Imbra Repuestos" width={110} height={44}
               className="h-8 w-auto object-contain"
               unoptimized
