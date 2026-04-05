@@ -75,6 +75,7 @@ export async function GET(request: Request) {
         vehicle_years: imbraProduct.vehicle_years,
         part_category: imbraProduct.part_category,
         category_slug: imbraProduct.category_slug,
+        cc_class: imbraProduct.cc_class ?? null,
         status: productRaw.status || 'publish',
       };
     });

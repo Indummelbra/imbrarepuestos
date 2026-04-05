@@ -28,6 +28,7 @@ export interface Product {
   vehicle_years: number[];
   part_category: string;   // display name: "Suspensión", "Frenos", etc.
   category_slug: string;   // URL slug: "suspension", "frenos", etc.
+  cc_class: string | null; // cilindrada: "125cc", "150cc", etc.
   stock_status: 'instock' | 'outofstock' | 'onbackorder';
   stock_quantity: number | null;
   on_sale: boolean;

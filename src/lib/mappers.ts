@@ -1,5 +1,5 @@
 import { Product } from "@/types/product";
-import { extractBrand, extractModel, extractYears, extractPartCategory, extractCategorySlug } from "./vehicle-utils";
+import { extractBrand, extractModel, extractYears, extractPartCategory, extractCategorySlug, extractCCClass } from "./vehicle-utils";
 
 /**
  * Mapper "Nivel Dios" para normalizar productos de WooCommerce.
@@ -69,6 +69,7 @@ export function mapWooProductToImbra(wooProduct: WooProductRaw): Product {
   const vehicle_years = extractYears(wooProduct.name);
   const part_category = extractPartCategory(wooProduct.name, categoryNames);
   const category_slug = extractCategorySlug(wooProduct.name, categoryNames);
+  const cc_class = extractCCClass(wooProduct.name, wooProduct.attributes || []);
 
   // 5. Normalización de on_sale: sale_price > 0 y diferente al precio regular
   const salePriceNum = parseFloat(wooProduct.sale_price || "0");
@@ -100,6 +101,7 @@ export function mapWooProductToImbra(wooProduct: WooProductRaw): Product {
     stock_status,
     stock_quantity,
     is_comprable,
+    cc_class,
     meta_data
   };
 }

@@ -92,6 +92,7 @@ export async function GET(request: NextRequest) {
       vehicle_years:   product.vehicle_years,
       part_category:   product.part_category,
       category_slug:   product.category_slug,
+      cc_class:        product.cc_class ?? null,
       status:          raw.status || 'publish',
     };
   });

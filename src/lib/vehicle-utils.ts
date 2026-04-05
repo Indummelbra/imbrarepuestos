@@ -129,6 +129,51 @@ export function extractCategorySlug(title: string, categories: string[] = []): s
 }
 
 /**
+ * Cilindradas conocidas en el catálogo IMBRA (en cc).
+ */
+export const CC_CLASSES = ["50", "100", "110", "115", "125", "135", "150", "175", "200", "250", "300", "650"];
+
+/**
+ * Extrae la cilindrada del título o atributos del producto.
+ * Retorna formato "125cc", "150cc", etc. o null si no encuentra.
+ *
+ * Estrategia en orden de prioridad:
+ * 1. Atributos WooCommerce (más confiable)
+ * 2. Patrón explícito "125CC" / "125 CC" en el título
+ * 3. Número suelto que coincide con CC conocida (ej: "BWS 125")
+ */
+export function extractCCClass(
+  title: string,
+  attributes: Array<{ name: string; options: string[] }> = []
+): string | null {
+  const upper = title.toUpperCase();
+
+  // 1. Atributos WooCommerce (Cilindraje, CC, Cilindrada)
+  for (const attr of attributes) {
+    const attrName = attr.name.toUpperCase();
+    if (attrName.includes('CC') || attrName.includes('CILINDRAD') || attrName.includes('CILINDRAJE')) {
+      const val = attr.options[0] ?? '';
+      const num = val.match(/\d+/)?.[0];
+      if (num && CC_CLASSES.includes(num)) return `${num}cc`;
+    }
+  }
+
+  // 2. Patrón explícito: "125CC", "125 CC"
+  const explicit = upper.match(/\b(\d{2,3})\s*CC\b/);
+  if (explicit) {
+    const num = explicit[1];
+    if (CC_CLASSES.includes(num)) return `${num}cc`;
+  }
+
+  // 3. Número suelto que coincide con CC conocida (más largo primero para evitar "11" antes de "110")
+  for (const cc of [...CC_CLASSES].sort((a, b) => b.length - a.length)) {
+    if (new RegExp(`\\b${cc}\\b`).test(upper)) return `${cc}cc`;
+  }
+
+  return null;
+}
+
+/**
  * Devuelve el objeto completo de categoría canónica.
  */
 export function extractCategoryMeta(title: string, categories: string[] = []): CategoryMeta {
