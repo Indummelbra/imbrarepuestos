@@ -6,7 +6,7 @@ import { mapWooProductToImbra, WooProductRaw } from "@/lib/mappers";
 
 const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
-const WOOCOMMERCE_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL;
+const WOOCOMMERCE_URL = (process.env.NEXT_PUBLIC_WORDPRESS_URL || '').replace(/\/$/, '');
 
 /**
  * Helper para obtener la data completa del producto desde Woo REST API.
@@ -24,8 +24,14 @@ async function getFullProduct(id: number) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const topic = request.headers.get("x-wc-webhook-topic");
+
+    // WooCommerce envía un ping al crear el webhook — responder 200 siempre
+    if (!topic || topic === 'ping') {
+      return NextResponse.json({ message: "pong" });
+    }
+
     const productId = body.id;
 
     console.log(`Webhook recibido: ${topic} para producto ID: ${productId}`);

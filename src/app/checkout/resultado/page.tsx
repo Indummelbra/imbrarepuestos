@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import PageHero from '@/components/ui/PageHero';
+import RequestIdRedirect from '@/components/checkout/RequestIdRedirect';
 
 import { PTPQuerySessionResponse } from '@/types/placetopay';
 
@@ -51,7 +52,9 @@ export default async function CheckoutResultPage({ searchParams }: ResultPagePro
   let orderDataFromWC: WCOrder | null = null;
 
   // Solo buscamos la orden en WC si la referencia es un numero entero (orderId real)
-  const numericOrderId = reference && /^\d+$/.test(reference) ? Number(reference) : null;
+  // Limpiamos prefijo IB- o similar que WooCommerce puede agregar al order number
+  const rawReference = reference?.replace(/^[A-Z]+-/i, '');
+  const numericOrderId = rawReference && /^\d+$/.test(rawReference) ? Number(rawReference) : null;
 
   if (numericOrderId) {
     try {
@@ -198,6 +201,7 @@ export default async function CheckoutResultPage({ searchParams }: ResultPagePro
         `}} />
       )}
 
+      <RequestIdRedirect />
       <main className="flex-grow px-5 py-12">
         <div className="max-w-7xl mx-auto">
 

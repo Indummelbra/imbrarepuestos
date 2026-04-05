@@ -5,7 +5,7 @@ import { mapWooProductToImbra, WooProductRaw } from "@/lib/mappers";
 
 const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
-const WOOCOMMERCE_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL;
+const WOOCOMMERCE_URL = (process.env.NEXT_PUBLIC_WORDPRESS_URL || '').replace(/\/$/, '');
 const SYNC_SECRET = process.env.SYNC_SECRET || "imbra-secret-2026"; // Cambiar en producción
 
 export async function GET(request: Request) {

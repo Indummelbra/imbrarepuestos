@@ -1,4 +1,53 @@
-const WP_API = process.env.NEXT_PUBLIC_WORDPRESS_URL?.replace(/\/$/, '') + '/wp-json/wp/v2';
+const WP_BASE = process.env.NEXT_PUBLIC_WORDPRESS_URL?.replace(/\/$/, '') ?? '';
+const WP_API  = `${WP_BASE}/wp-json/wp/v2`;
+
+// ── JWT Auth ───────────────────────────────────────────────────────────────────
+
+let _cachedToken: string | null = null;
+let _tokenExpires = 0;
+
+/**
+ * Obtiene (y cachea en memoria) un token JWT de WordPress.
+ * El token se renueva 60 segundos antes de expirar.
+ */
+async function getWpToken(): Promise<string | null> {
+  const user = process.env.WP_JWT_USER;
+  const pass = process.env.WP_JWT_PASS;
+  if (!user || !pass) return null;
+
+  const now = Date.now();
+  if (_cachedToken && now < _tokenExpires) return _cachedToken;
+
+  try {
+    const res = await fetch(`${WP_BASE}/wp-json/jwt-auth/v1/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass }),
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      console.error('[wordpress] JWT token error:', res.status);
+      return null;
+    }
+    const data = await res.json();
+    _cachedToken = data.token ?? null;
+    // WordPress JWT expira en 7 días por defecto; cacheamos por 6 horas
+    _tokenExpires = now + 6 * 60 * 60 * 1000;
+    return _cachedToken;
+  } catch (err) {
+    console.error('[wordpress] JWT fetch error:', err);
+    return null;
+  }
+}
+
+async function wpHeaders(): Promise<HeadersInit> {
+  const token = await getWpToken();
+  return token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
+}
+
+// ── Tipos ──────────────────────────────────────────────────────────────────────
 
 export interface WPPost {
   id: number;
@@ -22,6 +71,8 @@ export interface WPCategory {
   count: number;
 }
 
+// ── Funciones públicas ─────────────────────────────────────────────────────────
+
 export async function getPosts(params?: {
   perPage?: number;
   page?: number;
@@ -37,7 +88,10 @@ export async function getPosts(params?: {
   if (params?.categories?.length) query.set('categories', params.categories.join(','));
   if (params?.search) query.set('search', params.search);
 
-  const res = await fetch(`${WP_API}/posts?${query}`, { next: { revalidate: 3600 } });
+  const res = await fetch(`${WP_API}/posts?${query}`, {
+    headers: await wpHeaders(),
+    next: { revalidate: 3600 },
+  });
   if (!res.ok) return { posts: [], total: 0, pages: 0 };
 
   const posts: WPPost[] = await res.json();
@@ -48,6 +102,7 @@ export async function getPosts(params?: {
 
 export async function getPostBySlug(slug: string): Promise<WPPost | null> {
   const res = await fetch(`${WP_API}/posts?slug=${slug}&_embed=wp:featuredmedia,wp:term`, {
+    headers: await wpHeaders(),
     next: { revalidate: 3600 },
   });
   if (!res.ok) return null;
@@ -57,6 +112,7 @@ export async function getPostBySlug(slug: string): Promise<WPPost | null> {
 
 export async function getCategories(): Promise<WPCategory[]> {
   const res = await fetch(`${WP_API}/categories?per_page=100&hide_empty=true`, {
+    headers: await wpHeaders(),
     next: { revalidate: 3600 },
   });
   if (!res.ok) return [];
@@ -109,7 +165,7 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
   try {
     const res = await fetch(
       `${WP_API}/hero_slide?orderby=menu_order&order=asc&_embed=wp:featuredmedia&per_page=10&status=publish`,
-      { next: { revalidate: 300 } }
+      { headers: await wpHeaders(), next: { revalidate: 300 } }
     );
     if (!res.ok) return HERO_FALLBACK;
     const raw: Array<{
