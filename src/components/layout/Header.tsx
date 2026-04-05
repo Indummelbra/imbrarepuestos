@@ -123,7 +123,7 @@ export default function Header() {
       <header ref={headerRef} className="relative z-[60] bg-white border-b border-gray-100">
 
         {/* ── INFO BAR ── */}
-        <div className="bg-gray-100 border-b border-gray-200/50 overflow-hidden">
+        <div className="bg-gray-100 overflow-hidden" style={{ borderBottom: "0.5px solid #F18700" }}>
 
           {/* ── MOBILE: dos filas ── */}
           <div className="lg:hidden">

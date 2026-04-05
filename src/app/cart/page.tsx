@@ -66,7 +66,7 @@ export default function CartPage() {
                         <div className="col-span-6 flex items-center space-x-4">
                           <div className="relative w-24 aspect-square bg-white border border-gray-100 p-2 overflow-hidden">
                             <Image 
-                              src={item.product.images?.[0]?.src || "/placeholder.png"} 
+                              src={item.product.images?.[0]?.src || (item.product as any).image_url || "/placeholder.png"}
                               alt={item.product.name}
                               fill
                               className="object-contain"
@@ -118,7 +118,7 @@ export default function CartPage() {
                         <div className="flex gap-4">
                           <div className="relative w-24 h-24 flex-shrink-0 bg-white border border-gray-100 p-2">
                             <Image 
-                              src={item.product.images?.[0]?.src || "/placeholder.png"} 
+                              src={item.product.images?.[0]?.src || (item.product as any).image_url || "/placeholder.png"}
                               alt={item.product.name}
                               fill
                               className="object-contain"
