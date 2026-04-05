@@ -427,9 +427,9 @@ export default function CheckoutForm() {
       // PASO 5: Navegar al portal de PlacetoPay
       window.location.href = ptpResult.processUrl;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error en el proceso de pago:', error);
-      setErrorMsg(error?.message || 'Error de conexión. Por favor intenta de nuevo.');
+      setErrorMsg(error instanceof Error ? error.message : 'Error de conexión. Por favor intenta de nuevo.');
       isSubmitting.current = false;
       setLoading(false);
     }
