@@ -102,8 +102,8 @@ export function CartSidebar() {
                   <li key={product.id} className="flex gap-3 pb-4 border-b border-gray-100 last:border-0">
                     {/* Imagen */}
                     <div className="w-16 h-16 bg-gray-50 shrink-0 flex items-center justify-center">
-                      {(product.images?.[0]?.src || (product as any).image_url) ? (
-                        <img src={product.images?.[0]?.src || (product as any).image_url} alt={product.name} className="w-14 h-14 object-contain" />
+                      {(product.images?.[0]?.src || product.image_url) ? (
+                        <img src={product.images?.[0]?.src || product.image_url || undefined} alt={product.name} className="w-14 h-14 object-contain" />
                       ) : (
                         <ShoppingCart size={20} className="text-gray-300" />
                       )}

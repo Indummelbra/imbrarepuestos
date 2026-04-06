@@ -33,6 +33,7 @@ export interface Product {
   stock_quantity: number | null;
   on_sale: boolean;
   is_comprable: boolean;   // true si stock_quantity > 0 && stock_status === 'instock'
+  image_url?: string | null; // fallback para productos cargados desde Supabase
   meta_data: {
     key: string;
     value: unknown;
