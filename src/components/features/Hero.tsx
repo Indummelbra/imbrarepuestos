@@ -39,6 +39,8 @@ export default function Hero({ slides }: HeroProps) {
 
   // Swipe
   const onPointerDown = (e: React.PointerEvent) => {
+    // No capturar si el clic es sobre un enlace o botón
+    if ((e.target as HTMLElement).closest('a, button')) return;
     dragRef.current = { active: true, startX: e.clientX };
     sectionRef.current?.setPointerCapture(e.pointerId);
   };
@@ -98,7 +100,7 @@ export default function Hero({ slides }: HeroProps) {
             key={animKey}
             className="relative z-20 h-full flex items-center px-6 md:px-8 xl:px-12"
           >
-            <div className="w-full md:w-1/2 text-left">
+            <div className="w-full md:w-1/2 text-left pl-3 md:pl-6">
 
               {/* Etiqueta */}
               {slide.label && (
@@ -120,8 +122,8 @@ export default function Hero({ slides }: HeroProps) {
               {/* Subtítulo */}
               {slide.excerpt && (
                 <p
-                  className="imbra-body mb-8 max-w-lg text-white/80"
-                  style={{ animation: "hero-fadeup 0.5s 0.28s ease both" }}
+                  className="imbra-body mb-8 max-w-lg"
+                  style={{ animation: "hero-fadeup 0.5s 0.28s ease both", color: "#ffffff" }}
                 >
                   {slide.excerpt}
                 </p>

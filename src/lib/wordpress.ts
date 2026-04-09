@@ -163,29 +163,54 @@ const HERO_FALLBACK: HeroSlide[] = [
 
 export async function getHeroSlides(): Promise<HeroSlide[]> {
   try {
+    // Endpoint propio en WP que lee directamente la carpeta Filebird (folder_id=7)
     const res = await fetch(
-      `${WP_API}/hero_slide?orderby=menu_order&order=asc&_embed=wp:featuredmedia&per_page=10&status=publish`,
-      { headers: await wpHeaders(), next: { revalidate: 300 } }
+      `${WP_BASE}/wp-json/imbra/v1/slider`,
+      { cache: 'no-store' }
     );
     if (!res.ok) return HERO_FALLBACK;
-    const raw: Array<{
+
+    const items: Array<{
       id: number;
-      title: { rendered: string };
-      excerpt: { rendered: string };
-      meta: { slide_label?: string; slide_cta_text?: string; slide_cta_url?: string; slide_note?: string };
-      _embedded?: { 'wp:featuredmedia'?: Array<{ source_url: string }> };
+      title: string;
+      caption: string;
+      description: string;
+      alt_text: string;
+      source_url: string;
     }> = await res.json();
-    if (!raw.length) return HERO_FALLBACK;
-    return raw.map((p) => ({
-      id: p.id,
-      title: p.title.rendered,
-      excerpt: p.excerpt.rendered.replace(/<\/?p>/g, '').trim(),
-      image: p._embedded?.['wp:featuredmedia']?.[0]?.source_url ?? '/images/hero-bg.png',
-      label: p.meta?.slide_label ?? '',
-      ctaText: p.meta?.slide_cta_text ?? 'VER MÁS',
-      ctaUrl: p.meta?.slide_cta_url ?? '/tienda',
-      note: p.meta?.slide_note ?? '',
-    }));
+
+    if (!items.length) return HERO_FALLBACK;
+
+    // Convención de campos en WordPress Medios:
+    //   Texto alternativo → etiqueta naranja (ej. "⚡ DIRECTO DEL FABRICANTE")
+    //   Leyenda (title)   → subtítulo del slide
+    //   Descripción       → 3 líneas: título principal / texto botón / url
+    //   Imagen            → fondo del slide
+    const slides: HeroSlide[] = items.map((m, idx) => {
+      const lines = (m.description ?? '')
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean);
+      // La URL siempre es la última línea (empieza con /)
+      // El texto del botón es la penúltima
+      // Todo lo anterior es el título
+      const urlLine     = lines.findLast((l) => l.startsWith('/')) ?? '/tienda';
+      const remaining   = lines.filter((l) => l !== urlLine);
+      const ctaText     = remaining.pop() ?? 'VER MÁS';
+      const title       = remaining.join(' ') || ctaText;
+      return {
+        id:      m.id ?? idx,
+        title,
+        excerpt: m.title ?? '',
+        image:   m.source_url ?? '/images/hero-bg.png',
+        label:   m.alt_text ?? '',
+        ctaText,
+        ctaUrl: urlLine,
+        note:    '',
+      };
+    });
+
+    return slides;
   } catch {
     return HERO_FALLBACK;
   }
