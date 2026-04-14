@@ -4,6 +4,7 @@ import React from 'react';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useCart } from "@/context/CartContext";
+import Image from "next/image";
 import ProductImage from "@/components/common/ProductImage";
 import Link from "next/link";
 
@@ -65,8 +66,8 @@ export default function CartPage() {
                       <div className="hidden lg:grid grid-cols-12 gap-6 items-center">
                         <div className="col-span-6 flex items-center space-x-4">
                           <div className="relative w-24 aspect-square bg-white border border-gray-100 p-2 overflow-hidden">
-                            <Image 
-                              src={item.product.images?.[0]?.src || item.product.image_url || "/placeholder.png"}
+                            <ProductImage 
+                              src={item.product.images?.[0]?.src || item.product.image_url || "/images/placeholder-imbra.png"}
                               alt={item.product.name}
                               fill
                               className="object-contain"
@@ -117,8 +118,8 @@ export default function CartPage() {
                       <div className="lg:hidden">
                         <div className="flex gap-4">
                           <div className="relative w-24 h-24 flex-shrink-0 bg-white border border-gray-100 p-2">
-                            <Image 
-                              src={item.product.images?.[0]?.src || item.product.image_url || "/placeholder.png"}
+                            <ProductImage 
+                              src={item.product.images?.[0]?.src || item.product.image_url || "/images/placeholder-imbra.png"}
                               alt={item.product.name}
                               fill
                               className="object-contain"

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getProductsByCategory, getFeaturedProducts, getRecentProducts } from "@/lib/woocommerce";
 import { Product } from "@/types/product";
 import ProductImage from "@/components/common/ProductImage";
