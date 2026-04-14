@@ -37,6 +37,18 @@ export default function CheckoutForm() {
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
+  // --- ESTADO DEL CUPON ---
+  const [couponCode, setCouponCode] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discount_type: 'fixed_cart' | 'percent' | 'fixed_product';
+    amount: number;
+    description: string;
+    free_shipping: boolean;
+  } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
   // --- LÓGICA DE ENVÍO SIMULADO ---
   const [shippingCost, setShippingCost] = useState<number | null>(null);
 
@@ -134,6 +146,104 @@ export default function CheckoutForm() {
       }
     }
   }, [formData.cityCode, formData.stateCode, totalPrice]);
+
+  // --- CALCULO DEL DESCUENTO DEL CUPON ---
+  const calcularDescuento = useCallback((): number => {
+    if (!appliedCoupon) return 0;
+    switch (appliedCoupon.discount_type) {
+      case 'fixed_cart':
+        // Descuento fijo en el carrito — no puede exceder el subtotal
+        return Math.min(appliedCoupon.amount, totalPrice);
+      case 'percent':
+        // Descuento porcentual
+        return Math.round(totalPrice * (appliedCoupon.amount / 100));
+      case 'fixed_product':
+        // Descuento fijo por unidad de producto
+        const totalUnidades = items.reduce((sum, item) => sum + item.quantity, 0);
+        return Math.min(appliedCoupon.amount * totalUnidades, totalPrice);
+      default:
+        return 0;
+    }
+  }, [appliedCoupon, totalPrice, items]);
+
+  const discountAmount = calcularDescuento();
+  const effectiveShippingCost = (appliedCoupon?.free_shipping) ? 0 : (shippingCost || 0);
+  const totalFinal = totalPrice - discountAmount + effectiveShippingCost;
+
+  // --- FUNCION PARA VALIDAR CUPON ---
+  const handleApplyCoupon = useCallback(async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Escribe un codigo de cupon para aplicarlo.');
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponError(null);
+
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: couponCode.trim(),
+          subtotal: totalPrice,
+          productIds: items.map(i => i.product.id),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.valid) {
+        setAppliedCoupon({
+          code: data.code,
+          discount_type: data.discount_type,
+          amount: data.amount,
+          description: data.description,
+          free_shipping: data.free_shipping,
+        });
+        setCouponError(null);
+        setCouponCode('');
+        // Persistir en sessionStorage
+        sessionStorage.setItem('imbra_coupon', JSON.stringify(data));
+      } else {
+        setCouponError(data.error || 'Cupon no valido.');
+        setAppliedCoupon(null);
+      }
+    } catch {
+      setCouponError('Error de conexion. Intenta de nuevo.');
+    } finally {
+      setCouponLoading(false);
+    }
+  }, [couponCode, totalPrice, items]);
+
+  // --- FUNCION PARA QUITAR CUPON ---
+  const handleRemoveCoupon = useCallback(() => {
+    setAppliedCoupon(null);
+    setCouponError(null);
+    setCouponCode('');
+    sessionStorage.removeItem('imbra_coupon');
+  }, []);
+
+  // Recuperar cupon persistido al montar
+  useEffect(() => {
+    const saved = sessionStorage.getItem('imbra_coupon');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.valid && parsed.code) {
+          setAppliedCoupon({
+            code: parsed.code,
+            discount_type: parsed.discount_type,
+            amount: parsed.amount,
+            description: parsed.description || '',
+            free_shipping: parsed.free_shipping || false,
+          });
+        }
+      } catch (e) {
+        console.error('Error recuperando cupon persistido:', e);
+      }
+    }
+  }, []);
 
   // Ciudades filtradas por busqueda
   const ciudadesFiltradas = ciudades.filter(c =>
@@ -319,9 +429,7 @@ export default function CheckoutForm() {
       }
 
       // PASO 2: Crear la orden en WooCommerce con estado "pending"
-      const currentShippingCost = shippingCost || 0;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const totalToPay = totalPrice + currentShippingCost;
+      const currentShippingCost = effectiveShippingCost;
 
       // Líneas de envío para WooCommerce
       const shipping_lines = currentShippingCost === 0
@@ -364,6 +472,7 @@ export default function CheckoutForm() {
           { key: 'billing_state_code', value: String(formData.stateCode) },
         ],
         shipping_lines,
+        coupon_lines: appliedCoupon ? [{ code: appliedCoupon.code }] : [],
       };
 
       // PASO 2: Crear la orden en WooCommerce SIN TIMEOUT FALSOS.
@@ -382,14 +491,17 @@ export default function CheckoutForm() {
       }
 
       const realOrderId = orderData.orderId;
+      // Usar el total calculado por WooCommerce (con cupon aplicado) como fuente de verdad
+      const wcTotal = parseFloat(orderData.total) || totalFinal;
 
       // PASO 3: Lanzar PlacetoPay con la referencia DEFINITIVA y REAL
+      // Usamos wcTotal (devuelto por WooCommerce) para garantizar que PTP y WC coincidan
       const ptpResult = await initiatePayment({
         reference: String(realOrderId),
         description: `Pedido Imbra Repuestos #${realOrderId}`,
         amount: {
           currency: 'COP',
-          total: totalToPay,
+          total: wcTotal,
         },
         buyer: {
           name: formData.firstName,
@@ -703,6 +815,107 @@ export default function CheckoutForm() {
 
       {/* Columna resumen y boton de pago */}
       <div className="bg-gray-50 p-4 sm:p-8 border border-gray-200">
+
+        {/* --- SECCION CUPON (ARRIBA DEL RESUMEN) --- */}
+        <div className="mb-6">
+          <div className="bg-white border border-dashed border-gray-300 p-5">
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] mb-3 flex items-center gap-2">
+              <span className="material-icons text-primary text-base">sell</span>
+              TIENES UN CUPON DE DESCUENTO?
+            </p>
+
+            {!appliedCoupon ? (
+              <>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value.toUpperCase());
+                      if (couponError) setCouponError(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleApplyCoupon();
+                      }
+                    }}
+                    placeholder="Ej: DINO15"
+                    disabled={couponLoading}
+                    className="flex-1 bg-gray-50 border border-gray-200 p-3 text-sm font-bold text-secondary uppercase tracking-wider outline-none focus:border-primary transition-colors placeholder:text-gray-300 placeholder:font-normal disabled:opacity-50"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading || !couponCode.trim()}
+                    className={`px-5 py-3 font-Archivo font-black text-xs uppercase tracking-widest transition-all
+                      ${couponLoading
+                        ? 'bg-gray-200 text-gray-400 cursor-wait'
+                        : !couponCode.trim()
+                          ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                          : 'bg-secondary text-white hover:bg-primary hover:text-secondary'
+                      }`}
+                  >
+                    {couponLoading ? (
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
+                        VALIDANDO
+                      </span>
+                    ) : 'APLICAR'}
+                  </button>
+                </div>
+
+                {/* Mensaje de error — copy creativo */}
+                {couponError && (
+                  <div className="mt-3 bg-red-50 border border-red-200 p-3 flex items-start gap-2.5 animate-in fade-in slide-in-from-top-1">
+                    <span className="material-icons text-red-500 text-lg mt-0.5 shrink-0">warning</span>
+                    <div>
+                      <p className="text-[11px] font-black text-red-600 uppercase tracking-wide">
+                        Pilas! Algo no cuadra
+                      </p>
+                      <p className="text-[11px] font-bold text-red-500 mt-0.5">
+                        {couponError}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Cupon aplicado exitosamente — copy celebratorio */
+              <div className="bg-green-50 border border-green-200 p-4 animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <span className="material-icons text-green-500 text-2xl mt-0.5">celebration</span>
+                    <div>
+                      <p className="text-[12px] font-black text-green-700 uppercase tracking-wide">
+                        Felicidades! Tu descuento esta activo
+                      </p>
+                      <p className="text-[11px] font-bold text-green-600 mt-1">
+                        Cupon <span className="bg-green-100 px-1.5 py-0.5 rounded text-green-800 font-black">{appliedCoupon.code.toUpperCase()}</span> aplicado correctamente.
+                      </p>
+                      <p className="text-[14px] font-black text-green-700 mt-2 font-Archivo">
+                        {appliedCoupon.discount_type === 'percent'
+                          ? `Descuento del ${appliedCoupon.amount}% = -$${discountAmount.toLocaleString('es-CO')}`
+                          : `-$${discountAmount.toLocaleString('es-CO')} de descuento`
+                        }
+                        {appliedCoupon.free_shipping ? ' + Envio Gratis' : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-gray-400 hover:text-red-500 transition-colors shrink-0 ml-2"
+                    title="Quitar cupon"
+                  >
+                    <span className="material-icons text-lg">close</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         <h3 className="font-Archivo font-black text-secondary uppercase tracking-widest mb-8 text-center border-b-4 border-primary pb-4">
           RESUMEN FINAL
         </h3>
@@ -728,20 +941,32 @@ export default function CheckoutForm() {
             <span className="font-bold text-gray-400 uppercase">SUBTOTAL</span>
             <span className="font-bold text-secondary">${totalPrice.toLocaleString('es-CO')}</span>
           </div>
+
+          {/* Linea de descuento del cupon */}
+          {appliedCoupon && discountAmount > 0 && (
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-bold text-green-600 uppercase flex items-center gap-1">
+                <span className="material-icons text-xs">sell</span>
+                CUPON {appliedCoupon.code.toUpperCase()}
+              </span>
+              <span className="font-black text-green-600">-${discountAmount.toLocaleString('es-CO')}</span>
+            </div>
+          )}
+
           <div className="flex justify-between items-center text-xs">
             <span className="font-bold text-gray-400 uppercase">ENVIO A {formData.city || '...'}</span>
-            <span className={`font-bold uppercase ${shippingCost === 0 ? 'text-green-500' : 'text-secondary'}`}>
-              {shippingCost === null 
+            <span className={`font-bold uppercase ${effectiveShippingCost === 0 && (shippingCost !== null || appliedCoupon?.free_shipping) ? 'text-green-500' : 'text-secondary'}`}>
+              {shippingCost === null && !appliedCoupon?.free_shipping
                 ? <span className="text-gray-400 italic">POR CALCULAR</span> 
-                : shippingCost === 0 
+                : effectiveShippingCost === 0 
                   ? 'GRATIS' 
-                  : `$${shippingCost.toLocaleString('es-CO')}`}
+                  : `$${effectiveShippingCost.toLocaleString('es-CO')}`}
             </span>
           </div>
           <div className="pt-4 border-t border-gray-200 flex justify-between items-end">
             <span className="font-Archivo font-black text-secondary text-lg uppercase leading-none">TOTAL A PAGAR</span>
             <span className="text-3xl font-Archivo font-black text-primary leading-none">
-              ${(totalPrice + (shippingCost || 0)).toLocaleString('es-CO')}
+              ${totalFinal.toLocaleString('es-CO')}
             </span>
           </div>
         </div>
