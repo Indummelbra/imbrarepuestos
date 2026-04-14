@@ -316,8 +316,8 @@ export default async function ProductPage({ params }: PageProps) {
                 {/* Medios de pago */}
                 <div className="mb-5">
                   <img
-                    src="https://mkt.imbrarepuestos.com/wp-content/uploads/2026/03/Medios_de_Pago_Imbra_Store_Nuevo.webp"
-                    alt="Medios de pago aceptados en Imbra Store"
+                    src="https://static.placetopay.com/placetopay-logo.svg"
+                    alt="PlacetoPay - Medios de Pago"
                     className="w-full max-w-xs h-auto object-contain"
                   />
                 </div>
