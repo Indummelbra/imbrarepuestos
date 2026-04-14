@@ -7,6 +7,7 @@ import { WOO_CATEGORIES } from "@/lib/woo-categories";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useCart } from "@/context/CartContext";
 import { ShoppingCart } from "lucide-react";
+import ProductImage from "@/components/common/ProductImage";
 
 /** IDs de grupos destacados que aparecen en esta sección */
 const FEATURED_GROUPS = ["frenos", "motor", "suspension"];
@@ -39,18 +40,6 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-function ProductImage({ src, alt }: { src: string; alt: string }) {
-  const [imgSrc, setImgSrc] = useState(src || "/images/placeholder.png");
-  return (
-    <Image
-      src={imgSrc}
-      alt={alt}
-      fill
-      className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-      onError={() => setImgSrc("/images/placeholder.png")}
-    />
-  );
-}
 
 function CategoryRow({ group, products }: CategoryRowProps) {
   const { addItem } = useCart();
@@ -224,7 +213,12 @@ function CategoryRow({ group, products }: CategoryRowProps) {
                       className="group bg-white flex flex-col w-[150px] sm:w-[175px] flex-shrink-0 overflow-hidden hover:z-10 border border-gray-100"
                     >
                       <div className="relative w-full aspect-square bg-white overflow-hidden border-b border-gray-100">
-                        <ProductImage src={img} alt={product.name} />
+                        <ProductImage 
+                          src={img} 
+                          alt={product.name} 
+                          fill
+                          className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                        />
                         {product.on_sale && !isDuplicate && product.regular_price && product.regular_price > price && (
                           <span className="absolute top-2 left-2 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5">
                             -{Math.round((1 - price / product.regular_price) * 100)}% OFF

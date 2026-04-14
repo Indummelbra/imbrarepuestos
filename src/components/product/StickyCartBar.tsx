@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { Product } from "@/types/product";
 import { ShoppingBag } from "lucide-react";
+import ProductImage from "../common/ProductImage";
 
 interface StickyCartBarProps {
   product: Product;
@@ -54,7 +54,7 @@ export default function StickyCartBar({ product }: StickyCartBarProps) {
           {/* Lado Izquierdo: Info de Producto */}
           <div className="flex items-center gap-4 flex-1 min-w-0 pr-4">
             <div className="w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-md shrink-0 border border-gray-700 overflow-hidden relative hidden sm:block">
-              <Image 
+              <ProductImage 
                 src={imageSrc} 
                 alt={product.name} 
                 fill 

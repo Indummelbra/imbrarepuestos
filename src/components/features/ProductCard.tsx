@@ -1,16 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
 import { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
+import ProductImage from "../common/ProductImage";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rawImage = product.images?.[0]?.src || (product as any).image_url || "";
-  const [imgSrc, setImgSrc] = useState(rawImage || "/images/placeholder.svg");
+  const imgSrc = product.images?.[0]?.src || (product as any).image_url || "/images/placeholder-imbra.png";
   const price = parseFloat(product.price);
 
   return (
@@ -18,13 +16,12 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* Imagen — ocupa la mayor parte de la card */}
       <Link href={`/product/${product.slug}`} className="relative block overflow-hidden bg-white" style={{ aspectRatio: "1 / 1" }}>
-        <Image
+        <ProductImage
           src={imgSrc}
           alt={product.name}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-contain p-5 group-hover:scale-105 transition-transform duration-500"
-          onError={() => setImgSrc("/images/placeholder.svg")}
         />
 
         {/* Badge % descuento */}

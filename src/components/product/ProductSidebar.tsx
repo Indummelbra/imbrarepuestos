@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getRecentProducts } from "@/lib/woocommerce";
+import ProductImage from "@/components/common/ProductImage";
 
 /**
  * Sidebar izquierdo de la página de producto.
@@ -31,12 +32,11 @@ export default async function ProductSidebar() {
             >
               {/* Miniatura */}
               <div className="relative w-14 h-14 shrink-0 bg-white border border-gray-100 overflow-hidden">
-                <Image
-                  src={producto.images[0]?.src || "/placeholder.png"}
+                <ProductImage
+                  src={producto.images[0]?.src || "/images/placeholder-imbra.png"}
                   alt={producto.images[0]?.alt || producto.name}
                   fill
                   className="object-contain p-1 group-hover:scale-105 transition-transform duration-300"
-                  unoptimized={producto.images[0]?.src?.includes(".svg")}
                 />
               </div>
 

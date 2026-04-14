@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { searchProductsAdvanced, SearchResult } from '@/app/actions/search-actions';
 import Link from 'next/link';
-import Image from 'next/image';
+import ProductImage from '../common/ProductImage';
 
 export default function LiveSearch() {
   const [query, setQuery] = useState('');
@@ -92,8 +92,8 @@ export default function LiveSearch() {
                   className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all group"
                 >
                   <div className="h-16 w-16 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shrink-0 border border-gray-100 dark:border-gray-700 relative">
-                    <Image
-                      src={product.image_url || 'https://via.placeholder.com/150'}
+                    <ProductImage
+                      src={product.image_url || '/images/placeholder-imbra.png'}
                       alt={product.name}
                       fill
                       className="object-contain p-1 group-hover:scale-110 transition-transform duration-500"

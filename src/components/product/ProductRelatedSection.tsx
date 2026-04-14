@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getProductsByCategory, getFeaturedProducts, getRecentProducts } from "@/lib/woocommerce";
 import { Product } from "@/types/product";
+import ProductImage from "@/components/common/ProductImage";
 
 interface Props {
   categoriaSlug: string;
@@ -31,12 +32,11 @@ function ProductMiniCard({ product }: { product: Product }) {
         className="relative block overflow-hidden bg-white"
         style={{ aspectRatio: "1 / 1" }}
       >
-        <Image
-          src={product.images[0]?.src || "/placeholder.png"}
+        <ProductImage
+          src={product.images[0]?.src || "/images/placeholder-imbra.png"}
           alt={product.name}
           fill
           className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-          unoptimized
         />
 
         {/* Badge descuento — esquina superior izquierda */}

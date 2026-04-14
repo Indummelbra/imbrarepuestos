@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ZoomIn } from "lucide-react";
+import ProductImage from "@/components/common/ProductImage";
 
 interface ProductGalleryProps {
   images: { src: string; alt: string }[];
@@ -24,6 +25,7 @@ export default function ProductGallery({
   const [imagenActiva, setImagenActiva] = useState(0);
   const [zoomActivo, setZoomActivo] = useState(false);
   const [posicionZoom, setPosicionZoom] = useState({ x: 50, y: 50 });
+  const imagenActual = images[imagenActiva] || { src: "/images/placeholder-imbra.png", alt: productName };
 
   /* Manejo del efecto lupa al mover el mouse sobre la imagen */
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -32,8 +34,6 @@ export default function ProductGallery({
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setPosicionZoom({ x, y });
   };
-
-  const imagenActual = images[imagenActiva] || { src: "/placeholder.png", alt: productName };
 
   return (
     <div className="flex flex-col gap-4">
@@ -44,7 +44,7 @@ export default function ProductGallery({
         onMouseLeave={() => setZoomActivo(false)}
         onMouseMove={handleMouseMove}
       >
-        <Image
+        <ProductImage
           src={imagenActual.src}
           alt={imagenActual.alt || productName}
           fill
@@ -58,7 +58,6 @@ export default function ProductGallery({
                 }
               : {}
           }
-          unoptimized={imagenActual.src.includes(".svg")}
         />
 
         {/* Badge de descuento */}
@@ -95,12 +94,11 @@ export default function ProductGallery({
               ].join(" ")}
               aria-label={`Ver imagen ${i + 1}`}
             >
-              <Image
+              <ProductImage
                 src={img.src}
                 alt={img.alt || productName}
                 fill
                 className="object-contain p-1"
-                unoptimized={img.src.includes(".svg")}
               />
             </button>
           ))}
