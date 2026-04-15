@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { getFeaturedProductsForCarousel } from "@/app/actions/vehicle-actions";
+import ProductImage from "@/components/common/ProductImage";
 import { Heart, ChevronLeft, ChevronRight, Star } from "lucide-react";
 
 interface FeaturedProduct {
@@ -126,9 +127,10 @@ export function FeaturedCarousel({ onClose }: { onClose: () => void }) {
           >
             <Heart size={16} fill={liked.has(product.id) ? "currentColor" : "none"} />
           </button>
-          <img
+          <ProductImage
             src={product.image_url!}
             alt={product.name}
+            fill
             className="max-h-[185px] max-w-full object-contain group-hover/card:scale-105 transition-transform duration-500"
           />
         </div>

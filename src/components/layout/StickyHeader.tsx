@@ -368,11 +368,11 @@ export default function StickyHeader({
 
             {/* Pagar */}
             <a
-              href="https://imbrarepuestos.com/pagos/"
+              href="https://pgo.imbrarepuestos.com/"
               target="_blank" rel="noopener noreferrer"
               className="hidden xl:block text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-secondary text-white border border-secondary hover:bg-white hover:text-secondary transition-colors"
             >
-              Pagos B2B
+              Paga tus facturas B2B aqui
             </a>
 
             {/* Imbra Web */}
