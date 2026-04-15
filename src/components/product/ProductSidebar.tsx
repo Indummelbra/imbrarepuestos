@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getRecentProducts } from "@/lib/woocommerce";
-import ProductImage from "@/components/ui/ProductImage";
+import ProductImage from "@/components/common/ProductImage";
 
 /**
  * Sidebar izquierdo de la página de producto.

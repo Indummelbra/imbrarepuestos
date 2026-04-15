@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getProductsByCategory, getFeaturedProducts, getRecentProducts } from "@/lib/woocommerce";
 import { Product } from "@/types/product";
-import ProductImage from "@/components/ui/ProductImage";
+import ProductImage from "@/components/common/ProductImage";
 
 interface Props {
   categoriaSlug: string;

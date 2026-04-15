@@ -5,7 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
-import ProductImage from "@/components/ui/ProductImage";
+import ProductImage from "@/components/common/ProductImage";
 import Link from "next/link";
 
 export default function CartPage() {
