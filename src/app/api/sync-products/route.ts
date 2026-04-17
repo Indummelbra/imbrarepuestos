@@ -3,6 +3,26 @@ export const dynamic = "force-dynamic";
 import { supabaseAdmin } from "@/lib/supabase";
 import { mapWooProductToImbra, WooProductRaw } from "@/lib/mappers";
 
+/**
+ * Calcula la prioridad de visualizacion del producto:
+ * 1 = con stock y con foto real
+ * 2 = con stock pero sin foto real
+ * 3 = sin stock
+ */
+function calcularPrioridad(imageUrl: string | null, stockStatus: string): number {
+  // Las imagenes SAP (movil.indummelbra.com) son fotos reales de los productos IMBRA
+  // Solo se considera sin foto cuando no hay URL o es el placeholder generico
+  const sinFoto =
+    !imageUrl ||
+    imageUrl.includes('/images/placeholder.png');
+
+  const tieneStock = stockStatus === 'instock';
+
+  if (tieneStock && !sinFoto) return 1;
+  if (tieneStock && sinFoto)  return 2;
+  return 3;
+}
+
 const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
 const WOOCOMMERCE_URL = (process.env.NEXT_PUBLIC_WORDPRESS_URL || '').replace(/\/$/, '');
@@ -53,6 +73,7 @@ export async function GET(request: Request) {
       const productRaw = p as WooProductRaw & { status?: string };
       const imbraProduct = mapWooProductToImbra(productRaw);
       const salePriceNum = parseFloat(imbraProduct.sale_price || "0");
+      const imageUrl = imbraProduct.images[0]?.src || null;
       return {
         id: imbraProduct.id,
         name: imbraProduct.name,
@@ -65,7 +86,7 @@ export async function GET(request: Request) {
         on_sale: imbraProduct.on_sale,
         description: imbraProduct.description,
         short_description: imbraProduct.short_description,
-        image_url: imbraProduct.images[0]?.src || null,
+        image_url: imageUrl,
         categories: imbraProduct.categories,
         stock_status: imbraProduct.stock_status,
         stock_quantity: imbraProduct.stock_quantity,
@@ -77,6 +98,7 @@ export async function GET(request: Request) {
         category_slug: imbraProduct.category_slug,
         cc_class: imbraProduct.cc_class ?? null,
         status: productRaw.status || 'publish',
+        display_priority: calcularPrioridad(imageUrl, imbraProduct.stock_status),
       };
     });
 

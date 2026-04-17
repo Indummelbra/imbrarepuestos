@@ -202,7 +202,8 @@ export async function searchByVehicle({
   }
 
   const { data, error } = await query
-    .order('name')
+    .order('display_priority', { ascending: true })
+    .order('name', { ascending: true })
     .limit(limit);
 
   if (error) {
@@ -377,7 +378,9 @@ export async function searchWithFilters({
   if (filters.priceMin != null) query = query.gte('price', filters.priceMin);
   if (filters.priceMax != null) query = query.lte('price', filters.priceMax);
 
-  // Ordenamiento
+  // Ordenamiento — display_priority siempre es el primer criterio:
+  // 1 = con stock y con foto, 2 = con stock sin foto, 3 = sin stock
+  query = query.order('display_priority', { ascending: true });
   switch (sortBy) {
     case 'price_asc':  query = query.order('price', { ascending: true }); break;
     case 'price_desc': query = query.order('price', { ascending: false }); break;
@@ -434,7 +437,8 @@ export async function getFeaturedProductsForCarousel() {
         .eq('stock_status', 'instock')
         .not('image_url', 'is', null)
         .gt('stock_quantity', 0)
-        .order('name')
+        .order('display_priority', { ascending: true })
+        .order('name', { ascending: true })
         .limit(24);
       if (error || !data) return [];
       return data;

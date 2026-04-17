@@ -3,6 +3,26 @@ export const dynamic = 'force-dynamic';
 import { supabaseAdmin } from '@/lib/supabase';
 import { mapWooProductToImbra, WooProductRaw } from '@/lib/mappers';
 
+/**
+ * Calcula la prioridad de visualizacion del producto:
+ * 1 = con stock y con foto real
+ * 2 = con stock pero sin foto real
+ * 3 = sin stock
+ */
+function calcularPrioridad(imageUrl: string | null, stockStatus: string): number {
+  // Las imagenes SAP (movil.indummelbra.com) son fotos reales de los productos IMBRA
+  // Solo se considera sin foto cuando no hay URL o es el placeholder generico
+  const sinFoto =
+    !imageUrl ||
+    imageUrl.includes('/images/placeholder.png');
+
+  const tieneStock = stockStatus === 'instock';
+
+  if (tieneStock && !sinFoto) return 1;
+  if (tieneStock && sinFoto)  return 2;
+  return 3;
+}
+
 const CONSUMER_KEY    = process.env.WC_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
 const WOOCOMMERCE_URL = (process.env.NEXT_PUBLIC_WORDPRESS_URL || '').replace(/\/$/, '');
@@ -70,30 +90,32 @@ export async function GET(request: NextRequest) {
     const raw = p as WooProductRaw & { status?: string };
     const product = mapWooProductToImbra(raw);
     const salePriceNum = parseFloat(product.sale_price || '0');
+    const imageUrl = product.images[0]?.src || null;
     return {
-      id:              product.id,
-      name:            product.name,
-      slug:            product.slug,
-      sku:             product.sku,
-      brand:           product.brand,
-      price:           parseFloat(product.price) || 0,
-      regular_price:   parseFloat(product.regular_price) || 0,
-      sale_price:      salePriceNum > 0 ? salePriceNum : null,
-      on_sale:         product.on_sale,
-      description:     product.description,
+      id:               product.id,
+      name:             product.name,
+      slug:             product.slug,
+      sku:              product.sku,
+      brand:            product.brand,
+      price:            parseFloat(product.price) || 0,
+      regular_price:    parseFloat(product.regular_price) || 0,
+      sale_price:       salePriceNum > 0 ? salePriceNum : null,
+      on_sale:          product.on_sale,
+      description:      product.description,
       short_description: product.short_description,
-      image_url:       product.images[0]?.src || null,
-      categories:      product.categories,
-      stock_status:    product.stock_status,
-      stock_quantity:  product.stock_quantity,
-      is_comprable:    product.is_comprable,
-      vehicle_brand:   product.vehicle_brand,
-      vehicle_model:   product.vehicle_model,
-      vehicle_years:   product.vehicle_years,
-      part_category:   product.part_category,
-      category_slug:   product.category_slug,
-      cc_class:        product.cc_class ?? null,
-      status:          raw.status || 'publish',
+      image_url:        imageUrl,
+      categories:       product.categories,
+      stock_status:     product.stock_status,
+      stock_quantity:   product.stock_quantity,
+      is_comprable:     product.is_comprable,
+      vehicle_brand:    product.vehicle_brand,
+      vehicle_model:    product.vehicle_model,
+      vehicle_years:    product.vehicle_years,
+      part_category:    product.part_category,
+      category_slug:    product.category_slug,
+      cc_class:         product.cc_class ?? null,
+      status:           raw.status || 'publish',
+      display_priority: calcularPrioridad(imageUrl, product.stock_status),
     };
   });
 
