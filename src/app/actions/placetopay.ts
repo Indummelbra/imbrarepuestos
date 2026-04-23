@@ -3,8 +3,12 @@
 import { createSession } from '@/lib/placetopay';
 import { PTPAmount, PTPBuyer } from '@/types/placetopay';
 
+// URL base del sitio — siempre debe ser la URL publica de produccion
+// NEXT_PUBLIC_SITE_URL evita que en desarrollo local apunte a un dominio incorrecto
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://imbrarepuestos.com';
+
 // returnUrl base hacia la pagina de resultado del checkout
-const RETURN_URL = process.env.NEXT_PUBLIC_RETURN_URL || 'https://store.imbra.cloud/checkout/resultado';
+const RETURN_URL = process.env.NEXT_PUBLIC_RETURN_URL || `${SITE_URL}/checkout/resultado`;
 
 interface InitiatePaymentParams {
   reference: string;
@@ -41,6 +45,9 @@ export async function initiatePayment(params: InitiatePaymentParams) {
       expiration: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       // La referencia va en la URL para identificar el pedido al regresar
       returnUrl: `${RETURN_URL}?reference=${reference}`,
+      // PlacetoPay envia confirmaciones de pago a este endpoint (arquitectura Headless)
+      // Flujo: PlacetoPay -> Next.js webhook -> WooCommerce API
+      notificationUrl: `${SITE_URL}/api/payments/placetopay/webhook`,
       ipAddress,
       userAgent,
     });
