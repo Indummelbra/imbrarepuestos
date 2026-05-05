@@ -51,6 +51,8 @@ export interface PTPCreateSessionRequest {
   payer?: PTPBuyer;
   expiration: string;
   returnUrl: string;
+  // URL a la que PlacetoPay envia notificaciones de confirmacion de pago (webhook)
+  notificationUrl?: string;
   ipAddress: string;
   userAgent: string;
 }
